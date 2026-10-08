@@ -2,8 +2,10 @@
 
 Concrete gotchas hit while building the viewer (`engine/viewer/`) for eight cities on three.js **0.186.1**
 (`WebGPURenderer`, WebGL 2 fallback, TSL node materials). Each: symptom → cause → fix, with the city where it
-showed. Code references are `engine/viewer/*.js`. For TSL basics use the `webgpu-threejs-tsl` skill; this file is
-only what bit us.
+showed. Code references are `engine/viewer/*.js`. For TSL basics see the three.js documentation
+([TSL](https://github.com/mrdoob/three.js/wiki/Three.js-Shading-Language), `WebGPURenderer` and the
+[webgpu examples](https://threejs.org/examples/?q=webgpu)), or a general TSL skill if your agent has one; this file
+is only what bit us.
 
 ## Shader graph
 
