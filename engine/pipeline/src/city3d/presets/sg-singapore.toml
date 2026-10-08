@@ -1,0 +1,100 @@
+# Region preset "sg-singapore": Singapore (M4, 6 Oct 2026), built on "china-south" (base below): every table of
+# china-south's (building kinds, roads, markings, trees, cars, shores, rooftop colours) holds here unless this file sets
+# it; [facade.styles] adds Singapore's styles to china-south's (which stay, for the landmark rows: fins, bands, lattice,
+# honeycomb, panel; glass's palette is Singapore's) and [facade.osm_style] is Singapore's own (replace). Building kinds
+# stay china-south's (04_buildings unchanged: Singapore's M2 kinds); Singapore's code (presets/sg_singapore/) reads the
+# facade style from the kind, the HDB flags lent by [sources.hdb] (residential, commercial, multistorey_carpark), the
+# URA subzone (Sentosa), OSM's tag and land use, and named buildings ([facade.singapore] named in city.toml).
+#
+# SINGAPORE'S FACADE STYLES (new names; the viewer's styles/sg-singapore.json and facade/patterns.js draw each):
+#   hdb        HDB slabs and point blocks: off-white and pale pastel render with bold accent paint (a top band, the run
+#              ends, a band every few floors: patterns.js paintBands), corridor-access slabs (one long face an open
+#              corridor behind a parapet at every floor: corridorAccess), a void deck (the open ground floor between
+#              columns, blocks over 20 m: voidDeck), air-conditioner ledges, 2.8 m floors
+#   carpark    HDB multi-storey car parks and other parking decks: plain concrete decks, open slots between parapets
+#   shophouse  shophouses (Chinatown, Kampong Glam, Little India, Boat Quay, Emerald Hill, River Valley's rows): 2-4
+#              storeys of 4 m, pastel facades, tall windows with louvred shutters, a five-foot way (the arcade along the
+#              street: piers, a shaded walkway, the shop inside, a signboard over it: fiveFootWay), a pitched clay-tile
+#              roof (roof_shapes)
+#   granite    the 1980s-90s CBD towers in polished granite (Republic Plaza, One Raffles Place, OCBC Centre, Six Battery
+#              Road, Prudential Tower): punched windows in a stone grid, window strips on some
+#   colonial   colonial civic buildings (the Padang's, the National Gallery, Victoria Theatre, the Fullerton, Raffles
+#              Hotel, CHIJMES, the Istana): white and cream render, tall windows, a cornice, columns at every bay
+#              (colonnade), clay-tile roofs on the low ones
+#   condo      private condominiums (River Valley, Tanjong Rhu, Robertson Quay, Keppel Bay, Orchard): white, grey and
+#              sand render, floor-to-ceiling glass, projecting balconies and white slab edges at every floor
+#              (balconySlabs); lower apartment blocks and hotels too
+#   villa      Sentosa's houses (Sentosa Cove) and pavilions: white render, big windows, flat roofs
+#   temple     (landmark rows) a Chinese temple's red pillared walls with dark screens between: the Buddha Tooth Relic Temple
+#   worship    (landmark rows) mosques' and Hindu temples' cream render, few tall windows: the Sultan Mosque, Sri Mariamman
+# Kept from china-south: glass (CBD curtain walls: blue-grey, green-grey, silver and grey; not light blue), commercial
+# (malls and podiums), civic (modern civic), factory (sheds, depots, the City Terminals), plain, and the landmark styles
+# (fins: One Raffles Quay, Guoco, Ocean Financial Centre, Asia Square; bands: UOB Plaza's octagons, MBFC, Capital
+# Tower, Singapore Land Tower; lattice, honeycomb, panel). residential and village are no longer assigned.
+#
+# Palettes: sampled by eye from Commons photos of the places (Tiong Bahru and Everton Park HDB blocks, Chinatown's
+# Pagoda Street, Kampong Glam's Arab Street, Emerald Hill, the Padang), pulled towards albedo (a sunlit photo's mid
+# tones are lighter than the wall's albedo).
+
+base = "china-south"
+replace = ["facade.osm_style"]
+
+[facade.styles.glass]       # CBD curtain walls: silver, blue-grey, green-grey, grey (critique.md: never light blue); M4 fix
+floor = 4.2                 # round 1 (critic: Raffles Place a black cluster): lighter, a third silver (coated: the viewer's glass)
+palette = ["#7d8f9a", "#8b9ca3", "#a9b2b7", "#6c7d88", "#86978f", "#9ea7ad", "#73878f", "#b4babd", "#7f8a91"]
+[facade.styles.fins]
+floor = 4.4
+palette = ["#8497a3", "#98a3a9", "#7a8c97"]
+[facade.styles.bands]       # aluminium spandrel bands (UOB Plaza's champagne-silver, MBFC's grey)
+floor = 4.2
+palette = ["#8f9ba6", "#a3a9ad", "#7f8e9b"]
+[facade.styles.hdb]         # off-white and pale pastels (HDB's repainting schemes), the accents in the viewer
+floor = 2.8
+palette = ["#ecebe4", "#e8e4d8", "#f0ede4", "#e2e4e0", "#e9dfcf", "#dfe3dc", "#e6dccd", "#ece6da", "#d9dcd8",
+    "#efe7d6", "#e3e0d6", "#e4d9c9"]
+[facade.styles.streamline]  # (M7) the Singapore Improvement Trust's 1930s-50s walk-up flats (Tiong Bahru): cream and white
+floor = 3.0                 # render, streamline horizontals (slab edges), no accent paint
+palette = ["#f1ead6", "#ede3c9", "#f4efe2", "#e9dfc6", "#f2ecdc"]
+[facade.styles.carpark]     # bare and painted concrete decks
+floor = 2.9
+palette = ["#c9c7c0", "#d6d3cb", "#bdbbb4", "#e0ddd5", "#cfc9bc"]
+[facade.styles.shophouse]   # Pagoda St / Arab St / Emerald Hill pastels: cream, mint, pink, peach, lilac, sea green,
+floor = 4.0                 # ochre, salmon, white; a pale teal and a grey-blue now and then (not light blue blocks)
+palette = ["#efe0a8", "#cfe5cf", "#f0cdc6", "#f4ecd8", "#f1d2b0", "#ddd0e8", "#b5d8c8", "#f2efe8", "#eebba5",
+    "#e6cb8a", "#a8d3cf", "#c6dbe8", "#e9c3cf", "#dbe7b8", "#f3e6c4"]    # M4 fix round 1: cleaner, lighter pastels
+[facade.styles.granite]     # Republic Plaza's grey granite, One Raffles Place's darker stone, warm grey and brown
+floor = 4.0
+palette = ["#9b9792", "#837e79", "#aca59c", "#77726e", "#a3988c", "#8c7a6e"]
+[facade.styles.colonial]    # white and cream render (the Padang's, Raffles Hotel, the Fullerton's pale granite)
+floor = 4.5
+palette = ["#f6f4ee", "#f2ede0", "#f5f4f0", "#efebe1", "#f6f1e7", "#ebe6d8"]   # M4 fix round 1: whiter
+[facade.styles.condo]       # white, grey and sand render, grey cladding
+floor = 3.2
+palette = ["#e9e8e3", "#dcdad4", "#cfccc4", "#e3dccf", "#c8c9c6", "#efece6", "#d8d0c2", "#bfc3c3", "#d3cbbd"]
+[facade.styles.temple]      # (M4 fix round 1) a Chinese temple's walls: red pillars and dark screens (the Buddha Tooth Relic
+floor = 4.5                 # Temple, a landmark row; its roofs a figure)
+palette = ["#8e2c22", "#962f24"]
+[facade.styles.worship]     # (M4 fix round 1) mosques' and Hindu temples' walls: cream and white render, few tall windows
+floor = 5.0                 # (the Sultan Mosque, Sri Mariamman Temple: landmark rows)
+palette = ["#efe6cf", "#f2ecdc", "#ece2c8"]
+[facade.styles.villa]       # white render, sand, timber-toned
+floor = 3.4
+palette = ["#f0eee8", "#e7e1d3", "#d9d5cc", "#e9e4da", "#cfc6b6"]
+
+[facade.osm_style]          # style = OSM building tags that set it (then the rules in presets/sg_singapore/)
+glass = ["office"]
+condo = ["apartments", "residential", "dormitory", "hotel"]
+shophouse = ["terrace", "shophouse"]
+villa = ["house", "detached", "semidetached_house", "bungalow", "villa", "pavilion"]
+carpark = ["parking", "garage", "garages", "carport"]
+factory = ["industrial", "warehouse", "factory", "manufacture", "shed", "hangar", "service"]
+commercial = ["commercial", "retail", "supermarket", "mall", "kiosk"]
+civic = ["school", "university", "college", "kindergarten", "hospital", "train_station", "civic", "government",
+    "public", "temple", "church", "mosque", "synagogue", "religious", "transportation", "stadium", "sports_hall",
+    "sports_centre", "museum", "fire_station", "grandstand"]
+
+[rooftops.parapet_t]        # parapet thickness per facade style (m); others rooftops.parapet_default
+village = 0.2
+glass = 0.3
+shophouse = 0.2
+hdb = 0.25

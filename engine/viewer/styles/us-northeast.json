@@ -1,0 +1,15 @@
+{
+  "notes": "New York's styles (us-northeast) on china-south: brownstone row houses, brick walk-ups (fire escapes, a stone base, shops on most), limestone offices and setback towers (window strips), the floodlit 'crowned' towers (stone by day), cast-iron lofts, Times Square's billboards, spires and masts, terracotta piers, floodlit statues.",
+  "base": "china-south",
+  "styles": {
+    "brownstone": { "bay": 2.1, "window": [0.27, 0.24, 0.86], "masonry": true, "mottle": "brick", "night": "home" },
+    "brick": { "bay": 1.9, "window": [0.25, 0.27, 0.83], "shops": 0.6, "shopsBy": "hash", "masonry": true, "mottle": "brick", "night": "home", "stoneBase": true, "fireEscape": true },
+    "stone": { "bay": 1.7, "window": [0.22, 0.2, 0.9], "masonry": true, "mottle": "stone", "cornice": { "colour": "light", "maxHeight": 100 }, "stoneBase": true, "windowStrips": true },
+    "crowned": { "extends": "stone" },
+    "castiron": { "bay": 3.2, "window": [0.1, 0.1, 0.94], "shops": "all", "masonry": true, "cornice": { "colour": "light" } },
+    "signs": { "bay": 1.5, "window": [0.03, 0.24, 0.995], "shops": "all", "billboards": true },
+    "spire": {},
+    "piers": { "bay": 1.5, "window": [null, 0.03, 0.995] },
+    "floodlit": {}
+  }
+}

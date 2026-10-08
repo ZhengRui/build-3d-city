@@ -1,0 +1,425 @@
+# Region preset "europe-west": Western Europe's old block cities, for Paris first, then London and Berlin.
+# Its code (building kinds, facade rules, rooftop programmes) is in presets/europe_west/; a city overrides any
+# of it in city.toml.
+#
+# PARTLY STILL NEW YORK'S: this file and presets/europe_west/ started (30 Sept 2026) as an exact copy of
+# "us-northeast" (Manhattan), so the engine runs end to end while Paris's own tables are researched. Paris's
+# milestones replace its tables one by one:
+#   M2 (building kinds): DONE (Paris M2) -- [buildings], [buildings.kinds], [buildings.osm_kind] and
+#      building_kind() in europe_west/__init__.py: haussmann, faubourg, interwar, hbm, postwar, modern, tower,
+#      house, civic, factory, shed, from APUR's and BD TOPO's fields, OSM tags, height and shape
+#   M4 (facade styles and roofs): DONE (Paris M4) -- [facade.styles] and [facade.osm_style], facade_styles()
+#      and roof_shapes() in europe_west/__init__.py: haussmann (limestone, iron balconies on the 2nd and 5th
+#      floors), faubourg and house (plaster, shutters), limestone (palaces), brickstone (Place des Vosges), hbm,
+#      postwar, modern, concretepanel, glass, civic, factory, shed; zinc mansards and pitched tile roofs from
+#      APUR's c_forme_toit and c_toiture_mat. No brownstone, cast iron or Times Square signs
+#   M6 (trees, cars, rooftops): street trees (London planes, horse chestnuts, limes, sophoras; Paris's
+#      census from opendata.paris.fr "Les arbres"), no yellow cabs or US box trucks (European hatchbacks,
+#      black/white taxis with a roof light, RATP buses, vans), European colour shares, kerbside parking and
+#      lane widths ([roads.parking_lanes], [roads.default_w], [markings.sidewalk_w], [markings.median_w]),
+#      rooftops: chimney pots in rows along the party walls, zinc roofs, skylights and dormers -- no wooden
+#      water tanks (europe_west/rooftops.py's PROGRAMME, [rooftops.named])
+#   also: white centre lines (city.json markings.centreColour), shores ("quay": the Seine's stone quays)
+
+[buildings]
+# canopies (the Gare du Nord's), ships and the Seine's houseboats, skybridges, sites still being built, containers, stairs down to the metro aren't blocks
+osm_skip = ["roof", "carport", "ship", "boat", "houseboat", "shelter", "bridge", "construction", "container", "static_caravan",
+    "subway_entrance", "entrance", "grandstand", "demolished", "abandoned", "ruins", "tent"]
+lift_parts = true           # the Grande Arche's roof, the Arc de Triomphe's arches, the line 6 viaduct's stations
+cantilever_code = -1        # no cantilever code in the region's layers
+split = { min_n = 2, cover = 0.7, ratio = 1.5 }    # official layers joining a tower and its podium (BD TOPO in places)
+reconcile = { sources = ["osm_height"], over = 20.0, share = 0.3, flat = 2.0, big = 5000.0 }
+# the landmark's height goes to the building near its point whose height is closest (La Défense's points lie on
+# the dalle beside the towers); part-built landmarks and monuments get no part above their listed height
+landmarks = { match = "best", radius = 40.0, cap = true }
+
+[buildings.kinds]           # europe_west/__init__.py building_kind()
+tower_h = 50.0              # a tower from here up, any period (Paris's IGH threshold is 50 m for housing)
+tower_form_h = 37.0         # ... and from here up where the source calls it a tower form (APUR c_tissu IGH, c_morpho 7)
+haussmann_min_h = 15.0      # 1850-1914 buildings from here up are Haussmann blocks, lower ones faubourg houses
+neighbours = 150.0          # m: grid cell whose dated buildings date an undated one
+# period codes -> a year in the period (APUR c_perconst: 1 before 1800, 2 1801-50, 3 1851-1914, 5 1915-39, 6 1940-67,
+# 7 1968-75, 8 1976-81, 9 1982-89, 10 1990-99, 11 2000-07, 12 2008 on; 99 undated)
+periods = { c_perconst = { 1 = 1750, 2 = 1830, 3 = 1880, 5 = 1927, 6 = 1955, 7 = 1971, 8 = 1978, 9 = 1985, 10 = 1995, 11 = 2003, 12 = 2012 } }
+# HBM (Habitations à bon marché, 1919-39): the brick rings on the fortifications' belt, within `ring` m of the
+# edge of the city (the districts whose names start with `city`)
+hbm = { years = [1919, 1939], ring = 800.0, min_h = 12.0, city = "Paris " }
+
+[buildings.osm_kind]        # OSM building tag -> kind; wins over the period and shape rules unless the height says tower
+industrial = "factory"
+warehouse = "factory"
+manufacture = "factory"
+factory = "factory"
+garages = "factory"
+parking = "factory"
+service = "factory"
+depot = "factory"
+hangar = "factory"
+garage = "shed"
+shed = "shed"
+hut = "shed"
+kiosk = "shed"
+toilets = "shed"
+greenhouse = "shed"
+house = "house"
+detached = "house"
+semidetached_house = "house"
+villa = "house"
+bungalow = "house"
+terrace = "house"
+school = "civic"
+university = "civic"
+college = "civic"
+kindergarten = "civic"
+hospital = "civic"
+government = "civic"
+public = "civic"
+civic = "civic"
+stadium = "civic"
+train_station = "civic"
+transportation = "civic"
+church = "civic"
+cathedral = "civic"
+chapel = "civic"
+basilica = "civic"
+synagogue = "civic"
+mosque = "civic"
+temple = "civic"
+monastery = "civic"
+religious = "civic"
+museum = "civic"
+library = "civic"
+fire_station = "civic"
+sports_hall = "civic"
+palace = "civic"
+castle = "civic"
+monument = "civic"
+triumphal_arch = "civic"
+townhall = "civic"
+theatre = "civic"
+
+# facade styles (Paris's since M4): floor = nominal floor-to-floor height (m; the shader fits a whole number of
+# floors to each building), palette = wall colours (glass: the glass tint), one picked per building. The order is
+# free (tiles.json lists the styles, facade.js finds them by name). Palettes: demos/paris/data/region_research.md
+# §5.2 (sampled from Commons photos and IGN orthophotos, pulled to albedo) and landmark_facades.md (NEW STYLES)
+[facade.styles.haussmann]   # 1850-1914 (and interwar stone) apartment blocks: Lutetian limestone, iron balconies on the 2nd and 5th floors, zinc mansards
+floor = 3.3                 # 3.28 m median per level 1851-1914 (APUR height / OSM levels)
+palette = ["#d6ccb6", "#cfc4ab", "#c8bca2", "#d9d0bc", "#c2b697", "#cbc2b0", "#d2c8b0", "#b8ad94", "#c8b48a",
+    "#e0d8c6", "#ccc9c1", "#bfb49e"]      # cream-honey, soot-grey, golden (unwashed), fresh ravalement
+[facade.styles.faubourg]    # before 1850 and low 19th-century houses: plastered rubble, casements and shutters
+floor = 3.0
+palette = ["#d9d3c3", "#cfc8b4", "#e0dccf", "#d8c6a2", "#dacda8", "#d6cdbf", "#c9c1ae", "#bfb6a3", "#cbbfa6",
+    "#b9b3a8", "#d4c7ad"]                # cream, off-white, pale ochre, pale grey; grey stone (Paris M10: the
+                                         # pink and the saturated ochre read as pink/lavender and orange walls in the centre)
+[facade.styles.house]       # small houses and villas (Montmartre, the 20e's cités, Neuilly): plaster and rubble stone
+floor = 2.9
+palette = ["#d9d3c3", "#e0dccf", "#dacda8", "#d6cdbf", "#b8b4ad", "#cfc8b4", "#a9a397", "#d8c6a2"]   # (M10: no pink, paler ochre)
+[facade.styles.limestone]   # monuments and palaces (landmark_facades.csv; the classical ensembles, [facade.zones]): cut stone, tall windows, deep cornice
+floor = 4.5
+palette = ["#d6ccb6", "#cfc4ab", "#c8bca2", "#d9d0bc", "#e0d8c6", "#cdbfa1", "#b3a78f", "#cfc4a8", "#c6bda9"]
+[facade.styles.concretepanel] # 1960s-70s precast towers and slabs (Italie 13, Olympiades, Front de Seine): piers and window strips
+floor = 2.9
+palette = ["#c1c4c8", "#b9b0a8", "#a9acb3", "#9d6550", "#858279", "#c9c5b8", "#98a1a2"]
+[facade.styles.brickstone]  # Louis XIII brick and stone (Place des Vosges, Place Dauphine): red brick, stone quoins and bands, slate
+floor = 3.6
+palette = ["#a5674e", "#9c7a64", "#a4694f", "#9a5f4a"]
+[facade.styles.hbm]         # 1919-39 social housing on the Maréchaux ring: brick with stone and concrete bands
+floor = 3.0
+palette = ["#9a5f4a", "#8b5140", "#a4694f", "#7c4a3c", "#b57a4e", "#917468", "#9c7a64"]
+[facade.styles.postwar]     # 1940-81 blocks and slabs under tower height: render and concrete, window bands, loggias
+floor = 3.0
+palette = ["#d4d0c6", "#c8c4b8", "#bdb8ad", "#e0ddd4", "#b9b6ae", "#a8a49c", "#cfc6b4", "#c8c9c8", "#d9cfbb"]
+[facade.styles.modern]      # since 1982: white render, zinc cladding and big windows (Batignolles, Paris Rive Gauche)
+floor = 3.1
+palette = ["#e6e3dc", "#d8d4cb", "#c9c6c0", "#b5b3ae", "#8f9396", "#d9d0bf", "#ece9e2", "#a9adaf"]
+[facade.styles.glass]       # curtain-wall towers (La Défense, Front de Seine, Montparnasse): muted blue-green and grey glass
+floor = 4.0
+palette = ["#597f8e", "#5f7680", "#6c7f86", "#4f646e", "#7d8a8e", "#56707c", "#8a9294", "#465a66", "#a0a8aa"]
+[facade.styles.civic]       # schools, churches, hospitals, stations, ministries
+floor = 4.2
+palette = ["#c9bfae", "#b8a88f", "#d4ccbd", "#cfc4ab", "#c6bda9"]
+[facade.styles.factory]     # workshops, warehouses, depots, big low halls
+floor = 4.6
+palette = ["#9a8f84", "#7f766c", "#a8a096", "#b5aca0", "#8c7a6a", "#a0674f"]
+[facade.styles.shed]        # courtyard sheds, kiosks, annexes: few windows
+floor = 3.0
+palette = ["#bdb6a8", "#a9a397", "#c8c0b0", "#9a958c", "#cfc8b4"]
+[facade.styles.plain]       # rooftop plant rooms and bulkheads: no windows
+floor = 0.0
+palette = ["#9a968e"]
+[facade.styles.spire]       # masts and spires (thin tower parts above the roof): steel
+floor = 0.0
+palette = ["#b8bcc0"]
+# landmark styles, set from demos/paris/data/landmark_facades.csv with the tint sampled from photos
+[facade.styles.stone]       # stone-clad towers (Cœur Défense, the Grande Arche): punched windows between piers
+floor = 3.8
+palette = ["#cbc5a6", "#e0ded8", "#b8ae9c"]
+[facade.styles.fins]        # glass between metal fins/piers
+floor = 4.1
+palette = ["#6d8290"]
+[facade.styles.bands]       # glass with horizontal spandrel bands
+floor = 4.0
+palette = ["#5e7084"]
+[facade.styles.piers]       # glass between wide piers (the Hyatt Regency Étoile)
+floor = 4.1
+palette = ["#3a3d4c"]
+[facade.styles.lattice]     # diamond steel lattice, glass/panel infill (the Louvre pyramid, the Centre Pompidou)
+floor = 5.0
+palette = ["#6a8090"]
+[facade.styles.panel]       # metal panel cladding (halls, the CNIT)
+floor = 5.0
+palette = ["#a9adb1"]
+[facade.styles.monument]    # palaces, the Opéra, churches, the Arc: cut stone, no housing grid; the landmark's variant picks arcade, palace, gothic or blank ashlar (facade.js)
+floor = 8.0
+palette = ["#d8ccb2"]
+[facade.styles.floodlit]    # statues and monuments: no windows, floodlit after dark
+floor = 0.0
+palette = ["#9c978d"]
+[facade.osm_style]          # style = OSM building tags that set it (the building kinds carry most tags already)
+factory = ["industrial", "warehouse", "factory", "manufacture", "hangar", "garages", "parking", "service", "depot"]
+modern = ["retail", "supermarket", "mall"]
+shed = ["kiosk", "shed", "hut", "toilets"]
+
+[markings.sidewalk_w]       # sidewalk width (m) each side (M5, region research 1.3): Haussmann boulevards 8 m (Bd Haussmann,
+                            # Sébastopol: 14 m roadway + 2 x 8 m), Bd Saint-Germain 6.5-7; ordinary streets 3-6 m
+trunk = 4.0
+primary = 6.5
+secondary = 5.0
+tertiary = 4.0
+residential = 3.5
+unclassified = 3.0
+living_street = 2.5
+[markings.median_w]         # planted median of a divided road (Park Avenue's and Broadway's malls, parkways)
+motorway = 2.0
+trunk = 2.0
+primary = 3.0
+secondary = 2.0
+
+[roads.parking_lanes]       # OSM lanes are moving lanes; a parking lane along each kerb comes on top (2.4 m each): Bd
+                            # Haussmann's lanes=3 gives 3 x 3.2 + 2 x 2.4 = 14.4 m, its measured roadway 14.0 m (region
+                            # research 1.3); only a share of the kerb is parked (cars.kerbside)
+primary = 2
+secondary = 2
+tertiary = 2
+residential = 2
+unclassified = 2
+living_street = 1
+[roads.default_w]           # kerb to kerb (m), parking lanes included, where neither width nor lanes are tagged
+# Paris (region research 1.3; lanes 3.2 m, [roads] lane_w; 1.8-2 m parking bays): Haussmann boulevards 14 m of
+# roadway between 8 m sidewalks (Bd Haussmann, Sébastopol, measured), the Champs-Élysées ~26-30 m (tagged lanes),
+# residential streets a lane and one parking lane (72 % are one-way), 10-15 m facade to facade. Checked against the
+# facade-to-facade gap (rays from the centre line to APUR's footprints every 25 m, central Paris, 23,544 samples):
+# untagged one-way residential ways (69 % of the residential samples) have a median gap of 12.3 m = 6 m of roadway
+# + 2 x 3.5 m sidewalks less 0.7; two-way residential 17.9 m (9 + 7 leaves 1.9); tertiary 19 m either way;
+# two-way primaries 39.7 m (the few untagged ones). The tagged ways measure right: Bd Haussmann 14.4 m in a 33.5 m
+# gap, Bd de Sébastopol 14.4 m in 30.0, Av. de l'Opéra 17.6 m in 30.0, Rue de Richelieu 8.0 m in 11.7
+motorway = [21, 10.5]       # the Périphérique: 2 x 3-4 lanes of 3.5 m and a shoulder
+trunk = [16, 9]
+primary = [14, 11]          # a Haussmann boulevard's roadway; one-way halves of divided avenues 3 lanes and a bay
+secondary = [12, 9]
+tertiary = [10, 7.5]        # two lanes and a parking lane each side; one-way: a lane with a bay on both kerbs
+residential = [9, 6]        # one-way: a lane and a parking lane (Rue du Bac 6 m in 12.9); two-way: two lanes, two bays
+unclassified = [7, 5.5]
+living_street = [5, 4.5]    # the Marais's and Montmartre's lanes, 10.7 m facade to facade
+road = [8, 6]
+service = [5, 4]
+pedestrian = [8, 8]
+link = [7, 6]
+
+[shores]
+coast_type = "quay"         # bulkheads and relieving platforms along both rivers (esplanades are revetments where tagged)
+# exposed mud only where the tide leaves it: tidal flats and salt marsh (natural=shoal is always under water,
+# inland marshes and swamps have no mud coast)
+mudflat = ["natural=mud", "wetland=tidalflat", "wetland=saltmarsh"]
+mudflat_min_area = 2500.0   # pocket marshes by the piers (Brooklyn Bridge Park) and scraps of flat keep their bulkhead
+
+[trees]
+none = ["leisure=pitch", "leisure=track", "leisure=stadium"]   # ballfields, Pier 40's turf
+[trees.green]               # OSM green tag -> class, first match wins
+"landuse=forest" = "forest"
+"natural=wood" = "forest"
+"leisure=nature_reserve" = "forest"
+"landuse=cemetery" = "park"              # park-like, lawns and old trees
+"leisure=park" = "park"
+"leisure=garden" = "park"
+"landuse=recreation_ground" = "park"
+"landuse=village_green" = "park"
+"landuse=orchard" = "orchard"
+"natural=scrub" = "scrub"
+"natural=heath" = "scrub"
+"landuse=grass" = "grass"
+"landuse=meadow" = "grass"
+"natural=grassland" = "grass"
+"landuse=farmland" = "grass"
+"leisure=golf_course" = "grass"
+[trees.street]
+default = "broadleaf"       # London plane, lime, horse chestnut, maple (Paris's inventory; cities with a census use its species)
+step = 7.5                  # Paris: 6-10 m on the boulevards (nearest neighbour median 6.3 m), 4.5-5.5 m on newer avenues
+row_offset = 1.0            # tree grates about a metre in from the kerb
+[trees.street.odds]         # no palms; flowering pears and cherries are only green in October
+major = []
+minor = []
+[trees.street.planted]      # the share of streets with trees: Haussmann boulevards and quais mostly, few old narrow streets
+major = 0.7
+minor = 0.45
+[trees.street.height]
+palm = [11, 16]
+flowering = [7, 10]
+broadleaf = {major = [10, 20], minor = [7, 15]}
+
+[cars]                      # Paris (demos/paris/data/region_research.md §2): the city's 2022 traffic counts, French cars
+oneway_both_sides = true    # both kerbs of a one-way street are parked where it is wide enough
+street_side_lots = "row"    # OSM's 3,300 street_side/lane parking polygons: one file along each, not a car park grid
+kerb_occupancy = 0.42       # paid bays are nearly full by day, but rows break for driveways, delivery and bike bays
+kerbside_major = true       # the boulevards and avenues keep parking along some stretches
+osm_parking = true          # parking:left/right/both tags (13 % of Paris's streets) decide the side where tagged
+maxspeed_factor = 0.85      # free flow a little under the posted limit (30 km/h city-wide, 50 on the axes)
+park_w = 2.0                # 1.8 m bays
+park_pitch = [4.9, 5.8]     # ~5.2 m of kerb per car
+moto_bays = 0.07            # 43,000 two-wheeler places against 118,000 car places: a bay of 3-5 now and then
+restricted_density = 0.45   # the Rue de Rivoli (motor_vehicle=destination;permit): buses, taxis, deliveries
+psv_density = 0.35          # bus-only ways (the Pont d'Iéna, bus=designated, motor_vehicle=no): buses and taxis
+# sedan, suv, taxi, van, bus, truck, lorry, moto: residents' cars, taxis, deliveries, buses, scooters
+restricted_mix = [8, 5, 30, 12, 14, 0, 0, 22]
+parked_mix = [48, 27, 3, 6, 0, 0, 0, 0]     # no trucks parked; two-wheelers in their own bays (moto_bays)
+# vehicle types: name, length, width, height (m)(, the viewer's model), in the viewer's order
+types = [
+    ["sedan", 4.10, 1.78, 1.47, "hatch"],     # Clio, 208, C3, Sandero: two-box hatchbacks
+    ["suv", 4.35, 1.83, 1.60, "crossover"],   # 2008, Captur, T-Roc; a few Model Y: small crossovers
+    ["taxi", 4.62, 1.80, 1.48, "taxi_paris"], # Prius, Corolla, Model 3: dark, the "TAXI PARISIEN" roof light
+    ["van", 4.60, 1.90, 1.85],                # Kangoo, Berlingo, Trafic
+    ["bus", 12.0, 2.55, 3.15, "bus_idfm"],    # Heuliez GX 337, Bluebus 12: IDFM silver with blue
+    ["truck", 7.5, 2.4, 3.3],                 # 12-19 t rigid delivery trucks
+    ["lorry", 12.0, 2.55, 3.8],               # (motorways only)
+    ["moto", 2.05, 0.75, 1.2],                # scooters (NMAX, TMAX, Vespa) and motorbikes, a rider when moving
+]
+[cars.link_speed]
+motorway = 16
+trunk = 11
+[cars.kerbside]             # chance a side of a street has a parked row (then OSM's tags where they say)
+# Paris has ~118,000 on-street car places (2024) on ~18 % of its kerb: the M6 odds (0.35-0.8, occupancy 0.85) put
+# 422,000 parked cars in the districts and margins, 3.6 x that; residential 0.45 and occupancy 0.6 still 227,000
+# (201k kerbside, 39k in car parks). Now residential 0.4 a side (about 64 % of the side streets with a row on at
+# least one kerb), the axes 0.2-0.3, occupancy 0.5 (+0.1 in busy areas; driveways, delivery and bike bays, gaps):
+# research's derived shares were residential 0.6, tertiary 0.5, secondary 0.35, primary 0.2
+# -> 193,000 parked (165k kerbside after 11k dropped on buildings and carriageways, 39k in surface car parks and bus
+# stations), the districts and their 1 km road margin. M6 fix: residential 0.33, tertiary 0.3, secondary 0.25,
+# occupancy 0.42, OSM's street_side polygons one file each (not a car park grid)
+primary = 0.2
+secondary = 0.25
+tertiary = 0.3
+residential = 0.33
+unclassified = 0.33
+living_street = 0.25
+road = 0.3
+service = 0.12
+# per road class: free-flow speed (m/s, where OSM has no maxspeed), mean gap front to front (m, per lane at
+# activity 1), queue factor at signalled junction ends, and the mix (sedan, suv, taxi, van, bus, truck, lorry,
+# moto). Paris 2022 (motor vehicles): cars 51 %, two-wheelers 18 %, vans 17.6 %, taxis 7 %, buses 2.5 %, heavy
+# trucks 3.3 %; buses and trucks only on the axes (the kerb lane), none on the small streets; artics only on the
+# motorways; the Périphérique (trunk) has as many two-wheelers as inside. M6 fix: the counts' "vans" are mostly
+# car-like light vans (Kangoo, Berlingo); drawn as the tall van model they read as a column of white boxes, so
+# about 9-12 % tall vans, the rest to hatchbacks and small SUVs; boulevards 1 vehicle per ~32 m of lane
+[cars.class]
+motorway = [20, 36, 0.8, [42, 26, 4, 12, 1, 5, 4, 6]]
+trunk = [13, 36, 0.5, [36, 21, 5, 16, 0.3, 3, 1, 18]]
+primary = [11, 32, 0.5, [34, 20, 10, 9, 4, 3, 0, 17]]
+secondary = [10, 34, 0.5, [36, 21, 8, 10, 2, 2, 0, 17]]
+tertiary = [8, 42, 0.45, [38, 21, 6, 11, 1, 0, 0, 17]]
+residential = [7, 60, 0.4, [38, 22, 5, 12, 0, 0, 0, 17]]
+unclassified = [7, 70, 0.4, [38, 22, 5, 12, 0, 0, 0, 17]]
+living_street = [4, 120, 0.5, [36, 20, 3, 18, 0, 0, 0, 15]]
+road = [7, 70, 0.4, [38, 22, 5, 12, 0, 0, 0, 17]]
+service = [5, 140, 0.5, [38, 20, 2, 20, 0, 0, 0, 12]]
+# colour palettes per type: [body, second colour ("": none), weight]. Europe 2023 new cars white 29 %, grey 21 %,
+# black 20 %, blue fourth; older cars in the street more silver, red and blue (region_research.md §2.5)
+[cars.palettes]
+sedan = [["#f0f0ee", "", 21], ["#16171a", "", 17], ["#8d9196", "", 15], ["#b4b8bb", "", 10], ["#4b4f55", "", 13],
+    ["#2c4a78", "", 6], ["#1d2a44", "", 3], ["#a32028", "", 5], ["#4e6a57", "", 2], ["#c9bb9f", "", 2],
+    ["#7f9bb5", "", 2], ["#6d4f3a", "", 1], ["#d9822b", "", 1], ["#e5e1d3", "", 2]]
+suv = [["#f0f0ee", "", 21], ["#16171a", "", 20], ["#8d9196", "", 16], ["#4b4f55", "", 16], ["#b4b8bb", "", 8],
+    ["#2c4a78", "", 7], ["#a32028", "", 5], ["#4e6a57", "", 3], ["#c9bb9f", "", 2], ["#6d4f3a", "", 2]]
+taxi = [["#101114", "#101114", 70], ["#f0f0ee", "#f0f0ee", 15], ["#8d9196", "#8d9196", 10], ["#1d2a44", "#1d2a44", 5]]
+van = [["#f0f0ee", "", 60], ["#ffcc00", "#ffcc00", 6], ["#8d9196", "", 10], ["#4b4f55", "", 5],
+    ["#2c4a78", "", 7], ["#16171a", "", 6], ["#a32028", "", 3], ["#c9bb9f", "", 3]]
+bus = [["#c9cdd0", "#2a7fb4", 100]]     # IDFM (2017-): vif-argent body, dark glazing band, blue-turquoise accents
+truck = [["#f0f0ee", "#f0f0ee", 60], ["#f0f0ee", "#b3282a", 8], ["#1b3f7a", "#f0f0ee", 8],
+    ["#8d9196", "#f0f0ee", 14], ["#16171a", "#f0f0ee", 10]]
+lorry = [["#e8e9e8", "#c9ccce", 40], ["#b3282a", "#c9ccce", 15], ["#2a5aa8", "#c9ccce", 15], ["#141518", "#c9ccce", 30]]
+# two-wheelers: body, rider's helmet (black, white, grey mostly)
+moto = [["#16171a", "#16171a", 22], ["#16171a", "#f0f0ee", 10], ["#4b4f55", "#16171a", 12], ["#f0f0ee", "#16171a", 12],
+    ["#f0f0ee", "#8d9196", 5], ["#8d9196", "#16171a", 10], ["#2c4a78", "#f0f0ee", 7], ["#a32028", "#16171a", 7],
+    ["#c9bb9f", "#4b4f55", 5], ["#4e6a57", "#16171a", 4], ["#d9822b", "#16171a", 3], ["#7f9bb5", "#f0f0ee", 3]]
+
+[rooftops.parapet_t]        # parapet thickness per facade style (m); others rooftops.parapet_default
+glass = 0.3
+postwar = 0.25              # (the flat roofs' acrotères; roofs with a shape get none, rooftops.js)
+concretepanel = 0.25
+modern = 0.25
+hbm = 0.25
+[rooftops.named]            # colours the programmes (presets/europe_west/rooftops.py) use, sRGB
+stainless = "#cdd1d3"
+stainless2 = "#b7bcbf"
+tank_blue = "#2d6db0"
+tank_blue2 = "#3f88c6"
+tank_white = "#e2e0d8"
+tank_beige = "#d6ccb4"
+tank_green = "#6f8f7a"
+shed_blue = "#4679ad"
+shed_blue2 = "#5588bb"
+shed_cyan = "#6c9fbf"
+shed_white = "#d9dbd8"
+shed_grey = "#9ba1a4"
+shed_red = "#a24a3c"
+shed_green = "#5f8f6f"
+tile_red = "#8c4c3a"
+tile_orange = "#a4674a"
+tile_green = "#4c7058"
+tile_grey = "#5c6166"
+tile_blue = "#4a6583"
+tile_yellow = "#a38a55"
+concrete = "#a9a59c"
+concrete_light = "#cbc7bd"
+concrete_dark = "#86827b"
+white_tile = "#dcdad3"
+hvac = "#cfcec6"
+hvac2 = "#aeb3b3"
+hvac3 = "#bdb7a6"
+cooling = "#8d9898"
+cooling2 = "#7c8f8a"
+cooling_blue = "#6b8fae"
+steel = "#9ea3a6"
+steel_white = "#dddcd7"
+steel_dark = "#4b4f53"
+pv = "#1e2b46"
+tubes = "#1c2330"
+glass = "#8fa6b4"
+green = "#5a753d"
+green2 = "#6c8746"
+foliage = "#3a4a2c"
+foliage2 = "#45542f"
+foliage3 = "#505c34"
+foliage4 = "#5a6238"
+helipad = "#4b5c53"
+helipad_grey = "#676c6e"
+asphalt = "#3d3f41"
+car_white = "#e6e6e3"
+car_silver = "#b6b9bc"
+car_black = "#1d1e21"
+car_grey = "#5e6267"
+car_red = "#8c2320"
+car_blue = "#27426f"
+car_champagne = "#c6b597"
+# Paris's roofs (demos/paris/data/region_research.md §4.2-4.3, refs/area-zinc-roofs): rendered chimney stacks
+# (white to cream plaster, soot-greyed), terracotta pots, zinc hatches and frames, Velux glass
+render = "#d8d1c2"          # plastered stacks, fresh
+render2 = "#c6bca9"         # weathered cream
+render3 = "#a9a295"         # soot-grey
+pot = "#b0643c"             # terracotta mitrons
+pot2 = "#9a5634"
+pot_dark = "#7e4a36"        # old, blackened
+zinc = "#9aa0a3"
+zinc_dark = "#6f7579"
+velux = "#2b3036"
+brick = "#8b5a45"
+brick_dark = "#6a4a3c"

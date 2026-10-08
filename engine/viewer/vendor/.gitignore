@@ -1,0 +1,3 @@
+# the vendored three.js keeps its examples/jsm/libs/ (the repository ignores libs/ folders elsewhere): without
+# meshopt_decoder.module.js a "three": "local" city stuck on its loading screen (London M9 round 2)
+!libs/

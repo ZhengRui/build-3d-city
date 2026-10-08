@@ -1,0 +1,12 @@
+[project]
+name = "london"
+version = "0.1.0"
+description = "London (the City, Westminster, the South Bank, Tower Hamlets west, the Isle of Dogs, Battersea, south Camden and Greenwich): city.toml for the build-3d-city engine"
+requires-python = ">=3.12"
+dependencies = ["city3d"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+city3d = { path = "../../.agents/skills/build-3d-city/engine/pipeline", editable = true }

@@ -1,0 +1,17 @@
+{
+  "notes": "Western Europe's styles (Paris) on us-northeast (whose stone, spire, piers and floodlit Paris's landmark rows use): Haussmann blocks, plastered faubourg houses and small houses with shutters, palaces in limestone, Louis XIII brick and stone, HBM brick, post-war render, precast panels, modern blocks, courtyard sheds, the monuments. Haussmann's rusticated base, balcony rows and guard rails, the faubourg's shutters, brick-and-stone's floor bands, surrounds and quoins, the panels' spandrels: core features (facade/core.js), drawn on the wall itself (no fade).",
+  "base": "us-northeast",
+  "styles": {
+    "haussmann": {"bay": 2.9, "window": [0.3, 0.08, 0.8], "shops": 0.85, "masonry": true, "mottle": "stone", "cornice": {"colour": "light"}, "night": "home", "roof": {"dormers": "every"}, "rustication": {"rows": 2, "groove": 0.45, "joint": 0.1, "depth": 0.3, "notShops": true}, "balconyRows": {"rows": [2, 5], "shadow": 0.4}, "guardRails": {"from": 2}},
+    "faubourg": {"bay": 2.5, "window": [0.31, 0.22, 0.8], "shops": 0.55, "masonry": true, "cornice": {"colour": "light"}, "night": "home", "shutters": true},
+    "house": {"bay": 2.5, "window": [0.3, 0.25, 0.78], "masonry": true, "cornice": {"colour": "light"}, "night": "home", "shutters": true},
+    "limestone": {"bay": 3.6, "window": [0.32, 0.2, 0.76], "masonry": true, "mottle": "stone", "cornice": {"colour": "light", "scale": 1.6}, "roof": {"dormers": "every"}, "guardRails": {"from": 2}},
+    "brickstone": {"bay": 3.0, "window": [0.31, 0.2, 0.8], "shops": 0.5, "masonry": true, "mottle": "brick", "cornice": {"colour": "light"}, "night": "home", "roof": {"dormers": "every", "metal": "slate"}, "floorBands": "stone", "surrounds": true, "quoins": true},
+    "hbm": {"bay": 2.6, "window": [0.28, 0.25, 0.82], "shops": 0.15, "masonry": true, "mottle": "brick", "cornice": {"colour": "light"}, "night": "home", "roof": {"flat": true}, "parapet": "low", "floorBands": "concrete"},
+    "postwar": {"bay": 3.1, "window": [0.2, 0.3, 0.84], "shops": 0.3, "balconies": true, "night": "home", "roof": {"flat": true}, "parapet": "low"},
+    "modern": {"bay": 3.4, "window": [0.13, 0.12, 0.9], "shops": 0.4, "balconies": true, "night": "home", "roof": {"flat": true}, "parapet": "low"},
+    "concretepanel": {"bay": 2.5, "window": [0.1, 0.4, 0.86], "night": "home", "roof": {"flat": true}, "parapet": "low", "panelSpandrels": true},
+    "shed": {"bay": 3.2, "window": [0.36, 0.42, 0.76]},
+    "monument": {"bay": 5.0, "monument": true}
+  }
+}

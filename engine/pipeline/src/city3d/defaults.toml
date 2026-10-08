@@ -1,0 +1,675 @@
+# The engine's defaults for every setting. A city's city.toml overrides them (tables key by key), with its
+# region preset (presets/<preset>.toml) in between. Keys marked "required" have no useful default. Numbers
+# keep their type: write 3.0, not 3, where a float is shown (some end up in JSON the viewer reads).
+
+name = ""                   # required: the city's short name: data folder demos/data/<name>, glb generator strings
+title = ""                  # a readable name for reports ("West Shenzhen"); defaults to name
+preset = "china-south"      # region preset (presets/<preset>.toml and presets/<preset>/): styles, species, cars, roofs
+utm_epsg = 0                # required: the metric CRS everything is computed in (a UTM zone: 326xx north, 327xx south)
+level_h = 3.2               # metres per storey (OSM building:levels, default heights, floors)
+coast = "auto"              # true: land from OSM's natural=coastline; false: inland, the whole area is land;
+                            # "auto": inland when the area has no coastline (05_ground) or no sea (05a_terrain)
+drive = "right"             # driving side, "right" or "left" (markings, cars)
+generator = "3D-Fun {name}" # glb asset.generator, followed by "<stage>.py"
+user_agent = "3D-Fun {name} reconstruction (hobby project)"   # sent to Overpass and downloads: set your own, with a contact
+overpass = [                # Overpass mirrors, tried in turn
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+]
+
+# required: the districts in the scene, name -> OSM relation id (select by id, never by name)
+[districts]
+
+[paths]                     # relative to the city folder (demos/<city>)
+data = "../data/{name}"     # downloads (raw/) and every product; git-ignored
+checks = "checks"           # reports and figures
+web = "web"                 # the viewer; data folders are linked into it (web/tiles -> ../../data/<name>/tiles)
+landmarks = "data/landmarks*.csv"               # hand-checked landmark heights (glob; columns name_zh, lat, lon, height_m, use_height)
+landmark_facades = "data/landmark_facades.csv"  # landmark facades (name, facade, tint, module, variant, profile)
+
+[sun]                       # read by the viewer; the pipeline uses the latitude's sign (solar panels face the equator)
+latitude = 0.0
+declination = 0.0           # the season shown (degrees)
+
+[sources]
+footprints = ["osm"]        # building footprint sources in order: "osm", then adapters (sources/): "gba", "eastasia",
+                            # "arcgis", or a name of your own with a [sources.<name>] adapter = "file" table (below)
+heights = ["landmark", "osm_height", "osm_levels", "default"]   # height sources by priority, see 04_buildings
+dem = "copernicus"          # the DEM adapter the terrain is estimated from: "copernicus" (global surface model),
+                            # "usgs3dep" (US bare earth, lidar), "ign" (France: LiDAR HD MNT + RGE ALTI), "geotiff" (local files)
+backdrop = ""               # the DEM adapter of the hills beyond the ground area ("": dem)
+
+[sources.gba]
+tile = ""                   # GBA 5-degree tile, e.g. "e110_n25_e115_n20"
+[sources.eastasia]
+url = "https://zenodo.org/records/8174931/files/East_Asian_buildings.zip?download=1"
+region = ""                 # the archive's path prefix, e.g. "China/Guangdong/Shenzhen"
+[sources.cnbh]
+file = ""                   # the CNBH-10m tile in raw/, e.g. "cnbh10m_X113Y23.tif"
+[sources.copernicus]
+tiles = []                  # e.g. ["N22_00_E113_00"]; empty: every Copernicus tile in raw/ (02_dem fetches
+                            # those the ground area and the backdrop reach)
+[sources.usgs3dep]
+cell = 10.0                 # metres per pixel fetched from the 3DEP image service (at most 8000 pixels a side)
+back_cell = 30.0            # ... for the backdrop (the ground area plus terrain.far_reach)
+[sources.ign]               # France's bare earth (sources/ign.py): raw rasters in raw/ (Lambert-93), fetched from the
+                            # Géoplateforme WMS-Raster when missing, warped to UTM and filled
+crs = "EPSG:2154"           # the raw rasters' CRS (and the WMS requests')
+ground = "dem/ign_lidarhd_mnt_1m.tif"      # LiDAR HD MNT, the ground
+fill = "dem/ign_rgealti_5m.tif"            # RGE ALTI, filling the lidar's voids and pits
+backdrop = "dem/ign_rgealti_25m.tif"       # RGE ALTI for the backdrop
+layers = { ground = "IGNF_LIDAR-HD_MNT_ELEVATION.ELEVATIONGRIDCOVERAGE.LAMB93", fill = "ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES", backdrop = "ELEVATION.ELEVATIONGRIDCOVERAGE.HIGHRES" }
+cells = { ground = 1.0, fill = 5.0, backdrop = 25.0 }   # metres per pixel fetched
+cell = 5.0                  # the prepared ground grid in UTM (m; 05a_terrain works on 10 m)
+pit_below = 15.0            # a lidar value under this (m) seeds a fill ...
+pit_diff = 8.0              # ... as does one under RGE ALTI by more than this (m) ...
+pit_grow = 1.5              # ... and all connected to a seed that is under RGE ALTI by more than this is filled
+unbake = 10.0               # structures the lidar's ground class kept (the Grande Arche, stadium roofs): a cell on a
+                            # building footprint this far (m) over both the fill (RGE ALTI) and the ground's opening
+                            # seeds a region ...
+unbake_grow = 2.0           # ... grown over the footprints (and 2 cells round them) while this far over the fill,
+                            # which replaces it; 0 turns it off
+unbake_open = 200.0         # the opening's window (m): wider than the largest structure (La Défense Arena, 140 m)
+[sources.geotiff]           # any local elevation GeoTIFF(s) as the DEM (sources/geotiff.py): read where they are, in
+                            # their own CRS (05a_terrain warps them onto its UTM grid); nothing is fetched
+ground = []                 # files in raw/ (or absolute) for the ground area, e.g. ["terrain/dtm_6m.tif"]
+backdrop = []               # files for the backdrop ([]: the ground's)
+bare = true                 # bare earth (a lidar DTM): 05a_terrain skips its building masking, opening and canopy
+                            # steps; false for a surface model (roofs and trees in it)
+note = ""                   # a line for checks/dem.md: the product, its datum and resolution
+# A footprint source read from a file (sources/file.py), e.g.:
+# [sources.apur]
+# adapter = "file"; path = "footprints/apur.geojson"; layer = ""; crs = ""; url = ""; role = "primary"
+# districts = [...]; height = "h_med" (a field or an expression); height_scale = 1.0; keep = []; rename = {}
+# drop = {}; label = ""
+[sources.arcgis]            # official footprints from an ArcGIS FeatureServer layer (sources/arcgis.py)
+url = ""                    # .../FeatureServer/<n>
+where = "1=1"               # SQL filter
+drop = {}                   # FIELD = [values] left out
+height = ""                 # roof height above ground field ("": no heights)
+height_scale = 1.0          # its unit in metres (feet: 0.3048)
+keep = []                   # fields copied into the table (lower-cased)
+join = {}                   # attributes of another layer joined on a key: {url, where, key, on, fields}
+
+[osm]                       # 01_osm
+area = true                 # districts' buildings by Overpass area(); false: by each district polygon's box, kept where
+                            # they meet it (a server without areas, e.g. a local one whose area dispatcher is down)
+underground_drop = false    # true: 01_osm also keeps the underground / level tags, and the building table drops outlines with
+                            # underground=yes, location=underground|indoor or a level entirely < 0 (malls, stations, passages),
+                            # besides the layer < 0 rule (load_osm; building:parts too); false: only layer < 0 / location=underground
+min_height = false          # true: 01_osm keeps min_height / building:min_level on buildings too, and a building with one is a
+                            # raised piece from there to its height (a deck on towers: MBS SkyPark, sky bridges), as a part is;
+                            # "decks": only deck-like ones (building=bridge, named bridge/deck/sky park, or half over two or
+                            # more buildings reaching its underside), the rest (towers over a podium ring) stand on the ground
+
+[buildings]                 # 04_buildings
+min_h = 3.5                 # heights are floored here (m)
+min_piece = 12              # footprints and clipped leftovers smaller than this are dropped (m²)
+default_floors = 3          # height of a building nothing knows about: this x level_h
+osm_max_area = 5000         # larger OSM polygons are estate outlines unless tagged or named as one building (m²)
+big_building_tags = ["terminal", "transportation", "train_station", "stadium", "sports_hall", "sports_centre",
+    "hangar", "industrial", "warehouse", "commercial", "retail", "office", "civic", "public", "government",
+    "hospital", "university", "college", "school", "hotel", "exhibition_centre", "conference_centre"]
+dup_share = 0.05            # a footprint overlapping one chosen before by this share is the same building
+align_cell = 2000           # "pieces" sources are aligned to OSM per cell of this size (m)
+osm_kind = {}               # OSM building tag -> kind (the preset's)
+parts = false               # build buildings mapped with OSM building:part outlines from their parts (01_osm
+                            # fetches them): setbacks, podiums and crowns of towers
+overhang_keep = 0.0         # > 0: a raised building:part lying this share or more inside the building holding most of it
+                            # stays with that building, however many of a neighbour's grounded parts it touches; 0: off
+lift_parts = false          # true: a raised building:part over its own footprint (min_height) keeps it where mapped parts
+                            # meet its underside (what is between them stays open) or it is no thicker than the gap
+                            # below it (roof slabs, arches, viaduct stations); false: only parts reaching out beyond
+                            # the footprint float (overhangs), the rest stand on the ground; "gaps": only a thin part over a
+                            # real gap in a low building (no part of it on the ground under it or up to its underside, the
+                            # building's own height known and below it, under half its footprint: sky bridges over a podium,
+                            # a stadium's roof rings), the building's body kept under it at its own height
+parts_fill_shafts = 0.0     # > 0: what a building's parts leave (part_rest), closed by its taller parts whose lowest is this x
+                            # its width or more, is a shaft (a tower's core), filled to that lowest part; 0: off
+osm_skip = []               # OSM building tags never extruded (e.g. "roof": canopies, "ship")
+split = {}                  # primary footprints over several OSM buildings replaced by them (see split_merged):
+                            # {min_n = 2, cover = 0.7, ratio = 1.5}; empty: off
+reconcile = { sources = [], over = 20.0, share = 0.3, flat = 2.0, big = 5000.0 }   # second-opinion height sources, see reconcile()
+# a height source giving each polygon its highest point (a lidar maximum: London's Carbon & Place): tops that are a
+# chimney, plant or a neighbouring tower's edge, lowered to OSM's height or levels, or to the polygon's mean height x
+# mean_scale (see despike(); needs the source's `mean`). sources = []: off
+spikes = { sources = [], over = 10.0, ratio = 1.5, roof = 3.0, mean_share = 0.5, mean_scale = 1.35, min_h = 30.0, near = 0.9, neighbour_share = 0.4, alone_ratio = 0.0, alone_mean = 6.0, alone_min_h = 30.0, body_tags = [], body_scale = 1.2, caps = {}, podium = {} }
+# (alone_ratio > 0: a top with no OSM height tag over alone_ratio x the mean, or over a mean under alone_mean m, from
+# alone_min_h m, is lowered too: OSM levels, else the mean x mean_scale (x body_scale for the body_tags: churches'
+# naves), else the default; caps: {osm building tag = m} highest height without an OSM height tag; podium: {area,
+# ratio, min_h}: big footprints whose top is over ratio x their mean split along the source's polygons, see
+# split_podiums())
+# a "fill" source's polygons that may become buildings where OSM has none (see fill_filter()): {min_area = 30,
+# min_h = 2.5, skip_tags = true, not_in = ["landuse=construction"]}; {}: all of them
+fill = {}
+exclude = {}                # footprints left out: {field = [values]} of a primary layer (buildings demolished since its
+                            # snapshot); {osm = ["w5013364", "r4114842"]}: OSM buildings and building:parts by id
+                            # (structures such as the Eiffel Tower, which a [[structures]] figure draws instead)
+exclude_inside = false      # true: OSM buildings and parts lying 80 % inside an outline exclude.osm leaves out go with it
+keep = {}                   # {osm = ["w791658610"]}: OSM buildings always built, whatever osm_skip says (a topped-out tower
+                            # still tagged construction) and never dropped as an estate outline (a station holding its
+                            # platform buildings); the OSM buildings inside one go as its duplicates. With a primary
+                            # source they are built over it too (a tower since the official layer's snapshot): its
+                            # footprints are clipped around them, and no fill_max_h applies
+rules = []                  # a primary source's footprints, first matching rule wins (see primary_rules()): tables
+                            # {action, label, source, field, values, prefix, h_below, h_from, area_below, area_from,
+                            # thick}; action "drop" (a canopy, a terrace at ground level), "keep" (kept whatever
+                            # min_piece and the 3 m strip rule say: a cadastre's small building parts), "exact"
+                            # (kept, and its own height, not floored at min_h: memorial stelae, a chimney) or "roof"
+                            # (kept as its roof: from `thick` m under its eave (eave_z - ground_elevation, else its
+                            # top) up to its top, raised over open ground: canopies, a station's hall roof); [] off
+parts_in = []               # with parts = true: OSM ids of the only buildings (outlines) whose building:parts are used
+                            # (parts 80 % inside them, or listed themselves); [] every part (a primary source with
+                            # parts of its own needs OSM's only for a few towers and monuments)
+part_outlines = 0.0         # > 0: an OSM building its building:parts cover by this share or more is one building at any
+                            # size and whatever it holds (part_outlines()); 0: off (outlines over osm_max_area go)
+container_inner = false     # true: a building inside an estate outline that goes is no duplicate of it (by default both go)
+station_untagged = ""       # "drop" | "<metres>": OSM building=train_station|transportation outlines of 150 m² or more with no
+                            # height and no levels are dropped (no fill source builds there), or set to that height (entrance
+                            # sheds), after every estimate and never fed to one; "" off
+surface_layers = false      # true: OSM buildings with a layer < 0 stay where tagged location=surface/overground/roof, or
+                            # untagged with a fill source's polygon covering half of them (surface_layers()); false: all
+                            # layer < 0 go (load_osm)
+water = {}                  # {path = "os/tidal_water.shp" (in raw/), deck = 8.5}: fill pieces and OSM buildings with a layer of 1+
+                            # over these polygons stand on a deck there (min_h; lower ones lose that part); {}: off
+dedupe_keep_taller = false  # true: of two footprints overlapping by 90 % of the smaller, the smaller stays when it is over 1 m
+                            # taller (a tower drawn inside its building's outline; volume_dedupe then cuts it out of the
+                            # lower one); false: the smaller always goes
+volume_dedupe = false       # true: pieces overlapping on the map and in height are clipped (OSM's over a fill's, the taller
+                            # over the lower); false: kept as they are
+slab_drop = 0.0             # m; > 0: a building whose ground_elevation lies more than this under the DEM stands on an
+                            # old ground below a slab (La Défense's dalle): its height is lowered by the difference
+                            # (see slab_base); 0: off
+slab_sources = []            # the footprint sources whose ground_elevation slab_drop trusts ([]: every one that has it)
+osm_fix = {}                # OSM id -> height (m) replacing a building's or building:part's wrong height tag
+set_h = {}                  # OSM id -> the final top (m) of that OSM building's pieces, after every other rule (a station
+                            # shed at a lidar maximum, a ministry at levels x 3.2); several pieces are scaled to reach it
+fill_max_h = 20.0           # with a primary source: OSM only adds buildings lower than this (m), or untagged ones
+                            # up to 300 m² (a tall building the official layer lacks is likely gone)
+cantilever_code = -1        # the footprint source's feature_code of cantilevered buildings (NYC: 1006); -1: none
+own_ground = false          # true: a piece whose source measured its own ground and roof (ground_elevation and roof_top_z: a
+                            # cadastre's LoD2 solids, each standing on its ground) is never stood on the roof of a taller
+                            # piece it lies in (nested()) nor stacked on it (its height added to that roof's): a canopy over
+                            # a hall or a twin solid is no podium; its top stays roof_top_z - ground_elevation
+split_ground = false        # true: the levels of a building cut by roof level (a source's roof_split: roof_level set)
+                            # each lose the DEM's rise from the building's lowest ground to the lowest under their
+                            # own outline (06_tiles stands each there): Roppongi Hills' tower ~10 m up its slope
+recheck = {}                # a second height source over a primary's placeholder and generalised heights (see recheck()):
+                            # {of = "lod2", source = "umwelt", low = 5.0, ratio = 2.0, field = "rooftype", values = ["9999"],
+                            # diff = 8.0, storeys = "geschosse", storey_h = 3.4}; {}: off
+gen_split = {}               # generalised solids split by a second source's footprints clipped to them (see gen_split()):
+                            # {of = "lod2", source = "umwelt", field = "rooftype", values = ["9999"], min_area = 2000.0,
+                            # min_range = 6.0, min_piece = 20.0, skip = [gml_id, ...]}; {}: off
+canopy_fit = {}              # [buildings] rules "roof" pieces fitted to what they cover (see canopy_fit()): {thick_max = 3.0,
+                            # thick = 0.6, cover = 0.3, gap = 1.0, slab_max_area = 3000.0, slab_min_area = 0.0,
+                            # max_down = 18.0}; {}: off
+copied_keep = []            # height sources (h_<name>) that confirm a tall piece's height: copied() leaves a small piece
+                            # with a touching tower's height alone where one of them agrees with it (within 10 %, 5 m)
+copied_storeys = ""          # with copied_keep: a storeys field; where no copied_keep source has a height, a piece whose
+                            # storeys can carry its height (5 m each) is left alone too; "": off
+fix_h = {}                  # {field = {value = m}}: the final height of the pieces whose field has that value (a primary's
+                            # solid the laser got wrong: {gml_id = {DEBE3D... = 74.0}}), after the landmark list; h_src fix_h
+kind_map = {}               # {kind = other}: a kind the preset's shape rules give, as another of its kinds, after every
+                            # other kind rule (Hong Kong: {village = "midrise"}: china-south's urban village is tong lau
+                            # and pencil towers there); {}: off
+valid_out = false           # true: buildings.gpkg's geometries repaired as written (make_valid after the reprojection
+                            # to WGS84; polygons only); false: written as they are
+afloat = {}                 # {areas = ["natural=water"], share = 0.5, h = 3.5, tag = "ship"}: OSM's fill pieces lying this
+                            # share or more in these OSM areas (boats, pontoons, floating bars) at h m, osm_building = tag; {} off
+[buildings.landmarks]       # how the landmark list (paths.landmarks) meets the building table (04_buildings)
+match = "nearest"           # "nearest": the footprint under the point, else the nearest within radius m; "best": of the
+                            # buildings within radius m, the one whose data height is closest to the listed one
+                            # (distance counts too), so a tower's height doesn't land on the podium the point is on
+radius = 40.0
+cap = false                 # true: a building made of OSM parts gets no part above its listed height (all parts for a
+                            # height to the top: tip, spire, architectural...; the thick ones for a roof height), and
+                            # rows with use_height false that are buildings (monuments) name and cap theirs too
+raise_parts = 0.0           # m: a building made of OSM parts whose highest part is more than this under its listed height
+                            # (use_height true) has every part's top and base scaled by listed / highest (a tower the
+                            # parts show part-built, as the lidar or the mapper saw it); 0: off
+cap_keeps_lift = false      # true: a lifted part the cap lowers keeps its base unless that is over the cap (false: every
+                            # capped part stands on the ground, through the parts under it)
+max_d = 0.0                 # > 0 (match best): no building farther than this from the row's point (m)
+min_area = 0.0              # > 0 (match best): no plain footprint under this (m²) takes a row (a fragment beside the site)
+ground = ""                 # "point": a listed height counts from the DEM at the row's point (the tower's own ground), and
+                            # the table's from the lowest ground under the outline (06_tiles stands it there): the rise
+                            # between them is added (Roppongi Hills' 238 m stand ~10 m over the complex's lowest corner)
+podium = {}                 # {ratio = 1.6, base = 12.0, area = 1000.0, top_share = 0.85}: a landmark tower whose point lies
+                            # on a plain footprint holding its podium (the lidar source's top over ratio x its mean, the
+                            # tallest listed tower at least top_share of that top) is cut out as a box at its point, the
+                            # rest the podium (landmark_podiums()); {}: off
+[buildings.join]            # how a height source's polygons give their height to a footprint (source_height())
+weighted = 0.0              # > 0: a footprint no single polygon covers by needle.cover takes the area-weighted median
+                            # height of the polygons covering it, where they cover this share of it or more; 0: off
+big = 0.0                   # > 0: a footprint of this many m² or more still without a height takes the area-weighted
+                            # median of whatever polygons overlap it, however little (a station's shed the source lacks
+                            # but for its edges); 0: off
+[buildings.needle]          # a source's height goes to a footprint it covers by >= cover; a tall one (>= height m)
+cover = 0.3                 # only to footprints of >= area m² or covering >= share of its polygon
+height = 40
+area = 250
+share = 0.4
+[buildings.blend]           # the "blend" height source: weights x sources where their mean lies in band (m)
+sources = ["gba", "cnbh"]
+weights = [0.35, 0.65]
+band = [15, 30]
+
+[compare]                   # 03_compare
+detail = []                 # [lon, lat, "name"] of the footprint close-up; empty: the districts' centre
+
+[ground]                    # 05_ground
+margin = 4000               # the ground area: the districts' bounding box plus this (m); roads and trees fetch it too
+piers = false               # man_made=pier decks (areas, and lines by their width) are drawn as land
+tidal = 0.0                 # km²: water polygons at least this large that touch the sea join it (tidal rivers mapped
+                            # as water over the land; 0: off)
+town = false                # 06_tiles: land beyond the districts is its own layer, drawn as a painted roofscape
+                            # (a dense city around the one modelled, e.g. Brooklyn, Queens and New Jersey around Manhattan)
+masses = false              # 06e_masses: OSM buildings beyond the districts raised as low-poly block masses (flat roofs,
+                            # merged per 4 km cell and height class) instead of only the painted town layer
+masses_reach = 0.0          # ... and this far (m) beyond the ground area, thinning out to none, on the backdrop
+masses_fade = 1500.0        # ... over the reach's last this many m the masses sink to 30 % of their height
+masses_houses_far = false   # ... houses (under 9 m) beyond the ground area kept too (default: blocks of 9 m and more only)
+masses_skip = {}            # ... field -> [values]: footprints left out of the masses (towers and masts drawn as a fat
+                            # windowed block; Berlin M7: the Funkturm), e.g. { building = ["tower", "mast"] }
+masses_tall = {}            # ... {area, h}: footprints of area m² or more taller than h m held at h (a tower and its podium
+                            # in one outline: no block-wide slab at tower height); empty: off
+masses_within = ""          # ... a GeoJSON (path from the city folder; WGS84 Polygons / MultiPolygons, a FeatureCollection or a
+                            # geometry): only masses whose footprint lies inside the union are kept (a building whole, by a
+                            # point inside it: clipped it would end in a cut-off slab), and OSM is fetched only over the
+                            # 5 km chunks that touch it (a changed clip fetches again). A missing file or no polygon
+                            # stops 06e_masses. "": off, the whole margin as before
+# masses_min_h = 30.0: only masses of at least this height (m) stand, with or without masses_within (Hong Kong M7f: the
+# margin's new towns' estates as towers, the low town left to the painted roofscape); absent or 0: off
+masses_ring = {}            # ... {file, cover_h}: a ring (GeoJSON polygons) whose footprints from cover_buildings.gpkg
+                            # (cover_buildings = "all") stand as masses too, the roads' built_only clip not widened;
+                            # cover_h = [[cover shares], [heights m]] for its untagged footprints; empty: off
+green_tags = []             # more green areas: entries "a=b;c=d" (all pairs match), e.g. "leisure=pitch;surface=grass"
+green_ids = []              # OSM elements drawn as green: "way/<id>", "relation/<id>" (the Padang); [] both: off
+yards = []                  # OSM "key=value" areas (industrial=port) drawn as paved yards on the aeroway layer (Singapore
+                            # M5: container terminals); []: off
+# slopes = {tags = ["natural=cliff;anthropogenic=yes", "man_made=embankment"], width = 12.0, off_green = true}: man-made
+# slopes mapped as lines drawn as grey shotcrete strips (width m on the way's right, the lower side) on the aeroway
+# layer (Hong Kong M5); absent: off. slopes.areas = ["natural=bare_rock", ...] (Hong Kong M7f): OSM polygons with
+# these tags the same grey on the aeroway layer (kind "rock"), the green layer cut round them; absent: none
+pools = false               # split the water at dams, weirs and locks (OSM waterway=dam|weir|lock_gate, lock=yes), so
+                            # 05a_terrain levels each pool on its own (a river stepping down at its dams, a canal's locks)
+paved = false               # pedestrian areas (area=yes) as layers "paved" (stone surfaces) and "asphalt": needs paths
+green_min_width = 0.0       # m: narrower green pieces left out (grass slivers along sidewalks); 0: all kept
+path_relations = false      # pedestrian squares mapped as multipolygon relations are areas too (cut out, paved)
+green_off_water = false     # the green less the water layer (park lawns drawn out over a lake's edge)
+path_layers = false         # footpaths through the green on their surface's layer (gravel, asphalt, paved), not the land
+gravel_parks = []           # parks (OSM name) whose ground is gravel, not lawn: layer "gravel" less their mapped lawns
+paths = {}                  # highway -> width (m): footpaths cut out of the green near the districts (the paving
+                            # shows through), e.g. {footway = 3.0, path = 2.5}; sidewalks and crossings are not
+[ground.green]              # OSM key -> values drawn as green (clipped to the land, mangroves apart)
+leisure = ["park", "garden", "golf_course", "nature_reserve"]
+landuse = ["grass", "forest", "meadow", "farmland", "orchard", "recreation_ground", "village_green", "cemetery"]
+natural = ["wood", "scrub", "grassland", "wetland", "heath"]
+[ground.aeroway_width]      # runway / taxiway width where untagged (m)
+runway = 60.0
+taxiway = 23.0
+
+[landuse.use]               # 05c_landuse: OSM "key=value" -> use (residential, commercial, industrial, civic)
+"landuse=residential" = "residential"
+"landuse=commercial" = "commercial"
+"landuse=retail" = "commercial"
+"landuse=industrial" = "industrial"
+"landuse=education" = "civic"
+"amenity=school" = "civic"
+"amenity=university" = "civic"
+"amenity=college" = "civic"
+"amenity=kindergarten" = "civic"
+"amenity=hospital" = "civic"
+
+[terrain]                   # 05a_terrain (see its docstring); tuned to GLO-30 and Shenzhen's block sizes
+work = 10.0                 # estimation grid (m)
+tin_cell = 20.0             # TIN vertices lie on this grid (m)
+building_pad = 12.0         # footprints grown by this before masking them out of the DEM (m)
+open = 50.0                 # opening window (m), then these for masked blocks:
+open_fill = [150.0, 350.0, 750.0, 1500.0]
+canopy = {forest = 5.0, park = 3.0, orchard = 3.0, scrub = 1.0}   # metres off the DEM per green class
+smooth_open = 45.0          # Gaussian sigma on open ground (m)
+smooth_town = 120.0         # ... where built up
+smooth_bare = 15.0          # Gaussian sigma (m) for a bare-earth DEM (lidar DTM: none of the above applies)
+sea_drop = 3.0              # coastal: the ground drops by sea_drop + sea_knee to meet the sea at 0 (m)
+sea_knee = 2.0
+coast_flat = 40.0           # coastal: exactly 0 this close to the sea (m)
+coast_ramp = 160.0          # ... rising to its own height over this (m)
+flat_spread = 4.0           # water bodies whose ground spreads less than this (10th-90th percentile, m) are levelled
+water_flat = 25.0           # the banks of a levelled body are flat this far (m)
+water_ramp = 90.0           # ... and back to the ground's height by this (m)
+bank_slope = 0.35           # steepest fall away from levelled water (dams become embankments)
+water_all_touched = true    # a water body levels every cell it touches (false: only those whose centre it covers)
+tin_error = 4.0             # TIN tolerance in the districts (+ far_from), m
+tin_error_far = 12.0        # ... growing to this over far_over beyond
+tin_error_edge = 0.5        # ... where the ground is held level (coast strip, lakes)
+tin_error_bank = 0.0        # ... within bank_reach of levelled water (quays and embankments kept sharp); 0: off
+tin_steps = 0.0             # m: TIN nodes whose ground drops this much to a neighbouring node all kept (steps as clean ramps); 0: off
+bank_reach = 40.0           # m
+quay_walls = false          # river quays (Paris): where levelled water meets ground over quay_min higher, the first ring of
+                            # land cells takes the quay's height (not a slope's) and the water cells along it drop
+                            # quay_depth under the water, so the step lies inside one TIN cell that 05e_shores covers
+                            # with a vertical wall at the water's outline and a flat apron (shores quay_walls)
+quay_min = 1.0              # m over the water: a quay, not a soft bank
+quay_depth = 6.0            # m under the water for the water cells along a quay
+deck_ends = {}              # {reach, ramp, landings} or true: bridge abutments (a lidar DTM has none): where a road deck
+                            # meets a ground-level road (05b_roads' cache) the ground is raised to that road's level (each
+                            # road's line through its dry ground 8-20 m on, carried back; a short road: the median 4 m to
+                            # `reach` 12 m on) over the deck's end and along the roads, easing to their own line at `ramp`
+                            # 20 m; 05b_roads ends the deck on that ground. `landings`: footbridges (names) whose free ends
+                            # take the highest dry ground within 10 m; `level` "high": the deck's end at the highest dry
+                            # ground within `reach` m along the roads, not their fitted line (a quay's notch in the DEM
+                            # under the bridge's end: Tokyo), and with tin_cell over work the TIN's square round the
+                            # node held at it; empty: off
+water_levels = {}           # {name: [lon, lat, level]}: the water body holding the point held at that level (scene m),
+                            # whatever the ground under it reads, even over flat_spread (tidal rivers); empty: off
+patches = []                # [[lon, lat], ...] polygons whose ground is re-filled from their outline (a pit in the DEM)
+patches_file = ""           # a GeoJSON of WGS84 polygons (path from the city folder) treated as patches; "": off
+pits = {}                   # {below, grow, window}: dry pits with a cell under `below` m (the DEM's datum) re-filled from
+                            # their outlines; a pit reaches as far as the ground lies `grow` m under its closing over
+                            # `window` m (London: construction shafts and basements in the lidar); empty: off
+gap_fill = {}               # {open, smooth, edge, blend} m: the ground DEM's no-data cells filled from the backdrop DEM
+                            # (opened `open` 150 m and smoothed `smooth` 60 m: a surface model), offset by the two DEMs'
+                            # difference along the gap's edge (smoothed `edge` 150 m) easing into their median difference
+                            # over `blend` 600 m; empty: off (nearest-cell fill: streaks; Berlin's DGM1 corners)
+cuttings = {}               # {beyond, ways, near, grow, window}: rail and motorway cuttings more than `beyond` m outside the
+                            # districts (no roads drawn there) filled to grade: dry hollows `grow` m under the closing over
+                            # `window` m within `near` m of OSM ways of these values (Berlin's Ringbahn, A100); empty: off
+edge_land = false           # 05a: the cells along the ground area's outline take the land/sea of the cells just inside
+                            # (the land layer ends at the outline, the grid a cell beyond: false ramps the ground to 0
+                            # over the coast's 200 m all round the area's land edge)
+cover_buildings = false     # 06e_masses: the town's footprints painted into the inner cover map in the town colour (no
+                            # WorldCover tree green under and round the masses); "all": every OSM footprint over the inner
+                            # map (cached cover_buildings.gpkg), not only the masses' (masses_within limits those)
+# cover_yards = [r, g, b]   # (absent: off) 06e_masses: [ground] yards painted into both cover maps in this sRGB colour
+dalles = []                 # [[lon, lat], ...] polygons held flat at their median ground height (a slab over roads:
+                            # La Défense's dalle), the TIN kept to tin_error_edge on them; roads under them are
+                            # drawn as covered (05b_roads)
+far_from = 1500.0
+far_over = 4000.0
+far_cell = 200.0            # backdrop grid (m)
+far_reach = 36000.0         # backdrop reaches this far beyond the ground area (m), within the DEM tiles
+far_reach_sides = []        # [west, south, east, north] (m): the backdrop's reach per side instead of far_reach (Tokyo M7)
+back_error = [6.0, 30.0]    # backdrop TIN tolerance at its inner edge and at far_reach (m)
+back_sea = "level"          # "void": with a bare-earth backdrop, sea only where its first file has no data (not all
+                            # land at or under 0.2 m: zero-metre lowlands; Tokyo M7)
+curvature = {}              # {from, k}: the earth's drop past `from` m on the backdrop's heights (y^2 / (y + D)), k the
+                            # refraction coefficient; also stores back_h (heights before it); empty: off (Tokyo M7)
+back_shift = 0.0             # m added to the backdrop DEM (a surface model beyond a bare-earth ground: its bias; Berlin -4.8)
+peak_radius = 1000.0        # checks/terrain.md: the summit table's search radius round each [terrain.peaks] point (m)
+sea_y = -3.0                # backdrop vertices on the sea
+backdrop_town = 0.55        # share of the backdrop's flat land coloured as town (the rest fields)
+backdrop_forest = [25.0, 85.0]   # the backdrop's land is wooded from this height, all of it by the second (m)
+backdrop_town_rgb = [150, 146, 132]   # the backdrop's town colour (sRGB); also where the viewer's town layer fades to
+backdrop_cover = ""         # "worldcover": the backdrop coloured from ESA WorldCover's land cover (06e_masses writes
+                            # a 100 m map, cover.png) instead of by height and slope
+cover_lines = {}            # 06e_masses: { cell, rail, yard } a line map over the inner cover map (cover_lines.png,
+                            # `cell` m a pixel): R the cover_roads' share, G the rail beds' (OSM railway ways `rail` m
+                            # wide; landuse=railway at `yard`), B the tracks' direction, for the town layer's asphalt
+                            # and ballast with track lines (Berlin M7 fix round); empty: off
+cover_roads = {}            # highway -> width (m): OSM roads painted as asphalt into the inner cover map (06e_masses),
+                            # the street grid of the town beyond the roads' margin; empty: off
+cover_roofs = {}            # 06e_masses, with cover_buildings: { rgb = [[r, g, b], ...], gaps = [r, g, b] } (sRGB) the
+                            # footprints in the inner cover map as roofs of these colours (one per footprint, by a hash
+                            # of its centre), the built-up land no footprint or road covers in `gaps`; empty: off;
+                            # under_masses = true: the footprints standing as masses (masses_within, masses_ring) unpainted
+cover_outer_roads = {}      # 06e_masses: { widths = { highway = m }, rgb = [r, g, b] } the major roads painted into the
+                            # outer cover map too (OSM over its box, outer_roads.json); empty: off
+cover_inner_cell = 20.0     # 06e_masses: the inner cover map's metres a pixel
+cover_cell = 50.0           # 06e_masses: the outer cover map's metres a pixel
+snow = {}                   # 06e_masses, with curvature: {from, full, rgb, patchy} the outer cover map white over a snow
+                            # line (m, before the curvature); empty: off (Tokyo M7)
+datum = "auto"              # inland: metres taken off the DEM ("auto": the lowest ground, which becomes 0)
+dem_window = false          # true: DEM tiles read only over the grid each dem_on call fills (memory; Hong Kong)
+summits = {}                # {radius}: the named [terrain.peaks] in the ground area brought back up to their surveyed
+                            # height (less the sea drop), the hill within `radius` m scaled over its foot; empty: off
+[terrain.peaks]             # named summits for checks/terrain.md: name = [lon, lat, surveyed m] or [lon, lat]
+[terrain.spots]             # other named points for checks/dem.md: name = [lon, lat, expected m] or [lon, lat]
+
+[roads]                     # 05b_roads
+margin = 1000               # roads are cut this far outside the districts (m)
+built_only = {}             # {margin, keep}: ground ways cut `margin` m beyond the districts and the masses' clip, except
+                            # highway values in `keep` and railways (Tokyo: masses only in gaps); empty: off
+layer_h = 7.5               # deck height per OSM layer (m)
+rail_layer_h = 0.0          # a railway's first layer's deck height (m; 0: layer_h; higher layers add layer_h): tracks on brick arches
+grade = 0.05                # steepest ramp
+lane_w = 3.5                # width per lane when the lanes are tagged (m)
+parking_lanes = {}          # highway -> parking lanes (2.4 m) added to a width worked out from its lanes tag
+footbridges = false         # footways, paths and cycleways on bridges drawn as decks too (4 m where untagged)
+default_w = {}              # highway -> [two-way, one-way] width when neither width nor lanes are (the preset's)
+decks = {}                  # bridge name (found in name or bridge:name) -> deck height over what it spans (m), or
+                            # {deck, lower (lower level's height), rail_lower (its tracks run on the lower level),
+                            # water (its height over the water instead: a viaduct crossing a river on a road bridge),
+                            # reach (m: counted from the highest ground this near along it, level over a cutting)}
+decks_ref = "ground"        # a named deck's height counts from the ground under each node; "water": from the lowest
+                            # ground under its span (a bridge crossing an island stays level)
+decks_level = false         # with decks_ref "water": from the level of the water under the span ([terrain] quay_walls drop the ground there)
+lower_level = 7.0           # a lower level ("lower" in its name) runs this far under its bridge's deck (m)
+bridge_outlines = false     # OSM man_made=bridge outlines of the decks spans drawn whole as slabs (06_tiles), layer
+                            # "outlines" in roads.gpkg, checks/bridges.md (ways' deck share of each outline)
+outline_parts = false       # a multipolygon outline's parts drawn as separate slabs (parallel footbridges either side)
+rail_outlines = false       # outlines named as a decks span with only railways on them (no bridge:name on the tracks) drawn too
+outline_names = false       # an elevated road way without a decks span lying half inside an outline named as one takes it (Berlin)
+rail_join = false           # an unnamed elevated railway whose ends meet ways of one rail decks span takes it (Berlin's Hauptbahnhof)
+rail_on = {}                # {field, values (prefixes), near, gap, step}: railway decks on the building table's viaduct
+                            # structures' tops (Berlin's LoD2 Stadtbahn arches, 51009_1750); no stick piers inside them
+piers = {}                  # decks span -> [spans, fascia m(, type(, rise))] or {spans, fascia, type, ...}: piers under its outline slab, or with a type (06_tiles BRIDGE_TYPES) its arcade
+
+[quality]                   # 04b_quality: optional checks against the table's own columns
+second = ""                 # a second height source kept in the table as h_<second> (Berlin: "umwelt"): pieces at 5 m or
+                            # less it puts over twice as high, and pieces over 8 m off it; "": off
+storeys = ""                # a storeys field (Berlin: "geschosse"): pieces under storeys x storey_min m; "": off
+storey_min = 2.5
+
+[tiles]                     # 06_tiles (and the tile grid every later stage shares)
+size = 1000                 # tile size (m)
+plant_min_h = 24            # rooftop plant room on buildings at least this tall (m)
+plant_min_area = 250        # ... with this much roof (m²)
+plant_h = 3.6               # ... this high (m)
+pillars_in_water = true     # viaducts stand on pillars in rivers and the sea too (false: long spans need structures)
+roof_eave = false           # roof shapes rise from the source's eaves (eave_h, the LoD2's) where it has one 1-6 m under
+                            # the top (else from the height, ROOF in 06_tiles.py); de-berlin turns it on
+small_exact = false         # pieces a [buildings] rule keeps at their exact height ("exact", "roof": h_exact) are drawn
+                            # down to 0.2 m² (else footprints under 4 m² are skipped: a memorial's 2.4 m² stelae)
+[tiles.clearance]           # satellite footprints dropped on roads: shares of the footprint (see road_clearance)
+major = 0.3
+minor = 0.6
+deck = 0.5
+any = 0.55
+
+[blocks]                    # 07b_blocks
+size = 4000                 # block size (m): the viewer's download unit, building and markings tiles bundled
+
+[views]                     # the viewer's camera presets (tiles.json views; `city3d 06_tiles --views-only`)
+areas = {}                  # name = [lon, lat, distance m, elevation degrees]
+landmarks = {}              # menu label = building name as in buildings.gpkg (from the landmark lists), or
+                            # [name, azimuth looked from(, distance m(, elevation degrees))]
+groups = {}                 # menu group = [view names]: moved from "Areas" or "Landmarks" to that group, shown
+                            # between the two in this order
+landmark_frame = [2.4, 0.333, 12]   # a tall landmark's view: distance in its heights, aim point up its main
+                            # roof (fraction), elevation (degrees); closer and aimed higher in a dense core,
+                            # where the neighbours hide its lower floors anyway
+
+[facade]                    # 06_tiles (the preset's)
+styles = {}                 # style = {floor = m, palette = ["#rrggbb", ...]}, in the viewer's order (web/facade.js)
+osm_style = {}              # style = [OSM building tags]
+zones = {}                  # style = {polygon = [[lon, lat], ...]}: every building in it takes that style
+
+[markings]                  # 06b_markings
+big = ["trunk", "primary", "secondary"]             # big roads (double centre lines)
+zebra = ["trunk", "primary", "secondary", "tertiary", "residential", "unclassified"]   # get zebra crossings
+sidewalk_w = {}             # highway -> sidewalk width each side (m) (the preset's)
+median_w = {}               # highway -> median width of one-way carriageways (m) (the preset's)
+dedupe = 0.0                # a ground road way lying this share of its length on a wider way's carriageway isn't painted; 0: off
+# UK-style markings (London M5), all off by default:
+warning = 0.0               # m before a junction where the lane strip says "warning line" (city.json markings.dashes.warning)
+kerb_lines = {}             # highway -> "yellow" | "red": double lines along both kerbs (waiting restrictions, red routes)
+kerb_mouths = {}            # highway -> colour of kerb lines within `warning` m of a junction only (junction mouths)
+red_refs = []               # OSM ref values whose roads have double red lines whatever their class (TfL red routes)
+bus_lanes = false           # bus lanes from OSM busway / lanes:bus / bus:lanes tags along their kerb ...
+bus_red = 0.5               # ... this share of them red-surfaced
+cycle_lanes = false         # painted cycle lanes along the kerbs where OSM cycleway(=|:both|:left|:right) = lane
+junctions = "zebra"         # junction arms: "zebra" (a zebra at every arm) or "signals": OSM traffic signals within
+signal_reach = 25.0         # this (m) make a signalled junction (stop line, stud lines), else a give-way line on the
+                            # lesser road's arm and none on the greater
+zebras = false              # OSM zebra crossing nodes between junctions: stripes, give-way lines, zig-zags ...
+zigzag = 12.0               # ... this long (m) either side, and Belisha beacons (beacons = false: none)
+signal_crossings = false    # OSM signal-controlled crossings between junctions (pelican, puffin, toucan): stud lines,
+                            # stop lines and zig-zags
+# (opt-in, Tokyo M5) scrambles = {name = {lines = [[[lon, lat], [lon, lat]], ...], w = 4.0, big = true}}: diagonal
+# crossings over a junction box (Shibuya's scramble), each from kerb to kerb, drawn as zebra strips (city.json
+# markings.zebra.mid.half = w / 2); absent: off
+# Berlin options (M5), off by default:
+setts = []                  # OSM carriageway surface values drawn as granite setts (Berlin: ["sett", "cobblestone", ...])
+sidewalk_style = {}         # highway -> share of its ways whose sidewalks take style 1 (city.json markings.sidewalk.style2)
+trams = false               # tram tracks (railway=tram) as grooved rails over the roads: true or {setts, road_w, off_w}
+
+[shores]                    # 05e_shores
+detail_margin = 600         # banks and pools only within the districts plus this (m)
+coast_type = "revetment"    # coast without a tagged feature nearby: revetment, quay, beach or mudflat
+bank_type = "embankment"    # rivers' and canals' banks: embankment (concrete), pondedge (stone coping and face: masonry quays), pondbank
+mudflat = ["natural=wetland", "natural=mud", "natural=shoal"]   # tags that make the coast near them a mudflat
+                            # ("natural=wetland" any wetland, "wetland=tidalflat" one kind)
+mudflat_min_area = 0.0      # m²: smaller mudflat features don't make their coast muddy (a marsh bed by a pier)
+pond_edge_area = 0.0        # km²: lakes and reservoirs this large take the stone edge all round, beside lawns too
+                            # (Singapore: Marina Bay, OSM's Marina Reservoir); 0: off (park ponds' soft banks by the green)
+quay_walls = false          # banks where the ground stands quay_min over levelled water (05a_terrain quay_walls):
+                            # a vertical masonry wall at the water's outline and a flat stone apron behind it
+quay_apron = 8.0            # m inland: the apron covers the TIN's step (one 5 m cell and its diagonal)
+quay_top = 5.0              # m inland: the apron stands at the highest ground this close to the wall (a step further in stays a step)
+quay_step = 4.0             # m: quay runs cut into pieces this long, so the apron follows the ground along them
+quay_face = 1.5             # m: the wall's face stands this far into the water (the TIN's step never shows in front)
+step_walls = false          # the steps from lower to upper quays (steep TIN triangles near levelled water) under stone blocks:
+                            # a vertical ashlar face down to the ground on every side, a flat sett top at the crest
+step_reach = 70.0           # m from levelled water
+step_slope = 32.0           # degrees: steeper TIN triangles are a step ...
+step_min = 2.0              # ... when at least this high (m)
+step_close = 3.0            # m: the steep triangles merged and closed by this, so the foot runs straight along the TIN's teeth
+step_top = 7.0              # m: the block's top stands at the highest ground this close
+
+[trees]                     # 08_trees
+urban_margin = 1000         # estates and open land get trees this far outside the districts (m)
+building_gap = 2.5          # trees keep this far from walls (m)
+road_gap = 1.0              # ... and from carriageway edges (m)
+green = {}                  # OSM "key=value" -> class (forest, park, orchard, scrub, grass), first match wins (the preset's)
+none = []                   # OSM "key=value" areas without trees, over any class (the preset's: sports fields)
+none_on_paved = false       # no invented trees on 05_ground's paved and asphalt squares ([ground] paved)
+none_on_layers = []         # (opt-in) nor on these 05_ground layers (Tokyo: ["gravel"], Kokyo Gaien's plaza)
+lift_flag = false           # true: only trees on the drawn street surface take the viewer's trees.streetLift (trees.json liftBit)
+census_off_decks = false    # true: no census tree under an elevated way (bridge decks, viaducts)
+# (opt-ins, Hong Kong M6, off when absent) worldcover = {"10" = "forest", "20" = "scrub", "30" = "grass"}: land without an
+# OSM green area or land use takes ESA WorldCover 2021's class (read at worldcover_cell = 24 m by majority), and
+# worldcover_over = [classes] (e.g. ["grass", "scrub"]) are taken over too where WorldCover's class becomes forest;
+# feather = {edge = m, fringe = m, into = [classes], share}: area trees thin out over the ground area's last `edge` m,
+# and cells of `into` within `fringe` m of the forest become forest (up to `share` at its edge); the carpet unfeathered
+# (opt-in, Hong Kong M7f, off when absent) carpet = {extra = ["grass"], smooth = 16.0}: the far carpet also over the
+# extra classes (the viewer's trees.carpetBlend.colours colours them) and its classes smoothed (each class's share
+# blurred over `smooth` m, the largest taken): no 24 m stair steps or small holes in the canopy from afar
+# (opt-in, Tokyo M6, off when absent) [trees.zones.<name>] = {parks = [OSM names], ring = [[lon, lat], ...], from =
+# ["park", "grass"]}: area-tree cells of those classes inside the named green areas or the ring take a class of their
+# own, <name> (city.json trees.classes.<name> gives it every key): Kokyo Gaien's black pines, the Sumida's cherries
+[trees.landuse]             # 05c_landuse's use -> class
+residential = "residential"
+civic = "campus"
+commercial = "campus"
+industrial = "industrial"
+[trees.street]
+step = 9.0                  # spacing along a row (m; palms 1.25 x)
+row_offset = 2.6            # row beyond the carriageway edge (m)
+none_on = ["motorway", "motorway_link", "trunk_link", "primary_link", "secondary_link", "tertiary_link"]
+default = "broadleaf"       # species where the odds leave off
+odds = {}                   # major / minor = [[species, cumulative share], ...] (the preset's)
+planted = {}                # major / minor = share of roads lined with trees (1: all)
+height = {}                 # species = [min, max] m, or {major = [..], minor = [..]} (the preset's; drawn in this order)
+none_in = {}                # name = [[lon, lat], ...]: no street trees inside (Times Square's bowtie)
+named = {}                  # road name = {species, height [lo, hi], step, rows [offset | [offset, height factor]], first}:
+                            # named avenues planted their own way (Singapore M6: Orchard Road's double canopy); {}: off;
+                            # side = "kerb": a one-way way (a dual road's carriageway) only along its kerb, not its median;
+                            # within = [[lon, lat], ...]: only along that stretch, the rest of the road bare;
+                            # second = true: the viewer's second broadleaf slot (Tokyo M6: Omotesando's zelkovas)
+# a street tree census (NYC's 2015 TreesCount!): its trees replace the invented ones inside the districts.
+# file (in the data folder, CSV), its columns lon / lat / dbh (trunk diameter, inches) / species, height =
+# [a, b, min, max] (m = a + b * dbh, clamped), and groups = [[viewer species slot, [census names]], ...]:
+# a tree takes the first group naming its species, the last group the rest (at most four groups; species_bits = 3
+# for up to eight, the viewer reads trees.json speciesBits)
+# census.districts: the districts it covers (names; all by default), invented street trees elsewhere
+# Several inventories: census.sources = [{file, districts, ...}], each over the census table's keys. A source is
+# a CSV (lon/lat columns, or latlon = one "lat, lon" column; sep) or GeoJSON points; height_field = the census's
+# own height (0 = unknown: then the formula on dbh, else the group's median), jitter = +-share on heights,
+# dedupe = m (drop trees this close to an earlier source's). census.cover = {per_ha, cells}: no invented area
+# trees in green areas holding >= per_ha census trees a hectare, nor in the cells (+-cells) round each census tree
+# (cover.classes: the green classes the per_ha rule applies to; default forest, park, orchard, scrub, grass).
+# crown_field = the census's crown diameter (m, 0 = unknown): the crown's radius is capped at its half x crown_k
+# (1.15), as [trees] clip_walls caps it at the walls
+# A source's street = true (with [trees] lift_flag): its trees stand on the street surface unless on the green layer
+census = {}
+
+[cars]                      # 06d_cars (tables are the preset's)
+seed = 20260926
+parking_margin = 1000       # car parks are fetched over the districts' box plus this (m)
+deck_ends = false           # true: a lane meeting a bridge deck takes the deck's height at their shared node, not the ground's (a quay wall's foot)
+types = []                  # [name, length, width, height(, viewer model: hatch, taxi_paris, bus_idfm, moto)], in the viewer's order (web/cars.js)
+palettes = {}               # type = [[body "#rrggbb", second colour or "", weight], ...]
+class = {}                  # highway = [speed m/s, mean gap m, queue factor, [mix per type]]
+link_speed = {}             # highway = speed on its _link ramps
+parked_mix = []             # mix per type of parked cars
+kerbside = {}               # highway = chance a side of a minor street has a parked row
+cars_only = []              # names of ways (or their bridge:name) closed to lorries, trucks, vans and buses
+oneway_both_sides = false   # one-way streets get a parked row along both kerbs
+kerb_occupancy = 0.55       # share of a parked row's slots taken
+kerbside_major = false      # kerbside rows on the major classes (primary, secondary) the kerbside table names too
+osm_parking = false         # OSM parking:left/right/both (and parking:lane:*) tags decide a side where tagged
+maxspeed_factor = 0.0       # free-flow speed = OSM maxspeed x this where tagged (0: the class table's speed)
+no_kerbside = []            # names of ways never parked along (expressways, bus-lane avenues)
+none_in = {}                # name = [[lon, lat], ...]: no cars inside (ways whose middle lies inside, car parks, bus stations)
+restricted_mix = []         # mix per type on ways open to residents/permits only (motor_vehicle=destination;permit); [] off
+restricted_density = 0.4    # ... and their density factor
+park_w = 2.2                # a kerbside row's width (m)
+park_pitch = [5.6, 7.0]     # front-to-front spacing along the kerb (m)
+psv_density = 0.0           # ways closed to cars but designated for buses (psv/bus=designated) carry buses and taxis at this density (0: none)
+moto_bays = 0.0             # chance a kerbside slot is a bay of two-wheelers across the row (needs a "moto" type)
+# [[cars.areas]] (off when absent; Hong Kong M6): {districts = [names] | ring = [[lon, lat], ...], weights = {type =
+# [one weight per palette entry]}}: liveries by part of the city (the first area holding a car wins)
+
+[rooftops]                  # 06c_rooftops (the preset's)
+named = {}                  # colour name = "#rrggbb", as the preset's programmes use them
+parapet_t = {}              # facade style = parapet thickness kept clear of items (m)
+parapet_default = 0.25
+flat_party = []            # facade styles whose flat roofs know their party walls (the preset's stacks on them)
+# china-south's programmes, off by default (Singapore M6): `helipads` false: no helipad markings on residential and office
+# towers (a Chinese fire-code look); `residential` "hdb": residential roofs as Singapore's HDB slab blocks: concrete lift
+# motor rooms over each lift core in the wall colour, a raised water-tank housing on the plant room, SolarNova PV rows
+# on half the roofs, no steel or plastic tanks, heaters or helipads ("": Shenzhen's towers)
+helipads = true
+residential = ""
+village = ""                # "shophouse": village-style roofs with a box now and then, condensers, plants (no tiled hats,
+                            # plastic tanks, heaters or sheds); "": Shenzhen's urban villages
+street_signs = false        # hk-hongkong's programmes: projecting street signs on the tong lau and composite buildings'
+                            # street fronts (prototype and material `sign`, appended: other cities' files unchanged)
+
+[lamps]                     # 06e_lamps: a public lighting inventory (off without a path: procedural posts only)
+path = ""                   # GeoJSON of points (WGS84) under raw/
+label = ""
+skip_categories = []        # values of fields.category dropped (tunnels)
+kinds = {}                  # fixture kind (prefix of fields.kind) = [default height, min, max] (m), or a table { h, min, max,
+                            #   kelvin, flux, heads (lamps on one post: flux x heads), gas (a gas mantle's green-gold, code 2),
+                            #   sodium (share of streets, by fields.street, on high-pressure sodium) } (Berlin); others dropped
+kind_match = "prefix"       # "contains": a kind matches anywhere in fields.kind (the first in the table's order wins)
+crs = "EPSG:4326"           # the inventory's coordinates (Berlin: EPSG:25833; Point or MultiPoint)
+skip_status = []            # values of fields.status (prefixes) dropped: out of service, dismantled
+clip = -1                   # m: only lamps within this distance of the boundary (negative: all the file holds; Berlin 1500)
+# clip = 1500               # only lamps within this many m of the boundary (unset: all the file holds)
+fields = {}                 # kind, category, height, kelvin, family, power, flux, status, street: the inventory's property names
+generate = false            # no inventory: posts generated along roads.gpkg's ways (06e_lamps generated(); London)
+classes = {}                # highway or kind = { spacing (m, post to post along the road), layout ("staggered", "opposite", "one"), h (m),
+                            #   flux (lm), kelvin, share (of the ways lit), priority (kept first where two meet) }
+areas = []                  # [{ district = <boundary.gpkg name> | ring = [[lon, lat], ...], kelvin = { highway|kind|"*" = K },
+                            #   heritage = K for non-major streets in a conservation area, sodium = false }], later win
+conservation = ""           # GeoJSON (raw/) of conservation areas (heritage lanterns)
+sodium = 0.0                # share of streets (whole streets) on high-pressure sodium, outside areas with sodium = false
+gas = []                    # [{ at = [lon, lat], r = m, share, flux }]: a share of the minor streets' posts there are gas lamps
+osm_gas = false             # OSM highway=street_lamp nodes tagged gas as gas lamps (4 m, 2,000 K)
+rows = []                   # [{ names = [road names], side = "water"|"both", spacing, h, kelvin, flux, kerb, label }]: special
+                            #   rows replacing those roads' posts (the Victoria Embankment's dolphin lamps)
+dedupe = 8.0                # m: a post this close to one already placed is dropped (junctions, twin carriageways)

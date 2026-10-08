@@ -1,0 +1,28 @@
+{
+  "notes": "Tokyo's styles (jp-tokyo) on china-south: 雑居ビル and pencil buildings with stacks of vertical signboards (zakkyo), tiled mid-rise offices with window bands (tiled), apartment blocks with continuous balcony railings (mansion), grey curtain walls (glass), 1970s-90s granite and precast towers and the towers' stone podiums (granite), department stores and flagships (depato), low wooden houses (wooden), temples and shrines (temple), Kasumigaseki's ministries (government), civic buildings, factories, Shibuya's screens (signs: us-northeast's billboards). Patterns: facade/patterns.js tiledBands, balconyRails, timberFrame, lapSiding, signboardStack. M4 fix round (speed): granite, depato, government and civic off the bays branch (their stone and precast joints barely showed: plain walls with windows), the branch faded sooner (facade.bayFade [0.08, 0.24]), the signs style's boards in a branch of their own (facade.billboardBranch); tiled roofs on temples (facade.roofs.tile, dark kawara).",
+  "base": "china-south",
+  "facade": {
+    "shopfront": {
+      "boards": { "band": [0.84, 0.98], "colours": [[0.18, [0.86, 0.85, 0.8]], [0.32, [0.6, 0.07, 0.06]], [0.44, [0.82, 0.62, 0.08]], [0.56, [0.08, 0.18, 0.48]], [0.66, [0.06, 0.38, 0.18]], [0.82, [0.04, 0.04, 0.045]], [1, [0.55, 0.53, 0.5]]] },
+      "riser": { "to": [0.03, 0.04], "colour": [0.08, 0.08, 0.085] }
+    },
+    "bayFade": [0.08, 0.24],
+    "billboardBranch": true,
+    "roofs": { "tile": [0.045, 0.045, 0.052], "tileAge": 0.25 }
+  },
+  "styles": {
+    "zakkyo": { "bay": 2.3, "window": [0.14, 0.24, 0.86], "shops": "all", "ac": 0.12, "frames": { "dark": 0.35, "light": [0.66, 0.67, 0.67] }, "night": "village", "zone": 1, "parapet": "block", "fade": "bays", "shopfront": true, "signboards": true },
+    "tiled": { "bay": 3.2, "window": [0.025, 0.3, 0.8], "shops": 0.45, "shopsBy": "hash", "frames": { "dark": 0.3, "light": [0.66, 0.67, 0.67] }, "zone": 3, "roof": { "flat": true }, "parapet": "block", "fade": "bays", "shopfront": true, "tileBands": true },
+    "mansion": { "bay": 3.0, "window": [0.08, 0.4, 0.92], "shops": 0.3, "shopsBy": "hash", "ac": 0.0, "frames": { "dark": 0.2, "light": [0.68, 0.69, 0.69] }, "night": "home", "zone": 2, "roof": { "flat": true }, "parapet": "block", "fade": "bays", "balconyRails": true },
+    "granite": { "bay": 1.8, "window": [0.2, 0.28, 0.8], "frames": { "dark": 0.6 }, "zone": "office", "roof": { "flat": true }, "parapet": "block" },
+    "depato": { "bay": 4.6, "window": [0.3, 0.16, 0.86], "frames": { "dark": 0.7 }, "shops": "all", "night": "mall", "zone": 4, "roof": { "flat": true }, "parapet": "block" },
+    "wooden": { "bay": 1.9, "window": [0.18, 0.3, 0.8], "shops": 0.25, "shopsBy": "hash", "ac": 0.18, "frames": { "dark": 0.15, "light": [0.7, 0.71, 0.71] }, "night": "home", "zone": 1, "fade": "bays", "lapSiding": true },
+    "temple": { "bay": 2.4, "window": null, "night": "none", "fade": "bays", "timberFrame": true },
+    "government": { "bay": 1.9, "window": [0.2, 0.28, 0.8], "frames": { "dark": 0.55 }, "zone": 4, "roof": { "flat": true }, "parapet": "block" },
+    "civic": { "bay": 3.4, "window": [0.1, 0.3, 0.84], "zone": 4, "roof": { "flat": true }, "parapet": "block" },
+    "glass": { "bay": 1.5, "window": [0.03, 0.24, 0.995], "zone": "office", "roof": { "flat": true }, "parapet": "glass" },
+    "signs": { "bay": 1.5, "window": [0.03, 0.24, 0.995], "shops": "all", "billboards": true },
+    "spire": {},
+    "floodlit": {}
+  }
+}

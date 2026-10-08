@@ -1,0 +1,318 @@
+# Region preset "us-northeast": Manhattan, as built (New York, and a start for other old US north-eastern
+# cities: Boston, Philadelphia). Brownstones, brick tenements and pre-war apartment houses, limestone setback
+# towers and glass curtain walls; US street widths and sidewalks; honey locusts, London planes, pears and
+# ginkgos along the streets; yellow cabs, MTA buses and box trucks; wooden water tanks, bulkheads and HVAC
+# on the roofs. Its code (building kinds, facade rules, rooftop programmes) is in presets/us_northeast/.
+# A city overrides any of it in city.toml.
+
+[buildings]
+# canopies, ships, skybridges, sites still being built, containers, stairs down to the subway aren't blocks
+osm_skip = ["roof", "carport", "ship", "shelter", "bridge", "construction", "container", "static_caravan",
+    "subway_entrance", "entrance", "grandstand", "demolished", "abandoned", "ruins", "tent"]
+cantilever_code = 1006      # NYC's FEATURE_CODE for cantilevered buildings
+split = { min_n = 2, cover = 0.7, ratio = 1.5 }    # NYC's footprints join some towers and their podiums
+reconcile = { sources = ["osm_height"], over = 20.0, share = 0.3, flat = 2.0, big = 5000.0 }
+
+[buildings.osm_kind]        # OSM building tag -> kind; wins over the shape rules unless the height says tower
+industrial = "factory"
+warehouse = "factory"
+manufacture = "factory"
+garage = "factory"
+garages = "factory"
+parking = "factory"
+service = "factory"
+house = "rowhouse"
+terrace = "rowhouse"
+townhouse = "rowhouse"
+detached = "rowhouse"
+semidetached_house = "rowhouse"
+school = "civic"
+university = "civic"
+college = "civic"
+hospital = "civic"
+government = "civic"
+public = "civic"
+civic = "civic"
+stadium = "civic"
+train_station = "civic"
+transportation = "civic"
+church = "civic"
+cathedral = "civic"
+synagogue = "civic"
+mosque = "civic"
+museum = "civic"
+library = "civic"
+fire_station = "civic"
+sports_hall = "civic"
+kindergarten = "civic"
+
+# facade styles in the viewer's order (engine/viewer/facade.js): floor = nominal floor height (m), palette = wall
+# colours (glass: the glass tint), one picked per building. Sampled from Commons photos where the research says
+# so (demos/nyc/data/landmark_facades.md, "Manhattan facade palettes by building type"), else estimates.
+[facade.styles.glass]       # curtain-wall towers since the 1950s
+floor = 4.0
+palette = ["#4b6280", "#5d6d84", "#44607f", "#818a8d", "#6c6c72", "#8895a7", "#5a6a78", "#9aa3a6", "#a7aea9",
+    "#6e7a6a", "#7a7466", "#8c8f8c", "#556066", "#b0b5b6"]   # blue-grey, silver, green-grey, bronze, neutral grey
+[facade.styles.residential] # post-war and modern apartment houses: brick or panel, window bands
+floor = 2.9
+palette = ["#a39686", "#b1a18d", "#8a5a44", "#c2b8a8", "#9d8f80", "#d0c8bb", "#7f6a5c", "#b9ab98", "#8f7f70"]
+[facade.styles.brownstone]  # row houses: brownstone, red brick, painted in the Village
+floor = 3.3
+palette = ["#6b5345", "#74594a", "#5e4a3e", "#7c6252", "#8a5040", "#9a6450", "#b0a08c", "#c2b39c"]
+[facade.styles.brick]       # tenements and pre-war apartment houses
+floor = 3.1
+palette = ["#8b5a45", "#9a6450", "#7a4a3a", "#b39b7d", "#a58e72", "#6a4a3c", "#a56a4a", "#7a6d6a", "#94735e", "#b8a58c"]
+[facade.styles.stone]       # pre-war offices and lofts, 1910s-30s setback towers: limestone, buff brick, terracotta
+floor = 3.8
+palette = ["#b8ae9c", "#a89d85", "#c6bdad", "#9c958c", "#cfc6b6", "#b3a58a", "#a6a6a0", "#928b88"]
+[facade.styles.castiron]    # SoHo and Tribeca lofts: painted cast iron
+floor = 4.3
+palette = ["#c9c3b6", "#b8b2a6", "#a8a296", "#a0948f", "#d6d0c2", "#918b83"]
+[facade.styles.commercial]  # stores, podiums, markets
+floor = 4.5
+palette = ["#b8b0a3", "#a89f92", "#c7c0b3", "#8f8a82", "#b5ab9b"]
+[facade.styles.civic]       # schools, churches, hospitals, stations
+floor = 4.2
+palette = ["#c9bfae", "#b8a88f", "#9c8672", "#d4ccbd", "#a8927c"]
+[facade.styles.factory]     # warehouses, garages, piers' sheds
+floor = 4.6
+palette = ["#9a8f84", "#7f766c", "#a8a096", "#b5aca0", "#8c7a6a"]
+[facade.styles.plain]       # rooftop plant rooms and bulkheads: no windows
+floor = 0.0
+palette = ["#9a968e"]
+[facade.styles.signs]       # walls covered in billboards and screens up to 26-58 m, glass above (Times Square)
+floor = 4.0
+palette = ["#3c4654", "#4a5566", "#2e3440"]
+[facade.styles.spire]       # masts and spires (thin tower parts above the roof): steel
+floor = 0.0
+palette = ["#b8bcc0"]
+# landmark styles, set from data/landmark_facades.csv with the tint sampled from photos
+[facade.styles.fins]        # glass between stainless fins/piers
+floor = 4.1
+palette = ["#6d8290"]
+[facade.styles.bands]       # glass with horizontal spandrel bands
+floor = 4.0
+palette = ["#5e7084"]
+[facade.styles.lattice]     # diamond steel lattice, glass/panel infill
+floor = 5.0
+palette = ["#6a8090"]
+[facade.styles.honeycomb]   # hexagonal cells, metal and glass
+floor = 5.0
+palette = ["#dfe2e4"]
+[facade.styles.panel]       # metal panel cladding (halls)
+floor = 5.0
+palette = ["#a9adb1"]
+
+[facade.styles.piers]       # glass between glazed terracotta piers (Steinway Tower)
+floor = 4.1
+palette = ["#56554f"]
+[facade.styles.floodlit]    # statues and monuments: no windows, floodlit after dark
+floor = 0.0
+palette = ["#9c978d"]
+[facade.styles.crowned]     # stone setback towers whose crowns are floodlit after dark (named in landmark_facades.csv): stone by day
+floor = 3.8
+palette = ["#b8ae9c", "#a89d85", "#c6bdad", "#9c958c", "#cfc6b6", "#b3a58a", "#a6a6a0", "#928b88"]
+[facade.osm_style]          # style = OSM building tags that set it
+brownstone = ["house", "detached", "terrace", "townhouse", "semidetached_house"]
+factory = ["industrial", "warehouse", "factory", "manufacture", "shed", "hangar", "garage", "garages", "parking", "service"]
+commercial = ["retail", "supermarket", "mall", "kiosk"]
+civic = ["school", "university", "college", "kindergarten", "hospital", "train_station", "civic", "government",
+    "public", "temple", "church", "cathedral", "synagogue", "mosque", "transportation", "stadium", "sports_hall",
+    "museum", "library", "fire_station"]
+
+[markings.sidewalk_w]       # sidewalk width (m) each side: Manhattan's avenues 15-20 ft, streets 10-15 ft
+trunk = 5.0
+primary = 5.5
+secondary = 5.0
+tertiary = 4.5
+residential = 4.0
+unclassified = 3.5
+[markings.median_w]         # planted median of a divided road (Park Avenue's and Broadway's malls, parkways)
+motorway = 2.0
+trunk = 2.0
+primary = 3.0
+secondary = 2.0
+
+[roads.parking_lanes]       # OSM lanes are moving lanes; a parking lane along each kerb comes on top
+primary = 2
+secondary = 2
+tertiary = 2
+residential = 2
+unclassified = 2
+living_street = 1
+[roads.default_w]           # kerb to kerb (m), parking lanes included, where neither width nor lanes are tagged
+motorway = [22, 11]
+trunk = [20, 11]
+primary = [21, 18]          # Manhattan's avenues: 60-70 ft of roadway
+secondary = [18, 15]
+tertiary = [13, 11]
+residential = [11, 9.5]     # 30-34 ft side streets with a parking lane each side
+unclassified = [10, 8]
+living_street = [6, 5]
+road = [10, 8]
+service = [5, 4.5]
+pedestrian = [8, 8]
+link = [8, 7]
+
+[shores]
+coast_type = "quay"         # bulkheads and relieving platforms along both rivers (esplanades are revetments where tagged)
+# exposed mud only where the tide leaves it: tidal flats and salt marsh (natural=shoal is always under water,
+# inland marshes and swamps have no mud coast)
+mudflat = ["natural=mud", "wetland=tidalflat", "wetland=saltmarsh"]
+mudflat_min_area = 2500.0   # pocket marshes by the piers (Brooklyn Bridge Park) and scraps of flat keep their bulkhead
+
+[trees]
+none = ["leisure=pitch", "leisure=track", "leisure=stadium"]   # ballfields, Pier 40's turf
+[trees.green]               # OSM green tag -> class, first match wins
+"landuse=forest" = "forest"
+"natural=wood" = "forest"
+"leisure=nature_reserve" = "forest"
+"landuse=cemetery" = "park"              # park-like, lawns and old trees
+"leisure=park" = "park"
+"leisure=garden" = "park"
+"landuse=recreation_ground" = "park"
+"landuse=village_green" = "park"
+"landuse=orchard" = "orchard"
+"natural=scrub" = "scrub"
+"natural=heath" = "scrub"
+"landuse=grass" = "grass"
+"landuse=meadow" = "grass"
+"natural=grassland" = "grass"
+"landuse=farmland" = "grass"
+"leisure=golf_course" = "grass"
+[trees.street]
+default = "broadleaf"       # honey locust, London plane, Callery pear, ginkgo, pin oak, linden (tree census 2015)
+step = 8.5                  # tree pits 25-30 ft apart
+row_offset = 1.0            # pits a metre in from the kerb
+[trees.street.odds]         # no palms; pears are not in bloom in October
+major = []
+minor = []
+[trees.street.planted]      # the share of streets with trees: Midtown's avenues are mostly bare
+major = 0.45
+minor = 0.8
+[trees.street.height]
+palm = [11, 16]
+flowering = [7, 10]
+broadleaf = {major = [9, 16], minor = [7, 14]}
+
+[cars]
+oneway_both_sides = true    # New York's one-way side streets are parked along both kerbs
+kerb_occupancy = 0.85       # alternate-side parking: rows are nearly full
+parked_mix = [48, 34, 3, 11, 0, 4, 0]
+# vehicle types: name, length, width, height (m), in the viewer's order
+types = [
+    ["sedan", 4.9, 1.85, 1.46],
+    ["suv", 4.95, 1.95, 1.78],
+    ["taxi", 4.88, 1.84, 1.62],      # NYC yellow cab: Camry hybrid, RAV4, minivans, with the roof light
+    ["van", 5.9, 2.05, 2.5],         # delivery vans (Sprinter, Transit, UPS package cars)
+    ["bus", 12.5, 2.59, 3.2],        # MTA New Flyer Xcelsior 40 ft
+    ["truck", 8.5, 2.5, 3.6],        # box trucks
+    ["lorry", 16.0, 2.6, 4.1],       # tractor-trailers on the highways
+]
+[cars.link_speed]
+motorway = 13
+trunk = 11
+[cars.kerbside]             # nearly every kerb is parked (alternate-side parking)
+primary = 0.45
+secondary = 0.7
+tertiary = 0.9
+residential = 0.95
+unclassified = 0.8
+living_street = 0.8
+road = 0.7
+service = 0.4
+# per road class: free-flow speed (m/s; 25 mph citywide), mean gap front to front (m, per lane at activity 1),
+# queue factor at signalled junction ends, and the mix (sedan, suv, taxi, van, bus, truck, lorry): yellow cabs
+# are a quarter of Midtown's traffic
+[cars.class]
+motorway = [18, 40, 0.8, [44, 30, 6, 8, 1, 6, 5]]
+trunk = [15, 36, 0.4, [44, 30, 8, 8, 2, 6, 2]]
+primary = [10, 26, 0.35, [30, 22, 26, 10, 7, 7, 0]]      # avenues: M-buses and box trucks in the kerb lane
+secondary = [9, 30, 0.35, [32, 26, 22, 11, 4, 5, 0]]
+tertiary = [9, 40, 0.35, [34, 28, 20, 12, 1, 5, 0]]
+residential = [7, 70, 0.4, [36, 32, 14, 13, 0, 5, 0]]
+unclassified = [7, 80, 0.4, [38, 30, 12, 13, 0, 7, 0]]
+living_street = [4, 140, 0.5, [40, 34, 10, 12, 0, 4, 0]]
+road = [7, 80, 0.4, [38, 30, 12, 13, 0, 7, 0]]
+service = [5, 150, 0.5, [40, 30, 6, 16, 0, 8, 0]]
+# colour palettes per type: [body, second colour ("": none), weight]. US colour shares (Axalta): white 29 %,
+# black 23 %, grey 22 %, silver 7 %, blue 6 %, red 5 %, others
+[cars.palettes]
+sedan = [["#e8e9e8", "", 20], ["#f2f2ef", "", 5], ["#0e0f11", "", 18], ["#1b1d21", "", 5],
+    ["#6a6e72", "", 12], ["#44484c", "", 7], ["#8d9296", "", 3], ["#a6aaae", "", 5], ["#c2c4c4", "", 2],
+    ["#1c3050", "", 3], ["#2f5a93", "", 3], ["#8e1a1f", "", 4], ["#b3322c", "", 1],
+    ["#5b4333", "", 2], ["#b5a386", "", 2], ["#3c5a46", "", 1]]
+suv = [["#e8e9e8", "", 20], ["#f2f2ef", "", 5], ["#0e0f11", "", 20], ["#1b1d21", "", 6],
+    ["#6a6e72", "", 12], ["#44484c", "", 7], ["#8d9296", "", 3], ["#a6aaae", "", 5],
+    ["#1c3050", "", 3], ["#2f5a93", "", 3], ["#8e1a1f", "", 4], ["#5b4333", "", 2], ["#3c5a46", "", 1]]
+taxi = [["#ffbf0f", "#ffbf0f", 100]]                     # "taxi yellow"; the black livery stripe is too small to see
+van = [["#ecedec", "", 45], ["#4b3621", "#4b3621", 14],  # white vans, UPS brown
+    ["#ecedec", "#4d148c", 8], ["#2a3440", "", 10],     # FedEx, Amazon's dark grey-blue
+    ["#a9adb1", "", 13], ["#141518", "", 10]]
+bus = [["#e8eaec", "#1d4f9c", 55], ["#1c2a4a", "#3fa9f5", 45]]   # MTA: white with blue, the new navy and light blue
+truck = [["#ecedec", "#ecedec", 55], ["#ecedec", "#b3282a", 10], ["#1b3f7a", "#ecedec", 8],
+    ["#e3b021", "#ecedec", 5], ["#2c7447", "#ecedec", 5], ["#6a6e72", "#ecedec", 17]]
+lorry = [["#e8e9e8", "#c9ccce", 30], ["#b3282a", "#c9ccce", 15], ["#2a5aa8", "#c9ccce", 15],
+    ["#141518", "#c9ccce", 20], ["#e8e9e8", "#e8e9e8", 20]]
+
+[rooftops.parapet_t]        # parapet thickness per facade style (m); others rooftops.parapet_default
+village = 0.2
+glass = 0.3
+[rooftops.named]            # colours the programmes (presets/us_northeast/rooftops.py) use, sRGB
+stainless = "#cdd1d3"
+stainless2 = "#b7bcbf"
+tank_blue = "#2d6db0"
+tank_blue2 = "#3f88c6"
+tank_white = "#e2e0d8"
+tank_beige = "#d6ccb4"
+tank_green = "#6f8f7a"
+shed_blue = "#4679ad"
+shed_blue2 = "#5588bb"
+shed_cyan = "#6c9fbf"
+shed_white = "#d9dbd8"
+shed_grey = "#9ba1a4"
+shed_red = "#a24a3c"
+shed_green = "#5f8f6f"
+tile_red = "#8c4c3a"
+tile_orange = "#a4674a"
+tile_green = "#4c7058"
+tile_grey = "#5c6166"
+tile_blue = "#4a6583"
+tile_yellow = "#a38a55"
+concrete = "#a9a59c"
+concrete_light = "#cbc7bd"
+concrete_dark = "#86827b"
+white_tile = "#dcdad3"
+hvac = "#cfcec6"
+hvac2 = "#aeb3b3"
+hvac3 = "#bdb7a6"
+cooling = "#8d9898"
+cooling2 = "#7c8f8a"
+cooling_blue = "#6b8fae"
+steel = "#9ea3a6"
+steel_white = "#dddcd7"
+steel_dark = "#4b4f53"
+pv = "#1e2b46"
+tubes = "#1c2330"
+glass = "#8fa6b4"
+green = "#5a753d"
+green2 = "#6c8746"
+foliage = "#3a4a2c"
+foliage2 = "#45542f"
+foliage3 = "#505c34"
+foliage4 = "#5a6238"
+helipad = "#4b5c53"
+helipad_grey = "#676c6e"
+asphalt = "#3d3f41"
+car_white = "#e6e6e3"
+car_silver = "#b6b9bc"
+car_black = "#1d1e21"
+car_grey = "#5e6267"
+car_red = "#8c2320"
+car_blue = "#27426f"
+car_champagne = "#c6b597"
+cedar = "#8a7760"           # weathered cedar water tanks (sampled, SoHo, landmark_facades.md)
+cedar_dark = "#5e5448"
+cedar_new = "#c9ae8a"
+brick = "#8b5a45"
+brick_dark = "#6a4a3c"

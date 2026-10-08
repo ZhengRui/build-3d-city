@@ -1,0 +1,1161 @@
+{
+  "title": "Berlin",
+  "startView": "Unter den Linden to the Fernsehturm",
+  "startViewPortrait": "Brandenburg Gate",
+  "about": "Berlin: the historic core of Mitte with Museum Island and Unter den Linden, Tiergarten with the government quarter, Moabit, the Hansaviertel, Friedrichshain, Kreuzberg and Alt-Treptow, and the City West round the Zoo, the Kurfürstendamm and the Gedächtniskirche; around them the Bezirke and the land to about 36 km.\n\nReal, from open data, each thing where it is: the buildings from Berlin's official 3D building model (LoD2, the cadastre's footprints house by house, side wing by side wing, about 90,000 pieces), each at its height measured by the city's airborne laser scanning (the catalogue gives no flight year), with its roof type; OpenStreetMap's outlines only where the cadastre has none, and the towers finished since the scan (EDGE East Side, the Berlinian, Upbeat) and the landmarks' tops at their published heights; storeys and functions from the Umweltatlas's building heights; the ground from the city's 1 m laser terrain model (ATKIS DGM1), the Kreuzberg and Mont Klamott within a metre of their surveyed heights; roads (and their widths where tagged), bridges, railways, tram lines, the Spree, the canals, ponds, parks and land use from OpenStreetMap; the paths of the BVG's bus routes (OpenStreetMap's route relations) and of the tram tracks, which the buses and trams keep to; the street and park trees from the city's tree cadastre (Baumbestand: about 100,000 inside the districts, each at its place with its genus, height and crown); the street lamps from the city's lighting inventory (about 52,600 in and round the districts, each at its place with its fixture type, 3,260 of them gas lamps); the town beyond the districts to 4 km from the Umweltatlas's footprints and measured heights (as plain block masses); the far land's colours from ESA WorldCover; the sun on 10 October, clock time CEST.\n\nInferred from real attributes: the buildings' facade styles (Gründerzeit Altbau with its side and rear wings, post-war infill, Plattenbau, Karl-Marx-Allee's tiles, the Hansaviertel's slabs, brick, sandstone, glass) from the cadastre's building function, the Umweltatlas's block types, storeys, roof type and height; roof shapes (the Berliner Dach, pitched red tile, flat) from the LoD2's roof type; the widths of roads OpenStreetMap gives none; the bridges' deck heights (the water's level plus the waterways' clearance); the water levels (the Spree's upper and lower pools, the Landwehrkanal, from the laser terrain's water surfaces); each lamp's height, colour temperature and brightness from its fixture type (no colour or height is published per lamp; a share of the main roads' lamps sodium); the ground at the DGM1's bare corners and the far hills from Copernicus GLO-30, a surface model let down to meet the laser terrain.\n\nModelled after photos, not measured: the landmarks' shapes and parts (the Fernsehturm's shaft, sphere and antenna, the Brandenburg Gate and its Quadriga, the Reichstag's glass dome and corner towers, the Berliner Dom's drum, dome and towers, the Humboldt Forum's dome, the Französischer and Deutscher Dom, St. Hedwig's and the Bode-Museum's domes, the Altes Museum's colonnade, the Konzerthaus's portico, the Rotes Rathaus's tower top, the church steeples, the Siegessäule, the Gedächtniskirche's broken tower, the Sony Center's tent, the Haus der Kulturen der Welt's shell, the Oberbaumbrücke's towers, the Molecule Man, the East Side Gallery's wall, the Kreuzberg monument, the Neue Nationalgalerie's roof plate and glass hall, the Alte Nationalgalerie's temple front, the Soviet War Memorial's mound, soldier and banners in Treptower Park, Checkpoint Charlie's booth and sign, the Berlin Wall's segments at the Bernauer Straße (their line from OpenStreetMap), the Philharmonie's and the Kammermusiksaal's tents, the station halls, the Park Inn's antenna, the Europa-Center's star, the Funkturm as a lattice); their colours sampled from photos or estimated from them; landmarks without modelled massing take the generic facade styles.\n\nInvented to look plausible: the facades' detail (windows, stucco, string courses, shopfronts and wall colours drawn by the shader from palettes sampled from photos, not photographed); the roofs' details (chimneys, plant, parapets); the road markings' layout, the pavements and their mosaic strips, the quay walls and the paving; the cars, taxis, vans, buses and trams themselves, their number and timing (no timetable), and where the cars drive and park; 163 limes on Unter den Linden's promenade where neither the cadastre nor OpenStreetMap has its rows, woods where the cadastre lists no trees (the Tiergarten's forest), trees beyond the districts; the East Side Gallery's murals; which windows are lit at night, the floodlights on the monuments, the lamps' glow, and the glow.\n\nCredits: Land Berlin, Geoportal Berlin (gdi.berlin.de), all under the Datenlizenz Deutschland – Zero – Version 2.0 (dl-de/zero-2.0, no conditions; credited as a courtesy): Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen Berlin, 3D-Gebäudemodelle LoD2 and ATKIS DGM1; Umweltatlas Berlin (Senatsverwaltung für Mobilität, Verkehr, Klimaschutz und Umwelt), Gebäudehöhen and Reale Nutzung 2024; Land Berlin, Baumbestand Berlin; Öffentliche Beleuchtung. © OpenStreetMap contributors (ODbL), via a BBBike extract. Contains modified Copernicus DEM GLO-30 data © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved. © ESA WorldCover project 2021 / Contains modified Copernicus Sentinel data (2021) processed by ESA WorldCover consortium (CC BY 4.0). Reference photos from Wikimedia Commons were only looked at, not redistributed. The derived data (buildings, trees, lamps, roads and the rest) is a derivative database of OpenStreetMap's ODbL data and is offered under the Open Database License 1.0 (ODbL): it is the data files this page loads, served next to it (tiles, blocks, markings, trees, lamps and the other folders beside this page) and made by this repository's pipeline; the rendered images are Produced Works, attributed as above. Rendered with three.js and its meshoptimizer decoder (both MIT licence).",
+  "switchTitles": {"masses": "The town beyond the districts to 4 km, raised as plain block masses from the Umweltatlas's footprints at their measured heights (no roof shapes or facades)", "lamps": "The street lamps from Berlin's lighting inventory, each at its place (height, colour and brightness by fixture type; the gas lamps green-gold): a pool of light on the street and a glowing head per lamp, drawn only after dark (off: those streets go dark)", "trees": "The street and park trees from Berlin's tree cadastre (Baumbestand), each at its place with its genus, height and crown; invented woods where the cadastre is silent"},
+  "storagePrefix": "berlin3d",
+  "three": "local",
+  "location": {
+    "latitude": 52.5163,
+    "longitude": 13.3777
+  },
+  "sun": {
+    "date": "10-10"
+  },
+  "time": {
+    "start": 16.0,
+    "presets": {
+      "Day": 16.0,
+      "Dusk": 18.75,
+      "Night": 21.5
+    },
+    "utcOffset": 2,
+    "zone": "CEST"
+  },
+  "loading": {
+    "earlyCompile": true,
+    "deferLayers": false,
+    "frustumNear": true,
+    "passesLater": true
+  },
+  "animation": {
+    "gate": "frame",
+    "slowMs": 70,
+    "full": true,
+    "reason": true
+  },
+  "shadows": {
+    "groundSteep": 3,
+    "fit": true
+  },
+  "tiles": {
+    "merge": [
+      "road",
+      "bridge",
+      "markings"
+    ]
+  },
+  "camera": {
+    "azimuth": 200,
+    "clear": 2
+  },
+  "water": {
+    "mirrorCull": true,
+    "mirrorChunk": 250,
+    "windFrom": 225,
+    "sea": {
+      "shore": [0.0754, 0.091, 0.0832],
+      "near": [0.0598, 0.078, 0.0754],
+      "offshore": [0.0468, 0.0676, 0.078],
+      "silt": [0.091, 0.0962, 0.078],
+      "basin": [0.0442, 0.0598, 0.0572]
+    },
+    "inland": {
+      "river": [0.17, 0.19, 0.135],
+      "lake": [0.014, 0.026, 0.024],
+      "basin": [0.11, 0.13, 0.12],
+      "skyTint": [0.95, 0.95, 0.92],
+      "riverReflect": 0.7,
+      "reflectGrazing": 1.0,
+      "seaLink": false,
+      "riverWaves": 0.55,
+      "still": {
+        "maxArea": 3000000,
+        "body": [0.034, 0.038, 0.024],
+        "reflect": 1.4,
+        "waves": 0.05,
+        "banks": 0.3
+      }
+    },
+    "mirror": 1.7,
+    "skySaturation": {
+      "inland": 0.12
+    },
+    "mirrorBlur": 2.0,
+    "mirrorLines": 840,
+    "mirrorDistort": 0.4,
+    "night": {
+      "glow": 0.06,
+      "sky": 0.12,
+      "gain": 2.5,
+      "max": 2.5,
+      "streak": 5,
+      "knee": 0.08,
+      "base": 0.3,
+      "desat": 0.85,
+      "desatTint": [0.8, 0.9, 1.25],
+      "floor": [0.0025, 0.0036, 0.008]
+    }
+  },
+  "markings": {
+    "centreColour": "white",
+    "dashes": {
+      "street": [9, 3],
+      "arterial": [9, 3],
+      "motorway": [18, 6],
+      "centre": [9, 3]
+    },
+    "sidewalk": {
+      "paving": [0.33, 0.32, 0.3],
+      "flag": [0.35, 0.35],
+      "red": 0.0,
+      "bike": null,
+      "tactile": false,
+      "flowers": false,
+      "pits": false,
+      "kerb": [0.36, 0.355, 0.34], "gutterShade": 0.8, "arrisShade": 0.85,
+      "kerbW": 0.3,
+      "granite": true,
+      "gutter": 0.3,
+      "median": [[0.07, 0.088, 0.045], [0.12, 0.14, 0.07]], "promenade": { "gravel": [[0.3, 0.265, 0.2], [0.4, 0.355, 0.27]], "edge": 0.35 },
+      "style2": {
+        "granite": 0.5
+      }
+    },
+    "zebra": {
+      "bar": 0.5,
+      "gap": 0.5,
+      "from": 0.5,
+      "to": 4.0,
+      "zigzags": false,
+      "mid": {
+        "half": 2.0,
+        "period": 1.0,
+        "bar": 0.5,
+        "give": false
+      },
+      "signal": {
+        "studs": 2.0,
+        "w": 0.12,
+        "period": 1.0,
+        "on": 0.5,
+        "stop": 3.4,
+        "stopW": 0.3
+      },
+      "studs": {
+        "at": [0.6, 4.4],
+        "w": 0.12,
+        "period": 1.0,
+        "on": 0.5
+      }
+    },
+    "stopLine": [5.2, 5.7],
+    "lineWidth": [0.12, 0.15],
+    "edgeLines": false,
+    "stopInset": 1.0,
+    "bigCentre": "solid",
+    "giveWay": "teeth",
+    "busLane": {
+      "legend": 40,
+      "w": 3.25,
+      "line": 0.25,
+      "red": [0.2, 0.05, 0.04]
+    },
+    "cycleLane": {
+      "w": 1.9,
+      "line": 0.25,
+      "dashes": [9, 9],
+      "colour": [0.22, 0.06, 0.045]
+    },
+    "nearside": "right",
+    "repaving": {
+      "share": 0.1,
+      "dark": 0.85,
+      "light": 1.1
+    },
+    "setts": {
+      "tone": [
+        [0.2, 0.198, 0.19],
+        [0.34, 0.335, 0.32]
+      ],
+      "row": 0.16,
+      "stone": 0.13
+    },
+    "tram": {}
+  },
+  "facade": {
+    "preset": "de-berlin",
+    "probe": { "glassOnly": true, "lean": true, "reach": 2000 },
+    "acUnits": {
+      "nachkrieg": 0.02,
+      "platte": 0.02,
+      "neubau": 0.02,
+      "beton": 0.05,
+      "concretepanel": 0.04
+    },
+    "refugeShare": 0.0,
+    "glass": {
+      "skyDesat": 0.6,
+      "skyDim": 0.75,
+      "reflectance": 1.0,
+      "silverFrom": 0.06,
+      "silverTo": 0.3,
+      "silverDesat": 0.45,
+      "variety": true
+    },
+    "shopSeed": true,
+    "roofs": {
+      "tile": [0.28, 0.098, 0.058],
+      "tileAge": 0.45,
+      "flatTops": 0.45,
+      "zinc": [0.2, 0.205, 0.215],
+      "blueSteel": 0.03,
+      "tones": [
+        [
+          [
+            0.27,
+            0.26,
+            0.23
+          ],
+          4
+        ],
+        [
+          [
+            0.05,
+            0.05,
+            0.05
+          ],
+          2
+        ],
+        [
+          [
+            0.39,
+            0.37,
+            0.33
+          ],
+          2
+        ],
+        [
+          [
+            0.15,
+            0.2,
+            0.08
+          ],
+          0.35
+        ]
+      ]
+    }
+  },
+  "trees": {
+    "classes": {
+      "park": {
+        "mix": {
+          "maple": 0.3,
+          "lime": 0.14,
+          "oak": 0.12,
+          "broadleaf": 0.22,
+          "robinia": 0.07,
+          "chestnut": 0.06,
+          "birch": 0.05,
+          "plane": 0.04
+        },
+        "p": 0.85,
+        "h": [
+          10,
+          22
+        ],
+        "wr": [
+          0.8,
+          1.1
+        ],
+        "clump": 0.5
+      },
+      "forest": {
+        "mix": {
+          "oak": 0.24,
+          "maple": 0.26,
+          "broadleaf": 0.28,
+          "lime": 0.11,
+          "chestnut": 0.04,
+          "birch": 0.04,
+          "robinia": 0.03
+        },
+        "h": [
+          10,
+          22
+        ],
+        "wr": [
+          0.65,
+          0.95
+        ],
+        "p": 0.9,
+        "clump": 0.3
+      },
+      "orchard": {
+        "mix": {
+          "broadleaf": 1
+        }
+      },
+      "scrub": {
+        "mix": {
+          "broadleaf": 0.4,
+          "maple": 0.25,
+          "robinia": 0.2,
+          "birch": 0.15
+        }
+      },
+      "grass": {
+        "mix": {
+          "lime": 0.38,
+          "maple": 0.17,
+          "plane": 0.08,
+          "oak": 0.07,
+          "chestnut": 0.05,
+          "robinia": 0.06,
+          "birch": 0.05,
+          "broadleaf": 0.14
+        },
+        "p": 0.02
+      },
+      "residential": {
+        "mix": {
+          "lime": 0.38,
+          "maple": 0.17,
+          "plane": 0.08,
+          "oak": 0.07,
+          "chestnut": 0.05,
+          "robinia": 0.06,
+          "birch": 0.05,
+          "broadleaf": 0.14
+        },
+        "p": 0.12
+      },
+      "campus": {
+        "mix": {
+          "lime": 0.38,
+          "maple": 0.17,
+          "plane": 0.08,
+          "oak": 0.07,
+          "chestnut": 0.05,
+          "robinia": 0.06,
+          "birch": 0.05,
+          "broadleaf": 0.14
+        },
+        "p": 0.14
+      },
+      "industrial": {
+        "mix": {
+          "lime": 0.38,
+          "maple": 0.17,
+          "plane": 0.08,
+          "oak": 0.07,
+          "chestnut": 0.05,
+          "robinia": 0.06,
+          "birch": 0.05,
+          "broadleaf": 0.14
+        },
+        "p": 0.05
+      },
+      "open": {
+        "mix": {
+          "lime": 0.38,
+          "maple": 0.17,
+          "plane": 0.08,
+          "oak": 0.07,
+          "chestnut": 0.05,
+          "robinia": 0.06,
+          "birch": 0.05,
+          "broadleaf": 0.14
+        },
+        "p": 0.1
+      }
+    },
+    "species": {
+      "banyan": {
+        "drop": true
+      },
+      "camphor": {
+        "drop": true
+      },
+      "acacia": {
+        "drop": true
+      },
+      "bloom": {
+        "drop": true
+      },
+      "mangrove": {
+        "drop": true
+      },
+      "royal": {
+        "drop": true
+      },
+      "coconut": {
+        "drop": true
+      },
+      "plane": {
+        "like": "camphor",
+        "tiles": [
+          0,
+          1
+        ],
+        "h": 15,
+        "R": 6.3,
+        "wK": 0.82,
+        "trunkK": 0.9,
+        "bark": "#a29d86",
+        "pal": [
+          "#6d7c40",
+          "#768342",
+          "#7f8a46",
+          "#687540",
+          "#86904a"
+        ],
+        "shape": {
+          "base": 0.36,
+          "lobes": 12,
+          "ring": 0.62,
+          "lobeR": [
+            0.34,
+            0.46
+          ],
+          "cards": 6,
+          "size": [
+            0.55,
+            0.75
+          ],
+          "fork": 0.3,
+          "flat": 1.0,
+          "inner": 1,
+          "up": [
+            0.5,
+            1.25
+          ],
+          "scaffold": [
+            2,
+            0.62,
+            4
+          ]
+        },
+        "leaf": {
+          "form": "lobed",
+          "L": 15,
+          "W": 15,
+          "n": 950,
+          "sprays": [
+            26,
+            32
+          ],
+          "size": 0.15,
+          "spread": 1,
+          "hue": 0.1,
+          "turn": 0.14
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#8e8244",
+          "#978a48",
+          "#857c42",
+          "#a08e4c"
+        ],
+        "bark2": "#c9c3a4",
+        "vary": 0.7,
+        "mottle": [
+          0.08,
+          0.34,
+          4.5
+        ],
+        "lean": 0.06,
+        "asym": 0.16
+      },
+      "chestnut": {
+        "like": "camphor",
+        "tiles": [
+          2,
+          3
+        ],
+        "h": 12,
+        "R": 5.2,
+        "wK": 0.95,
+        "trunkK": 1.25,
+        "bark": "#6f665b",
+        "pal": [
+          "#66683a",
+          "#6e6c3c",
+          "#5e6438",
+          "#76703e",
+          "#6a6a3c"
+        ],
+        "shape": {
+          "base": 0.3,
+          "lobes": 9,
+          "ring": 0.5,
+          "lobeR": [
+            0.42,
+            0.52
+          ],
+          "cards": 5,
+          "size": [
+            0.55,
+            0.72
+          ],
+          "fork": 0.3,
+          "flat": 1.1,
+          "inner": 0
+        },
+        "leaf": {
+          "form": "palmate",
+          "L": 13,
+          "W": 3.2,
+          "n": 700,
+          "sprays": [
+            22,
+            28
+          ],
+          "size": 0.15,
+          "spread": 1,
+          "hue": 0.1,
+          "turn": 0.6
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#8e5a32",
+          "#9a6538",
+          "#7c4e2e",
+          "#a6703e"
+        ],
+        "vary": 0.7,
+        "turnVary": 0.8,
+        "asym": 0.1
+      },
+      "lime": {
+        "like": "camphor",
+        "tiles": [
+          4,
+          5
+        ],
+        "h": 13,
+        "R": 4.0,
+        "wK": 0.72,
+        "trunkK": 1.1,
+        "bark": "#48443e",
+        "furrow": [0.5, 7],
+        "pal": [
+          "#6f803c",
+          "#78873e",
+          "#82903f",
+          "#8a8f3d",
+          "#74843c"
+        ],
+        "shape": {
+          "base": 0.3,
+          "lobes": 9,
+          "ring": 0.44,
+          "lobeR": [
+            0.42,
+            0.52
+          ],
+          "cards": 6,
+          "size": [
+            0.55,
+            0.72
+          ],
+          "fork": 0.35,
+          "flat": 1.45,
+          "inner": 0
+        },
+        "leaf": {
+          "L": 9,
+          "W": 6.5,
+          "n": 3600,
+          "sprays": [
+            30,
+            38
+          ],
+          "size": 0.14,
+          "spread": 1,
+          "hue": 0.12,
+          "turn": 0.3
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#c0a93a",
+          "#b89e36",
+          "#c8b048",
+          "#a89a3a"
+        ],
+        "vary": 0.7,
+        "asym": 0.1,
+        "turnVary": 0.6
+      },
+      "robinia": {
+        "like": "acacia",
+        "tiles": [
+          6,
+          7
+        ],
+        "h": 12,
+        "R": 4.4,
+        "wK": 0.88,
+        "trunkK": 0.95,
+        "bark": "#776c5f",
+        "pal": [
+          "#7d8a45",
+          "#84903f",
+          "#76843f",
+          "#8a9448"
+        ],
+        "shape": {
+          "base": 0.4,
+          "lobes": 9,
+          "ring": 0.66,
+          "lobeR": [
+            0.34,
+            0.44
+          ],
+          "cards": 5,
+          "size": [
+            0.52,
+            0.72
+          ],
+          "fork": 0.45,
+          "flat": 0.72,
+          "inner": 0
+        },
+        "leaf": {
+          "L": 6,
+          "W": 2.8,
+          "n": 3200,
+          "sprays": [
+            24,
+            30
+          ],
+          "size": 0.15,
+          "spread": 0.95,
+          "hue": 0.1,
+          "turn": 0.2
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#a8a040",
+          "#b0a648",
+          "#9c9a3e",
+          "#b4aa4c"
+        ],
+        "vary": 0.6,
+        "asym": 0.15,
+        "lean": 0.05
+      },
+      "maple": {
+        "like": "camphor",
+        "tiles": [
+          8,
+          9
+        ],
+        "h": 10,
+        "R": 4.0,
+        "wK": 0.85,
+        "trunkK": 1.0,
+        "bark": "#7a7368",
+        "pal": [
+          "#6b7a3a",
+          "#62723a",
+          "#74803e",
+          "#6a763a"
+        ],
+        "shape": {
+          "base": 0.3,
+          "lobes": 8,
+          "ring": 0.52,
+          "lobeR": [
+            0.4,
+            0.5
+          ],
+          "cards": 7,
+          "size": [
+            0.55,
+            0.72
+          ],
+          "fork": 0.34,
+          "flat": 0.95,
+          "inner": 0
+        },
+        "leaf": {
+          "form": "lobed",
+          "L": 11,
+          "W": 11,
+          "n": 2000,
+          "sprays": [
+            30,
+            36
+          ],
+          "size": 0.14,
+          "spread": 1,
+          "hue": 0.12,
+          "turn": 0.35
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#c08a30",
+          "#b8742c",
+          "#c89a3a",
+          "#a8752e"
+        ],
+        "vary": 0.6,
+        "asym": 0.1,
+        "turnVary": 0.7
+      },
+      "oak": {
+        "like": "camphor",
+        "tiles": [
+          10,
+          11
+        ],
+        "h": 16,
+        "R": 6.0,
+        "wK": 0.9,
+        "trunkK": 1.3,
+        "bark": "#6c655b",
+        "furrow": [0.4, 5],
+        "pal": [
+          "#56663a",
+          "#5d6a34",
+          "#52603a",
+          "#62703c"
+        ],
+        "shape": {
+          "base": 0.3,
+          "lobes": 12,
+          "ring": 0.7,
+          "lobeR": [
+            0.4,
+            0.52
+          ],
+          "cards": 7,
+          "size": [
+            0.55,
+            0.72
+          ],
+          "fork": 0.35,
+          "flat": 0.78,
+          "inner": 0
+        },
+        "leaf": {
+          "L": 9,
+          "W": 4.6,
+          "n": 3800,
+          "sprays": [
+            30,
+            38
+          ],
+          "size": 0.14,
+          "spread": 1,
+          "hue": 0.1,
+          "turn": 0.06
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#7a6a36",
+          "#86703a",
+          "#6e6634",
+          "#8a7840"
+        ],
+        "vary": 0.6,
+        "asym": 0.3,
+        "lean": 0.04
+      },
+      "birch": {
+        "like": "acacia",
+        "tiles": [
+          12,
+          13
+        ],
+        "h": 13,
+        "R": 3.4,
+        "wK": 0.55,
+        "trunkK": 0.75,
+        "bark": "#d6d2c8",
+        "bark2": "#3a3631",
+        "mottle": [
+          0.3,
+          0.4,
+          3.0
+        ],
+        "pal": [
+          "#8a9446",
+          "#94984a",
+          "#7e8c42",
+          "#a4a050",
+          "#86903f"
+        ],
+        "shape": {
+          "base": 0.3,
+          "lobes": 8,
+          "ring": 0.36,
+          "lobeR": [
+            0.36,
+            0.46
+          ],
+          "cards": 4,
+          "size": [
+            0.5,
+            0.68
+          ],
+          "fork": 0.4,
+          "flat": 1.55,
+          "inner": 0
+        },
+        "leaf": {
+          "L": 5,
+          "W": 3.6,
+          "n": 4200,
+          "sprays": [
+            26,
+            32
+          ],
+          "size": 0.13,
+          "spread": 0.9,
+          "hue": 0.12,
+          "turn": 0.3
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#b8a24a",
+          "#c2ac52",
+          "#a89844",
+          "#bca04c"
+        ],
+        "vary": 0.7
+      },
+      "broadleaf": {
+        "like": "camphor",
+        "tiles": [
+          14,
+          15
+        ],
+        "h": 13,
+        "R": 5.0,
+        "wK": 0.85,
+        "trunkK": 1.15,
+        "bark": "#746e64",
+        "pal": [
+          "#5a6a36",
+          "#627038",
+          "#58683a",
+          "#66743a",
+          "#6c763c"
+        ],
+        "shape": {
+          "base": 0.3,
+          "lobes": 9,
+          "ring": 0.55,
+          "lobeR": [
+            0.4,
+            0.5
+          ],
+          "cards": 7,
+          "size": [
+            0.55,
+            0.72
+          ],
+          "fork": 0.33,
+          "flat": 0.95,
+          "inner": 0
+        },
+        "leaf": {
+          "L": 8,
+          "W": 4.5,
+          "n": 4200,
+          "sprays": [
+            32,
+            40
+          ],
+          "size": 0.14,
+          "spread": 1,
+          "hue": 0.12,
+          "turn": 0.1
+        },
+        "bloom": true,
+        "bloomPal": [
+          "#76683a",
+          "#7e7040",
+          "#6e6638",
+          "#847444"
+        ],
+        "vary": 0.6,
+        "turnVary": 0.4,
+        "asym": 0.12
+      }
+    },
+    "dense": [
+      "forest",
+      "orchard",
+      "park"
+    ],
+    "far": {
+      "from": 900,
+      "to": 3200,
+      "grow": 1.35,
+      "bright": 1.25
+    },
+    "streetLift": 1.75,
+    "trunkDrop": 2.0
+  },
+  "sliders": {
+    "reflections": 0.9
+  },
+  "ground": {
+    "yardBase": 0.4,
+    "aeroway": [
+      [0.21, 0.21, 0.205],
+      [0.245, 0.243, 0.235]
+    ],
+    "lawn": [
+      [0.066, 0.091, 0.046],
+      [0.122, 0.143, 0.074]
+    ],
+    "lawnStyle": {
+      "patches": 0.5,
+      "dry": [0.15, 0.15, 0.09],
+      "worn": 0.4,
+      "cover": 1
+    },
+    "sodium": {
+      "arterial": 0.08,
+      "street": 0.03
+    },
+    "streetLight": 1.2,
+    "outerLamps": {
+      "gain": 0.3,
+      "tint": [1, 0.78, 0.5]
+    },
+    "townLights": {
+      "gain": 0.12,
+      "base": 0.03,
+      "far": 0.002
+    },
+    "gravel": [
+      "#c8b898",
+      "#d8ccb0"
+    ],
+    "asphalt": [1.95, 1.88, 1.72],
+    "asphaltMottle": 0.5,
+    "urban": {
+      "paving": [0.36, 0.345, 0.32],
+      "concrete": [0.33, 0.325, 0.31],
+      "beige": [0.38, 0.36, 0.33],
+      "darkTop": [0.24, 0.235, 0.23],
+      "scrub": 0,
+      "soil": 0,
+      "weeds": 0.15,
+      "stain": 0.75,
+      "slab": 1.2,
+      "coverLawn": { "share": 1, "wood": 0.6, "lawn": [[0.062, 0.078, 0.038], [0.115, 0.125, 0.066]], "paths": 0.3 }
+    },
+    "paved": [
+      "#c9c5bd",
+      "#8f8b85"
+    ],
+    "pavedStyle": {
+      "setts": 0.2,
+      "slab": [1.2, 0.8],
+      "joints": 0.45,
+      "mottle": 0.12,
+      "cellTone": 0
+    },
+    "townFarCover": 1.0,
+    "townNoiseGreen": 0,
+    "townPaving": [[0.15, 0.148, 0.142], [0.21, 0.205, 0.195]],
+    "townLawn": [[0.066, 0.091, 0.046], [0.122, 0.143, 0.074]],
+    "coverLines": {"asphalt": [0.085, 0.085, 0.088], "ballast": [[0.13, 0.118, 0.105], [0.21, 0.195, 0.175]], "track": [0.05, 0.042, 0.036], "pitch": 4.5, "band": 1.7},
+    "coverWater": [0.11, 0.106, 0.094],
+    "coverWaterSky": 0.4,
+    "relief": 1.2,
+    "coverTownTint": [0.88, 0.8, 0.74],
+    "landFarCover": [3500, 7000]
+  },
+  "light": {
+    "sky": 1.5,
+    "ground": "#948a78",
+    "skyColour": "#cdd5da"
+  },
+  "haze": {
+    "density": 5e-05,
+    "colour": [
+      1.05,
+      1.18,
+      1.35
+    ],
+    "layer": 1500,
+    "thinHeight": 10000000.0,
+    "edge": [22000, 42000],
+    "height": {"density": 1.1e-04, "scale": 1000, "ramp": 4000, "lift": 0.04, "sky": 0.9, "saturation": 0.6, "edgeSky": true}
+  },
+  "night": {
+    "schedule": {
+      "feature": [[0, 0], [16.5, 0], [17, 0.3], [23, 0.3], [23.5, 0], [24, 0]],
+      "home": [[0, 0.16], [1, 0.1], [3, 0.05], [6, 0.12], [7, 0.3], [8, 0.2], [17, 0.18], [18, 0.28], [19, 0.36], [20, 0.4], [21, 0.4], [22, 0.36], [23, 0.28], [24, 0.16]],
+      "office": [[0, 0.05], [6, 0.05], [8, 0.5], [9, 0.85], [17, 0.78], [18, 0.62], [19, 0.46], [20, 0.32], [21, 0.23], [22, 0.16], [23, 0.1], [24, 0.05]],
+      "shops": [[0, 0.3], [1, 0.1], [6, 0.1], [8, 0.5], [10, 0.85], [19.5, 0.85], [20.5, 0.62], [23, 0.5], [24, 0.3]]
+    },
+    "skyGlow": [0.044, 0.039, 0.04],
+    "flood": {
+      "tint": [1.25, 0.97, 0.66],
+      "gain": 1.5,
+      "min": 0.45,
+      "spires": 0.55,
+      "bridges": 0.5,
+      "roofTint": [0.88, 0.95, 1.0],
+      "fallM": 18,
+      "ground": 4.5,
+      "roof": 0.06,
+      "low": 4.5,
+      "at": [[746.6, -748.8, 58]]
+    },
+    "dusk": {
+      "warm": 1,
+      "zenith": 1.6,
+      "horizonPow": 0.8,
+      "beltAt": 0.06,
+      "beltFall": 25,
+      "belt": 0.7,
+      "fogGlow": 0.4
+    },
+    "dimDusk": [0.3, -11],
+    "sky": {
+      "zenith": [0.003, 0.008, 0.034],
+      "glowTop": 0.012,
+      "glowFall": 7
+    },
+    "homeStyles": ["altbau", "althof", "nachkrieg", "platte", "kma", "hansa", "neubau", "house"],
+    "carSpots": true,
+    "busLights": 0.5,
+    "roofLamps": 0,
+    "lampDusk": 0.55,
+    "duskFill": {
+      "k": 0.25,
+      "colour": [0.45, 0.58, 1.0]
+    },
+    "ambient": {
+      "k": 0.35,
+      "tint": [0.75, 0.85, 1.25],
+      "ground": [0.36, 0.38, 0.42],
+      "fog": 0.8,
+      "fogTint": [0.8, 0.85, 1.2]
+    },
+    "windows": {
+      "zone": 2,
+      "litFloor": 0.95,
+      "darkFloor": 0.03,
+      "even": true,
+      "vary": 0.3,
+      "office": 0.55,
+      "max": 0.36,
+      "cool": [0.97, 0.9, 0.8],
+      "neutral": [1.0, 0.82, 0.62]
+    },
+    "masses": {
+      "k": 1.0,
+      "white": 0.6,
+      "patch": 0.85,
+      "dusk": true
+    },
+    "glows": [
+      {"at": [812.5, -1022.2], "r": 19, "y": [215.8, 218.9], "colour": [1.0, 0.84, 0.6], "k": 0.7, "dark": [196, 240]},
+      {"at": [-1450.5, -825.1], "r": 21, "y": [32.5, 56.5], "colour": [1.0, 0.78, 0.48], "k": 0.6, "fade": 0.3, "on": "lattice", "members": 0.6},
+      {"at": [-1450.5, -825.1], "r": 7.8, "y": [33, 50], "colour": [1.0, 0.82, 0.55], "k": 0.55, "fade": 0.5},
+      {"at": [-3228.0, -410.8], "r": 5, "y": [60, 73], "colour": [1.0, 0.78, 0.42], "k": 3.0, "flood": true},
+      {"at": [-4302.8, 633.1], "r": 21, "y": [5.5, 24.6], "colour": [0.03, 0.09, 0.85], "k": 0.2, "fade": 0.75, "grid": [0.6, 0.2, 0.5], "dark": [4, 32]},
+      {"at": [-4240.8, 655.2], "r": 8, "y": [5.5, 57.4], "colour": [0.03, 0.09, 0.85], "k": 0.18, "fade": 0.6, "grid": [0.6, 0.2, 0.5], "dark": [4, 62]},
+      {"at": [-1662.4, 125.9], "r": 55, "y": [42, 74], "colour": [0.42, 0.26, 1.0], "k": 0.5, "radial": 0.3, "on": "lattice", "members": 0.5},
+      {"at": [-1549.9, 242.0], "r": 24, "y": [84, 110], "colour": [1.0, 0.82, 0.55], "k": 1.2, "flood": true}
+    ]
+  },
+  "movingResolution": 1.25,
+  "features": {
+    "trees": true,
+    "rooftops": true,
+    "traffic": true
+  },
+  "cars": {
+    "sunShade": true,
+    "posts": true,
+    "keepOut": 6,
+    "glass": {
+      "reflect": 0.95,
+      "tint": 1.25,
+      "transit": 0.35
+    }
+  },
+  "lamps": {
+    "white": 0.6,
+    "falloff": 3,
+    "headFar": [14000, 24000],
+    "farGain": {"from": 4000, "to": 12000, "head": 18, "pool": 7},
+    "beaconPx": 3,
+    "pool": 0.065,
+    "head": 3.5,
+    "halo": 0.25,
+    "far": -0.5,
+    "pole": 0,
+    "spread": 1.1,
+    "cut": {
+      "spread": 0.6
+    },
+    "mirror": {
+      "px": 4,
+      "gain": 6
+    },
+    "extra": {
+      "points": [
+        {"at": [819.8, 75, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 75, -1014.9], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [805.2, 75, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 75, -1029.5], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [818.9, 135, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 135, -1015.8], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [806.1, 135, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 135, -1028.6], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [817.7, 236, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 236, -1017.0], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [807.3, 236, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 236, -1027.4], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [814.1, 282, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [810.9, 282, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [813.8, 312, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [811.2, 312, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [813.5, 342, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [811.5, 342, -1022.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [812.5, 373.5, -1022.2], "head": 0.8, "colour": [1.0, 0.03, 0.01], "flux": 3500},
+        {"at": [1044.7, 157.5, -1253.2], "head": 0.6, "colour": [1.0, 0.03, 0.01], "flux": 3500}
+      ]
+    }
+  },
+  "masses": {
+    "chunk": 3000,
+    "aoCut": true,
+    "housesNear": 22000,
+    "weathered": 0.65,
+    "cellTint": 0.8,
+    "farWindows": 0.4
+  },
+  "masts": [
+    {"name": "Funkturm", "x": -8135, "z": 531, "height": 147, "turn": 0, "colour": "#6a5246",
+      "profile": [[0, 20], [50, 9.5], [53, 12.5], [57, 9], [124, 4.2], [126, 6.5], [129, 3.4]], "mast": [129, 1.0]}
+  ],
+  "shores": {
+    "quayGrass": { "paved": 2.2, "share": 1 },
+    "pool": {
+      "shallow": [
+        0.09,
+        0.2,
+        0.22
+      ],
+      "deep": [
+        0.04,
+        0.11,
+        0.14
+      ]
+    }
+  }
+}

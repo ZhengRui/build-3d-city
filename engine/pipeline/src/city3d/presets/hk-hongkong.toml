@@ -1,0 +1,90 @@
+# Region preset "hk-hongkong": Hong Kong (M4, 6 Oct 2026), built on "china-south" (base below): every table of
+# china-south's (roads, markings, trees, cars, shores, rooftop colours) holds here unless this file sets it; the facade
+# styles add Hong Kong's own to china-south's (glass, commercial, civic, factory, village, plain and the landmark skins
+# stay, with Hong Kong's palettes where set here) and [facade.osm_style] is Hong Kong's own (replace). Its code
+# (presets/hk_hongkong/): building kinds per BUILDING, not per Lands Department row (the touching rows of one tower
+# grouped: its wings were "slab"), LandsD podium rows and named malls as podiums, stadiums and halls civic; facade
+# styles from the kind, height, LandsD's English name, OSM's tag and land use.
+#
+# HONG KONG'S FACADE STYLES (the viewer's styles/hk-hongkong.json draws each):
+#   estate     public housing blocks (the Housing Authority's Harmony, Trident, Concord, cruciform and slab blocks;
+#              LandsD names them "<name> House"): white and pastel paint with colour accents, small paired windows,
+#              AC boxes under them, ~2.75 m storeys
+#   apartment  private residential towers (30-60 storeys): beige, pink, grey and brown tiles, bay windows with their
+#              ledges, AC boxes, ~3.0 m storeys
+#   tonglau    tong lau and 1950s-70s walk-ups (Mong Kok, Sham Shui Po, Yau Ma Tei, Wan Chai, Sheung Wan; under 30 m):
+#              grimy paint, balconies (open, caged or glazed in) at every floor, shops and signboards on the street
+#   composite  1960s-80s composite buildings ("... Building", "... Mansion", 30-75 m on a small plot): mosaic tiles,
+#              small windows, AC boxes, enclosed balconies, shops under them
+#   industrial flatted factories and industrial buildings (Kwun Tong, San Po Kong, Chai Wan): grey and cream
+#              concrete, ribbon windows, ~4.2 m storeys
+#   colonial   colonial civic buildings (the Court of Final Appeal, the Former French Mission, Western Market, the
+#              Central Police Station, Flagstaff House): granite and stucco, cornices
+# Kept from china-south: glass (Central, Admiralty, Wan Chai, TST, Kowloon East's offices; Hong Kong's palette:
+# silver, blue-grey and green-grey, not Shenzhen's blue), commercial (malls and podiums), civic, factory (depots,
+# warehouses), village (the New Territories' three-storey village houses in Sai Kung and Clear Water Bay), plain,
+# residential (unused: Hong Kong's towers are estate, apartment or composite), fins, bands, lattice, honeycomb, panel.
+
+base = "china-south"
+replace = ["facade.osm_style"]
+
+[facade.styles.glass]       # Central's and Kowloon East's curtain walls: silver-grey, blue-grey, green-grey (IFC, Exchange Square)
+floor = 4.2
+palette = ["#7d8b95", "#6a7d8a", "#8b9aa3", "#5b6b76", "#6f8378", "#94a0a6", "#55636e", "#7a8c99", "#a3acb0", "#667570"]
+[facade.styles.commercial]  # malls and podiums: pale cladding, granite, render
+floor = 4.8
+palette = ["#d4d0c6", "#c6c2b9", "#bfc2c3", "#ddd6c9", "#b9b4aa", "#cfc8bc", "#c9bba6"]
+[facade.styles.village]     # village houses (three storeys, tiled or painted: white, cream, pale pink, pale green)
+floor = 3.0
+palette = ["#e8e2d2", "#e4d6bf", "#d9cdb9", "#efe9dc", "#d8c8b4", "#e1d3c8", "#cbd2cc", "#e6dcc0", "#d2c4b8"]
+[facade.styles.estate]      # Housing Authority paint: white, cream, pale yellow, pale green, pale blue, lilac
+floor = 2.75
+palette = ["#ebe8df", "#eeede6", "#e6dfcf", "#e9e3cc", "#dde6dc", "#dfe5ea", "#e6dee6", "#efe2cf", "#e3e6dd", "#e8e4d8"]
+[facade.styles.apartment]   # private towers' tiles: beige, buff, salmon pink, grey, brown
+floor = 3.0
+palette = ["#d9c9b0", "#cdb9a0", "#e0d2c0", "#d8c0b4", "#c9b2a6", "#bfb7aa", "#d6d2c8", "#b8b0a4", "#e4dccd",
+    "#c8beb0", "#a8a39b", "#d3c7b9", "#bba493"]
+[facade.styles.tonglau]     # sooty paint and render: grey, buff, faded green and blue, pink
+floor = 3.3
+palette = ["#bfb6a6", "#a9a294", "#c8bfae", "#b4a89a", "#9d9a92", "#c2b8a0", "#ad9f8a", "#b9b5aa", "#cfc3aa",
+    "#a8b0a8", "#c4a99a", "#a7aeb2"]
+[facade.styles.composite]   # mosaic tiles: grey, buff, pale green, cream, brown
+floor = 2.9
+palette = ["#c9c0ae", "#b9b4a8", "#d2c6b0", "#a9a6a0", "#c4b6a2", "#b5bdb6", "#cbb7a5", "#bdb0a0", "#d6cfc0", "#a39a8c"]
+[facade.styles.industrial]  # concrete and paint: grey, cream, pale blue-grey
+floor = 4.2
+palette = ["#b3b2ad", "#a8a9a6", "#c2c0b8", "#9c9d9a", "#bdb8ab", "#aab0b0", "#c9c6bc", "#999791", "#b9b2a2"]
+[facade.styles.colonial]    # granite, painted stucco, the French Mission's red brick
+floor = 4.6
+palette = ["#d8cfbf", "#c9bfae", "#e3dccd", "#cbb89b", "#d6d0c4", "#b8705a"]
+
+[facade.osm_style]          # style = OSM building tags that set it (where the name and kind rules leave the style)
+glass = ["office", "hotel"]
+commercial = ["retail", "supermarket", "mall", "kiosk"]
+industrial = ["industrial", "factory", "manufacture"]
+factory = ["warehouse", "shed", "hangar"]
+civic = ["school", "university", "college", "kindergarten", "hospital", "train_station", "civic", "government",
+    "public", "temple", "church", "transportation", "stadium", "sports_hall", "museum"]
+
+[rooftops.parapet_t]        # parapet thickness per facade style (m)
+village = 0.2
+tonglau = 0.2
+glass = 0.3
+
+[facade.styles.tiled]       # (M4 fix round 1) windowless walls in square ceramic tiles: the Cultural Centre's figure
+floor = 4.0
+palette = ["#d4a08e"]
+
+[facade.styles.portholes]   # (M7) round windows in a square grid on light aluminium: Jardine House (landmark_facades.csv)
+floor = 3.4
+palette = ["#e2e0d8"]
+[rooftops.named]            # the projecting street signs' board colours (presets/hk_hongkong/rooftops.py, street_signs)
+sign_white = "#e8e6de"
+sign_cream = "#e6d8b0"
+sign_yellow = "#e8b416"
+sign_red = "#b8201a"
+sign_blue = "#1d4a9a"
+sign_green = "#1f7a3e"
+sign_black = "#1a1a1c"
+sign_orange = "#d8661a"
+sign_pink = "#d0507a"

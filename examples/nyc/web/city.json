@@ -1,0 +1,418 @@
+{
+  "title": "New York 3D",
+  "about": "Manhattan (New York County), with the waterfronts facing it: Brooklyn from DUMBO and Brooklyn Heights to Downtown Brooklyn and Fort Greene, and in New Jersey Hoboken, Weehawken, Union City and Jersey City's Heights and Downtown. New York City's buildings come from its official footprints with their roof heights (NYC OTI) and MapPLUTO; New Jersey's from OpenStreetMap, with heights measured from USGS lidar through Overture Maps where known and three storeys where not. Towers are built from OpenStreetMap's building parts, landmark heights from CTBUH and Wikipedia; ground from USGS 3DEP lidar; roads, water, parks and land use from OpenStreetMap; street trees in Manhattan and Downtown Brooklyn from the NYC Parks 2015 tree census. Beyond these areas the boroughs and New Jersey are a painted roofscape. Facades, trees elsewhere, cars and rooftop clutter are invented to look plausible, and so are Times Square's billboards, which windows are lit at night, the shore types and the painted backdrop's colours; the road markings' lane counts come from OpenStreetMap, their layout is invented; the bridges' towers and cables and the Statue's pedestal are built from published dimensions. Sun of 10 October, clock time EDT. The Statue of Liberty's figure is a 3D scan of a replica by gomeasure3d (Zenodo 10307962, CC BY 4.0), scaled to the real statue. © OpenStreetMap contributors; Overture Maps Foundation (ODbL); NYC Open Data; NYC Department of City Planning (MapPLUTO); USGS.",
+  "storagePrefix": "nyc3d",
+  "location": {
+    "latitude": 40.75,
+    "longitude": -73.98
+  },
+  "sun": {
+    "date": "10-10"
+  },
+  "time": {
+    "start": 15.25,
+    "presets": {
+      "Day": 15.25,
+      "Dusk": null,
+      "Night": 21
+    },
+    "utcOffset": -4,
+    "zone": "EDT"
+  },
+  "loading": {
+    "earlyCompile": true,
+    "deferLayers": false,
+    "frustumNear": true,
+    "passesLater": true
+  },
+  "tiles": {
+    "merge": ["road", "bridge", "markings"]
+  },
+  "camera": {
+    "azimuth": 200
+  },
+  "water": {
+    "windFrom": 225,
+    "sea": {
+      "shore": [
+        0.0754,
+        0.091,
+        0.0832
+      ],
+      "near": [
+        0.0598,
+        0.078,
+        0.0754
+      ],
+      "offshore": [
+        0.0468,
+        0.0676,
+        0.078
+      ],
+      "silt": [
+        0.091,
+        0.0962,
+        0.078
+      ],
+      "basin": [
+        0.0442,
+        0.0598,
+        0.0572
+      ]
+    },
+    "inland": {
+      "river": [
+        0.03,
+        0.042,
+        0.034
+      ],
+      "lake": [
+        0.014,
+        0.026,
+        0.024
+      ]
+    }
+  },
+  "markings": {
+    "centreColour": "yellow",
+    "dashes": {
+      "street": [
+        12,
+        3
+      ],
+      "arterial": [
+        12,
+        3
+      ],
+      "motorway": [
+        12,
+        3
+      ],
+      "centre": [
+        12,
+        3
+      ]
+    },
+    "sidewalk": {
+      "paving": [
+        0.42,
+        0.41,
+        0.39
+      ],
+      "flag": [
+        1.5,
+        1.5
+      ],
+      "red": 0.0,
+      "bike": null,
+      "tactile": false,
+      "flowers": false,
+      "pits": false
+    }
+  },
+  "facade": {
+    "preset": "us-northeast",
+    "acUnits": {
+      "brick": 0.22,
+      "residential": 0.18,
+      "brownstone": 0.05
+    },
+    "refugeShare": 0.1,
+    "glass": {
+      "skyDesat": 0.8,
+      "skyDim": 0.55,
+      "reflectance": 0.6
+    },
+    "roofs": {
+      "blueSteel": 0.03,
+      "tones": [
+        [
+          [
+            0.05,
+            0.05,
+            0.055
+          ],
+          3
+        ],
+        [
+          [
+            0.2,
+            0.2,
+            0.2
+          ],
+          3
+        ],
+        [
+          [
+            0.38,
+            0.39,
+            0.4
+          ],
+          2
+        ],
+        [
+          [
+            0.55,
+            0.56,
+            0.55
+          ],
+          2
+        ],
+        [
+          [
+            0.24,
+            0.21,
+            0.17
+          ],
+          1
+        ]
+      ]
+    }
+  },
+  "trees": {
+    "classes": {
+      "forest": {
+        "mix": {
+          "camphor": 0.45,
+          "banyan": 0.35,
+          "acacia": 0.2
+        }
+      },
+      "park": {
+        "mix": {
+          "banyan": 0.4,
+          "camphor": 0.4,
+          "acacia": 0.2
+        },
+        "p": 0.72,
+        "h": [
+          10,
+          24
+        ],
+        "wr": [
+          0.7,
+          1.15
+        ],
+        "clump": 0.6
+      },
+      "orchard": {
+        "mix": {
+          "camphor": 1
+        }
+      },
+      "scrub": {
+        "mix": {
+          "acacia": 0.6,
+          "camphor": 0.4
+        }
+      },
+      "grass": {
+        "mix": {
+          "camphor": 0.45,
+          "banyan": 0.3,
+          "acacia": 0.25
+        },
+        "p": 0.015
+      },
+      "residential": {
+        "mix": {
+          "camphor": 0.45,
+          "banyan": 0.3,
+          "acacia": 0.25
+        }
+      },
+      "campus": {
+        "mix": {
+          "camphor": 0.45,
+          "banyan": 0.3,
+          "acacia": 0.25
+        }
+      },
+      "industrial": {
+        "mix": {
+          "camphor": 0.45,
+          "banyan": 0.3,
+          "acacia": 0.25
+        }
+      },
+      "open": {
+        "mix": {
+          "camphor": 0.45,
+          "banyan": 0.3,
+          "acacia": 0.25
+        }
+      }
+    },
+    "species": {
+      "banyan": {
+        "h": 16,
+        "R": 7,
+        "wK": 1.1,
+        "trunkK": 1.15,
+        "bark": "#8a8576",
+        "pal": [
+          "#3e5a2b",
+          "#476231",
+          "#4f6a34",
+          "#3a5429",
+          "#557138",
+          "#43602f"
+        ],
+        "shape": {
+          "roots": 0,
+          "base": 0.3,
+          "flat": 0.95,
+          "fork": 0.33
+        }
+      },
+      "acacia": {
+        "h": 12,
+        "R": 5.4,
+        "wK": 1.05,
+        "trunkK": 0.95,
+        "bark": "#4e4740",
+        "pal": [
+          "#7c8a3f",
+          "#8a9544",
+          "#72843c",
+          "#999a42",
+          "#83903f"
+        ],
+        "shape": {
+          "base": 0.4,
+          "fork": 0.42,
+          "flat": 0.8,
+          "inner": 0
+        },
+        "leaf": {
+          "L": 6,
+          "W": 2.2,
+          "n": 2600
+        }
+      },
+      "bloom": {
+        "h": 9,
+        "R": 3.6,
+        "wK": 0.9,
+        "trunkK": 1.0,
+        "bark": "#4f4a44",
+        "bloom": false,
+        "pal": [
+          "#3a5530",
+          "#41602f",
+          "#355029",
+          "#46642f"
+        ],
+        "shape": {
+          "base": 0.25,
+          "flat": 1.15,
+          "ring": 0.46,
+          "fork": 0.3
+        },
+        "leaf": {
+          "flowers": 0
+        }
+      },
+      "camphor": {
+        "pal": [
+          "#4d6632",
+          "#56703a",
+          "#5f7a3e",
+          "#66793a",
+          "#52683a"
+        ]
+      }
+    },
+    "dense": [
+      "forest",
+      "mangrove",
+      "orchard",
+      "park"
+    ]
+  },
+  "sliders": {
+    "reflections": 0.9
+  },
+  "ground": {
+    "airportHeading": 44,
+    "aeroway": [
+      [
+        0.21,
+        0.21,
+        0.205
+      ],
+      [
+        0.245,
+        0.243,
+        0.235
+      ]
+    ],
+    "lawn": [
+      [
+        0.052,
+        0.074,
+        0.03
+      ],
+      [
+        0.1,
+        0.122,
+        0.052
+      ]
+    ],
+    "sodium": {
+      "arterial": 0.08,
+      "street": 0.03
+    },
+    "streetLight": 1.2
+  },
+  "light": {
+    "sky": 1.5,
+    "ground": "#948a78"
+  },
+  "haze": {
+    "density": 5e-05,
+    "colour": [
+      1.05,
+      1.18,
+      1.35
+    ],
+    "layer": 1500,
+    "thinHeight": 10000000.0
+  },
+  "night": {
+    "schedule": {
+      "feature": [
+        [
+          0,
+          0
+        ],
+        [
+          16.5,
+          0
+        ],
+        [
+          17,
+          0.3
+        ],
+        [
+          23,
+          0.3
+        ],
+        [
+          23.5,
+          0
+        ],
+        [
+          24,
+          0
+        ]
+      ]
+    },
+    "skyGlow": [
+      0.043,
+      0.04,
+      0.046
+    ]
+  },
+  "movingResolution": 1.25
+}

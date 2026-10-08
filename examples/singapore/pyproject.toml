@@ -1,0 +1,12 @@
+[project]
+name = "singapore"
+version = "0.1.0"
+description = "Singapore centre and Greater Southern Waterfront (Marina Bay, the CBD, the Civic District, Orchard, Kallang Basin, HarbourFront, Mount Faber, Sentosa): city.toml for the build-3d-city engine"
+requires-python = ">=3.12"
+dependencies = ["city3d"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+city3d = { path = "../../.agents/skills/build-3d-city/engine/pipeline", editable = true }

@@ -1,0 +1,910 @@
+# London: the City, Westminster, the South Bank and Bankside, the Tower and Wapping to Limehouse, the Isle of Dogs
+# (Canary Wharf), Battersea Power Station and Nine Elms, south Camden (the BT Tower) and Maritime Greenwich with the
+# peninsula. Every city-specific setting of the build-3d-city pipeline; the engine
+# (.agents/skills/build-3d-city/engine/pipeline, its README lists every key with its default) and the region preset
+# "europe-west" hold the rest. Run a stage with `uv run city3d <stage>` from this folder, everything with
+# `uv run city3d all`.
+
+name = "london"
+title = "London"
+# Script-written settings, kept out of this file so that a script run does not rewrite (and commit) it again:
+# the [[structures]] figures of scripts/*_structures.py, in generated/ (laid under this file in list order, then
+# this file's own [[structures]]; see the engine README, `include`)
+include = ["generated/structures-m4h.toml"]
+# London's preset (M4): "uk-london", built on Western Europe's "europe-west" (its building kinds, roads, trees, cars
+# and rooftop items) with London's facade styles (stock brick and stucco terraces, mansion blocks, Portland stone,
+# estates, warehouses, muted curtain walls), roof shapes (slate behind parapets, pitched slate, no zinc mansards) and
+# rooftop programmes (party-wall stacks with pots); the style rules read [facade.london] below. Trees, cars (black
+# cabs, red buses) come in M5-M6 from data/region_research.md; see README "Region preset"
+preset = "uk-london"
+# UTM 30N (central meridian 3 W). London straddles the Greenwich meridian, 3 degrees east of the zone's centre:
+# scale 1.00013, grid north 2.3 degrees west of true north, as Shenzhen (3 degrees off its zone's centre). The
+# British National Grid (EPSG:27700, the UK data's CRS, central meridian 2 W) would be no better here (1.5 degrees),
+# and every stage, the viewer's index JSONs and the reports assume a UTM zone; the sources are warped as they load
+utm_epsg = 32630
+coast = false               # the tidal Thames is a river polygon (OSM water=river, tidal=yes); no natural=coastline
+                            # within 25 km (the coastline ends in the estuary, beyond Dartford)
+drive = "left"
+# metres per storey for OSM building:levels (on 51-67 % of the City's and Westminster's buildings, 7-10 % of
+# Southwark's and Lambeth's; height on 0.1-3 %, Phase 0). Measured on the 344 OSM buildings in the boundary tagged
+# with both (checks/sources.md §3): median height / levels 3.22 m (p25 3.00, p75 4.50); Georgian and Victorian terraces have tall ground
+# and first floors (3.5-4 m) and ~2.8 m upper ones, offices 3.8-4.2 m, post-war flats 2.7-2.9 m
+level_h = 3.2
+user_agent = "3D-Fun london reconstruction (hobby project)"
+# Local Overpass first: Docker container city3d-overpass-london, built from BBBike's London extract of 25-26 Sept
+# 2026 (raw/osm/London.osm.pbf, box lon -0.6..0.42, lat 51.28..51.70); if it is down: `docker start
+# city3d-overpass-london`. The public servers time out on the boroughs' queries from this network (Phase 0)
+overpass = ["http://127.0.0.1:8798/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter"]
+
+# The user's boundary (30 Sept 2026, "Core + Canary Wharf + Greenwich"; the Phase 0 boundary note,
+# demos/data/phase0/london.md): the City of London (admin_level 6) and the whole City of Westminster by relation;
+# the rest are lon/lat rectangles intersected with their borough (05: the clip is cut by the relation, so the
+# river edges follow the borough boundaries in mid-Thames). Phase 0's rectangles, except: Lambeth reaches south to
+# 51.478 (Vauxhall and Lambeth's part of Nine Elms: St George Wharf Tower, the DAMAC tower, the Keybridge towers);
+# Wandsworth's Battersea clip reaches east to the Lambeth line (One Nine Elms);
+# Tower Hamlets west steps back to -0.045 south of 51.515, where the Isle of Dogs clip begins (Phase 0's two clips
+# overlapped by 0.83 km² at Limehouse); the Isle of Dogs clip reaches east to 0.000
+[districts]
+"City of London" = 51800
+"City of Westminster" = 51781
+# Bankside, Borough, London Bridge and the Shard, Bermondsey riverside to Jamaica Road
+"Southwark (riverside)" = { relation = 8450265, clip = [[-0.115, 51.512], [-0.115, 51.4975], [-0.090, 51.4930], [-0.062, 51.4935], [-0.062, 51.512], [-0.115, 51.512]] }
+# the South Bank, the London Eye, Waterloo, Lambeth Palace, Vauxhall, Nine Elms (Lambeth's part)
+"Lambeth (riverside)" = { relation = 184710, clip = [[-0.150, 51.512], [-0.150, 51.478], [-0.108, 51.478], [-0.108, 51.512], [-0.150, 51.512]] }
+# the Tower of London, Aldgate, Spitalfields, Whitechapel, Wapping, Shadwell, Limehouse
+"Tower Hamlets (west)" = { relation = 51805, clip = [[-0.080, 51.530], [-0.080, 51.500], [-0.045, 51.500], [-0.045, 51.515], [-0.030, 51.515], [-0.030, 51.530], [-0.080, 51.530]] }
+# the Isle of Dogs: Canary Wharf, the West India and Millwall docks, Blackwall reach (east to the meridian, past
+# Phase 0's -0.005: Ontario Tower and the Blackwall Basin's east side)
+"Isle of Dogs (Canary Wharf)" = { relation = 51805, clip = [[-0.045, 51.515], [-0.045, 51.483], [0.000, 51.483], [0.000, 51.515], [-0.045, 51.515]] }
+# Battersea Power Station, Nine Elms (Wandsworth's part, east to the Lambeth line: the US Embassy, Embassy Gardens,
+# One Nine Elms; Phase 0's rectangle stopped at -0.130 and left One Nine Elms out), Battersea Park's east end
+"Wandsworth (Battersea)" = { relation = 51906, clip = [[-0.160, 51.490], [-0.160, 51.474], [-0.115, 51.474], [-0.115, 51.490], [-0.160, 51.490]] }
+# the BT Tower (Fitzrovia), Bloomsbury and the British Museum, Holborn, north of Covent Garden
+"Camden (south)" = { relation = 51827, clip = [[-0.150, 51.532], [-0.150, 51.510], [-0.100, 51.510], [-0.100, 51.532], [-0.150, 51.532]] }
+# Maritime Greenwich (the Old Royal Naval College, the Cutty Sark, the Royal Observatory and Greenwich Park), the
+# peninsula with the O2 and the cable car, Deptford Creek's east bank
+"Greenwich (Maritime Greenwich and the peninsula)" = { relation = 51902, clip = [[-0.025, 51.510], [-0.025, 51.470], [0.025, 51.470], [0.025, 51.510], [-0.025, 51.510]] }
+
+# London's style rules (presets/uk_london/__init__.py): the districts counted as the west (Georgian squares and
+# mansion blocks where the east and south have Victorian terraces and estates), the listed buildings, and the
+# character of each place: conservation areas by name (planning.data.gov.uk, OGL; a name containing the key, the
+# smallest area winning) over hand-drawn areas (lon/lat). Characters: georgian, stucco, victorian, mansion,
+# portland (stone offices and institutions), offices (the City's mix of stone, glass and modern), glass (the
+# tower clusters), warehouse (the docks), estate, greenwich (Maritime Greenwich's brick)
+[facade.london]
+west_districts = ["City of Westminster", "Camden (south)"]
+# M4 fix round (builder F): shopfront ground floors (presets/uk_london shopfronts()): buildings holding an OSM shop or
+# amenity node (scripts/m4f_shops.py writes osm_shops.json into the data folder) or, in the City and the west,
+# within shop_road_m of one of these roads (Ludgate Hill, Fleet Street and the Strand's shops are tertiary or primary)
+shops = "osm_shops.json"
+shop_roads = ["trunk", "primary", "secondary", "tertiary"]
+shop_road_m = 14.0
+listed = "dl/listed-building.csv"
+[facade.london.conservation]
+path = "dl/conservation-area.geojson"
+[facade.london.conservation.characters]
+"albert embankment" = ""     # (before "bank")
+"bankside" = ""
+"belgravia" = "stucco"
+"pimlico" = "stucco"
+"regent's park" = "stucco"
+"regents park" = "stucco"
+"bayswater" = "stucco"
+"albert gate" = "stucco"
+"grosvenor gardens" = "stucco"
+"thurloe" = "stucco"
+"bloomsbury" = "georgian"
+"mayfair" = "georgian"
+"harley street" = "georgian"
+"portman estate" = "georgian"
+"east marylebone" = "georgian"
+"dorset square" = "georgian"
+"fitzroy square" = "georgian"
+"charlotte street" = "georgian"
+"soho" = "georgian"
+"st james's" = "georgian"
+"covent garden" = "georgian"
+"kennington" = "georgian"
+"stockwell park" = "georgian"
+"roupell street" = "georgian"
+"trinity church square" = "georgian"
+"smith square" = "georgian"
+"vincent square" = "georgian"
+"fournier street" = "georgian"
+"elder street" = "georgian"
+"stepney green" = "georgian"
+"tredegar square" = "georgian"
+"albert gardens" = "georgian"
+"west square" = "georgian"
+"cheyne" = "georgian"
+"clerkenwell green" = "georgian"
+"charterhouse" = "georgian"
+"barnsbury" = "georgian"
+"duncan terrace" = "georgian"
+"camberwell grove" = "georgian"
+"king's bench" = "georgian"
+"walcot" = "georgian"
+"adelphi" = "georgian"
+"northampton square" = "georgian"
+"denmark street" = "georgian"
+"stratford place" = "georgian"
+"molyneux street" = "georgian"
+"temples" = "georgian"
+"east greenwich" = "greenwich"
+"hans town" = "mansion"
+"knightsbridge" = "mansion"
+"westminster cathedral" = "mansion"
+"whitehall" = "portland"
+"strand" = "portland"
+"fleet street" = "portland"
+"trafalgar square" = "portland"
+"finsbury circus" = "portland"
+"guildhall" = "portland"
+"kingsway" = "portland"
+"regent street" = "portland"
+"haymarket" = "portland"
+"savoy" = "portland"
+"westminster abbey" = "portland"
+"millbank" = "portland"
+"birdcage walk" = "portland"
+"bank" = "portland"
+"queen street" = "portland"
+"bishopsgate" = "portland"
+"eastcheap" = "portland"
+"new broad street" = "portland"
+"moorfields" = "portland"
+"lloyd's avenue" = "portland"
+"st helen's place" = "portland"
+"creechurch" = "portland"
+"newgate street" = "portland"
+"st paul's cathedral" = "portland"
+"bow lane" = "portland"
+"foster lane" = "portland"
+"leadenhall market" = "portland"
+"chancery lane" = "portland"
+"whitefriars" = "portland"
+"wapping" = "warehouse"
+"st saviours dock" = "warehouse"
+"tooley street" = "warehouse"
+"tower bridge" = "warehouse"
+"west india dock" = "warehouse"
+"narrow street" = "warehouse"
+"coldharbour" = "warehouse"
+"bermondsey street" = "warehouse"
+"rotherhithe" = "warehouse"
+"limehouse cut" = "warehouse"
+"deptford creekside" = "warehouse"
+"sugar house lane" = "warehouse"
+"barbican" = "estate"
+"churchill gardens" = "estate"
+"dolphin square" = "estate"
+"lillington" = "estate"
+"boundary estate" = "estate"
+"peabody" = "estate"
+"pullens" = "estate"
+"latchmere" = "estate"
+"balfron" = "estate"
+"lansbury" = "estate"
+"priory green" = "estate"
+"page street" = "estate"
+"yates estate" = "estate"
+"sceaux gardens" = "estate"
+"shaftesbury park" = "victorian"
+[facade.london.areas]       # later ones win; each a lon/lat ring
+"The City (offices)" = { character = "offices", polygon = [[-0.1125, 51.5070], [-0.0725, 51.5090], [-0.0725, 51.5215], [-0.1125, 51.5195], [-0.1125, 51.5070]] }
+"Holborn and Midtown (offices)" = { character = "offices", polygon = [[-0.1250, 51.5130], [-0.1060, 51.5130], [-0.1060, 51.5205], [-0.1250, 51.5205], [-0.1250, 51.5130]] }
+"Victoria Street (offices)" = { character = "offices", polygon = [[-0.1440, 51.4960], [-0.1320, 51.4960], [-0.1320, 51.4995], [-0.1440, 51.4995], [-0.1440, 51.4960]] }
+"The City cluster (glass)" = { character = "glass", polygon = [[-0.0880, 51.5110], [-0.0760, 51.5110], [-0.0760, 51.5185], [-0.0880, 51.5185], [-0.0880, 51.5110]] }
+"Canary Wharf (glass)" = { character = "glass", polygon = [[-0.0300, 51.4990], [-0.0030, 51.4990], [-0.0030, 51.5090], [-0.0300, 51.5090], [-0.0300, 51.4990]] }
+"Nine Elms and Vauxhall (glass)" = { character = "glass", polygon = [[-0.1400, 51.4780], [-0.1180, 51.4780], [-0.1180, 51.4870], [-0.1400, 51.4870], [-0.1400, 51.4780]] }
+"Maritime Greenwich" = { character = "greenwich", polygon = [[-0.0160, 51.4740], [0.0020, 51.4740], [0.0020, 51.4840], [-0.0160, 51.4840], [-0.0160, 51.4740]] }
+
+[sun]                       # 10 October, leaves still green (the viewer works its sun out from city.json's sun.date)
+latitude = 51.5
+declination = -6.8
+
+[sources]
+# OSM first (London's footprints are hand-drawn and nearly complete, terraces split house by house; the towers carry
+# building:parts). Carbon & Place's polygons (OS OpenMap / INSPIRE / OSM outlines split per land-registry plot) give
+# their lidar heights to the OSM footprints they cover, and fill where OSM has no building ("fill": kept only where
+# they overlap no OSM footprint; M1 checks/report.md §2 counts them; M2 decides whether they stay)
+footprints = ["osm", "carbon"]
+# the hand-checked landmark list first (towers since the lidar: 2021-26, Wood Wharf, Nine Elms), then Carbon &
+# Place's lidar height, then OSM's tags where it has none, then the default. Why: checks/report.md §3, §10, §11
+heights = ["landmark", "carbon", "osm_height", "osm_levels", "default"]
+dem = "geotiff"
+backdrop = "geotiff"
+
+[sources.carbon]            # Carbon & Place Building Heights (Univ. of Leeds; ODC-By 1.0, polygons with OSM: ODbL), raw/carbon_place/README.txt
+adapter = "file"
+# the GB-wide GeoPackage (buildings_heights_20260825, 35.4 M polygons) cut to lon -0.30..0.12, lat 51.42..51.58
+path = "carbon_place/carbon_place_london.gpkg"
+layer = "buildings"
+label = "Carbon & Place"
+role = "fill"
+# m above the lidar ground: the highest 2 m DSM - DTM cell in the polygon (EA National LiDAR Programme composite):
+# a roof's ridge or its plant, ~2 m over the eaves of a pitched-roof house (checks/report.md §3)
+height = "height_max"
+# its mean over the polygon (m³ / m²): within 0.2 m (median) of levels x 3.2 on ordinary buildings, no use as a
+# height on towers (the Gherkin 4 m), but under half the maximum it says the maximum is a chimney, plant or a
+# neighbour's edge ([buildings.spikes], 04_buildings)
+mean = "volume / area"
+keep = ["id", "building", "height_min", "volume"]
+
+[sources.geotiff]           # Carbon & Place GBDEM (ODC-By 1.0; from the EA lidar composite, OGL v3, and OS Terrain 50)
+# the web-mercator mosaics as fetched (raw/terrain/carbon_place_dtm/README.txt), so they are resampled once, onto the
+# terrain's UTM grid: z13 (5.95 m at 51.5 N) over lon -0.30..0.12, lat 51.42..51.58; z11 (23.8 m) over
+# lon -0.60..0.44, lat 51.18..51.82 for the backdrop
+ground = ["terrain/carbon_place_dtm/dtm_core_z13_epsg3857.tif"]
+# M7: the z11 mosaic ends 25-29 km beyond the ground area (lon -0.60..0.44, lat 51.18..51.82); OS Terrain 50 (50 m
+# ASCII grids per 10 km square, OS OpenData; the same ODN heights, which Carbon & Place's fill is made from) carries the
+# hills on to the backdrop's 36 km: the squares SU, SP, TQ, TL, TR read in place from the GB archive
+backdrop = ["terrain/carbon_place_dtm/dtm_backdrop_z11_epsg3857.tif",
+    { archive = "terrain/os_terrain50/terr50_gagg_gb.zip", members = ["data/su/*", "data/sp/*", "data/tq/*", "data/tl/*", "data/tr/*"], ext = ".asc" }]
+bare = true
+note = "Carbon & Place GBDEM: the Environment Agency's lidar composite DTM (1-2 m) where it exists (all of Greater London), OS Terrain 50 elsewhere, as Mapbox terrain-RGB tiles (0.1 m steps); metres over Ordnance Datum Newlyn. The Thames is a flat water surface in it (the level at the flights' tide, ~+3 m), not its bed."
+
+[buildings]
+parts = true                # ~11k building:part outlines (the City's towers, the Shard, Canary Wharf, the Palace of Westminster)
+# Carbon & Place's height is the highest lidar cell in its polygon: a low building takes its chimney, its plant or
+# the edge of the tower beside it (the West Wintergarden 152 m for 25, Cabot Place 134 for 23, the Barbican's
+# podium 112 for its towers). Lowered to OSM's height (levels x 3.2 + 3 m of roof) where that is far lower and the
+# polygon's mean is under half its top, or to the mean x 1.35 where the top is a touching building's (M2,
+# checks/buildings.md "Spikes")
+# (the [buildings.spikes] table below)
+# Carbon & Place polygons where OSM has no building (M1: 3,682 in the districts, 0.43 km², median 32 m²): kept from
+# 30 m² and 2.5 m (sheds, garages, kiosks, the odd building OSM lacks: Crossrail Place, which OSM tags layer=-1),
+# not tagged roof/ship/construction (its building field is OSM's), not on a building site (landuse=construction:
+# the lidar's buildings since demolished, e.g. 72 Upper Ground). Overture's Microsoft ML footprints are not used
+# (1,194 where OSM has none, 0.12 km²: mostly the same sheds and roofs, no heights)
+fill = { min_area = 30.0, min_h = 2.5, skip_tags = true, not_in = ["landuse=construction"] }
+# the London Eye is a structure (a [[structures]] figure in M4), not a building: OSM draws it as its outline (way
+# 204068874, 136.5 m) holding ~200 rim pieces as lifted building:parts, which go with it (exclude_inside), and its
+# hub and boarding pier (w153273222, w1133007198: 131 m from the lidar, the wheel over them)
+# M4 (builder H): Nelson's Column (w150920358, a stack of eight parts) is a figure too
+exclude = { osm = ["w204068874", "w153273222", "w1133007198", "w150920358"] }
+exclude_inside = true
+# Elizabeth Tower's spire: its 96 m tip is a 0 m² part; the pyramid under it (82-91 m) takes it (landmarks_london.csv)
+# Whiteleys (w41657430): rebuilt 2019-24 behind its 1911 facade, the lidar saw the site (mean 2.9 m, crane 70 m):
+# ~30 m, ESTIMATED (6-10 storeys over the retained facade)
+# Somerset House (w372841786): OSM's 2 levels (6.4 m) took its 8,947 m² down from Carbon & Place's edges' 20-27 m;
+# the list's ESTIMATED 25 m (4-5 storeys over the Strand and the Embankment)
+osm_fix = { w1139769319 = 96.0, w41657430 = 30.0, w372841786 = 25.0 }
+# second opinions (the preset's OSM height tag, and here its levels too): the lidar predates the towers of the last
+# few years, which it saw as building sites (Central Tower and Bouchon Point at Aldgate, 3.5 m for 26 storeys; Charter
+# Street, Harbord Square at Wood Wharf): a footprint takes levels x 3.2 where that is 20 m (or 30 %) over Carbon &
+# Place's height (M2: 12 footprints; none lowered)
+reconcile = { sources = ["osm_height", "osm_levels"] }
+# M2 fix round (checks/buildings.md "M2 fix round"):
+# untagged, unnamed OSM outlines up to 12,000 m² are buildings (the preset's 5,000 m² cut dropped 10,000 m² blocks
+# by London Bridge and Bermondsey to nothing): estate outlines are those holding other buildings (drop_osm_containers)
+osm_max_area = 12000
+# an OSM outline its building:parts cover by half is one building at any size and whatever it holds: the National
+# Gallery (11,265 m²), 100 Liverpool Street, Smithfield's General Market, 100 Bishopsgate's site were left out
+part_outlines = 0.5
+# a building inside an estate outline that goes stays (by default both went: Blackfriars station's platform buildings)
+container_inner = true
+# layer < 0 goes only with location=underground, or untagged without a Carbon & Place polygon over it: Victoria
+# Station (layer=-2, location=surface), UCL's Wilkins Building, Crossrail Place (layer=-1 over the dock) stay
+surface_layers = true
+# built whatever their tags: 40 Charter Street (Wood Wharf; topped out at 179 m in 2026, completion 2027: the tower
+# stands, OSM tags it building=construction); Blackfriars station (w147969007, layer=1 on the rail bridge: an
+# outline over its platform buildings, else replaced by Carbon & Place blocks rising from the river)
+# M4 (builder H): Lambeth Palace (r1403938, 3,126 m2, 4 levels) went as an estate outline over its library and
+# chapel (13 % covered by Carbon & Place pieces): kept
+keep = { osm = ["w791658610", "w147969007", "r1403938"] }
+# the preset's list less "grandstand": Lord's and the Oval's stands are buildings (capped below without a height tag)
+osm_skip = ["roof", "carport", "ship", "boat", "houseboat", "shelter", "bridge", "construction", "container",
+    "static_caravan", "subway_entrance", "entrance", "demolished", "abandoned", "ruins", "tent"]
+# what lies over the tidal Thames (OS OpenMap Local) of a fill piece or an OSM building with layer 1+ stands on a
+# deck 8.5 m over the water (Blackfriars' station and platforms); lower fill there goes
+water = { path = "os_openmap_local/TQ_TidalWater.shp", deck = 8.5 }
+# one volume drawn twice (fill over OSM parts at College Buildings, 8 Bishopsgate's capped crown through its
+# parts): the lesser is clipped
+volume_dedupe = true
+# M4: a raised building:part lying 90 % in the building holding most of it stays with it: One Blackfriars' bulging
+# floors 56-128 m touch the Bankside Hotel's three grounded parts (16-26 m² each) and went to it (the tower hollow, the
+# hotel two needles at 113 and 126 m)
+overhang_keep = 0.9
+# M4 (builder H; 04_buildings set_h, generic, off by default): final heights where the lidar's maximum or OSM's levels
+# are wrong for the building: station sheds topped at a neighbour's edge or a crane (Waterloo 33 -> 20 m, King's
+# Cross 32 -> 23, Liverpool Street 34 -> 23, Fenchurch Street 65.5 -> 20, St Pancras's Barlow shed 32.4 -> 30.5 to its
+# ridge, OSM's tag), St Pancras's hotel 23 -> 34 (eaves ~25 m, roofs to ~34, its towers are figures), the FCDO at
+# levels x 3.2 (22.4 -> 26 m: four tall civic storeys and the attic), Somerset House 19.9 -> 25 (the list's
+# ESTIMATED: osm_fix's 25 lost to Carbon & Place), the Queen's House 9.6 -> 12.5, Flamsteed House 9.6 -> 16,
+# church bodies left at their tower's lidar top (St Mary-le-Bow 50 -> 18, St Bride's 43 -> 20, St Botolph's Aldgate
+# 41 -> 16, St Clement Danes 29 -> 16: their steeples are figures)
+[buildings.set_h]
+w4245075 = 20.0
+w260720558 = 23.0
+w4959629 = 23.0
+w22650557 = 20.0
+w4256246 = 30.5
+w15694166 = 34.0
+r78291 = 26.0
+w372841786 = 25.0
+r15327162 = 12.5
+w268533444 = 16.0
+w90244113 = 18.0
+w4076420 = 20.0
+w107740117 = 16.0
+w25904232 = 16.0
+[buildings.join]
+# a footprint no single Carbon & Place plot covers by 30 % (a block the land registry splits into many plots;
+# M1: 1,539 footprints, 1.04 km²) takes the plots' area-weighted median height where they cover half of it
+weighted = 0.5
+# a footprint of 2,000 m² or more still without a height takes the median of whatever plots touch it (St Pancras's
+# train shed, Liverpool Street, Somerset House, the Southbank Centre: Carbon & Place has only their edges)
+big = 2000.0
+[buildings.spikes]
+sources = ["carbon"]
+# a top with no OSM height tag 3.5x over the polygon's mean, or over a mean under 6 m (the lidar saw a building
+# site), from 30 m: OSM's levels, else the mean x 1.35 (churches, chapels, mosques: x 1.2, the nave; spires and
+# domes are M4's landmark pass, listed in checks/buildings.md), else (a site) 3 storeys. The Barbican Conservatory
+# 112 m (mean 15), the Oval's stand 96 (12: floodlights), Whiteleys 70 (2.9), Christ Church Spitalfields 63.5
+alone_ratio = 3.5
+body_tags = ["church", "cathedral", "chapel", "mosque", "synagogue", "temple", "religious", "civic"]
+caps = { stadium = 30.0, grandstand = 30.0 }
+# 1,000 m²+ footprints whose top is over 2x their mean and 25 m: split along the Carbon & Place plots under them,
+# each at its own top (the Bank of England, Fenchurch Street station, One New Change), else the mean x 1.35
+podium = { area = 1000.0, ratio = 2.0, min_h = 25.0 }
+[buildings.landmarks]
+# part-built towers under their listed heights (South Quay Plaza 1 179 for 214, 10 Park Drive, Guy's Tower, DAMAC,
+# 1 Leadenhall, CityPoint): parts scaled up to the listed top
+raise_parts = 3.0
+cap_keeps_lift = true
+# no row sets a building over 15 m from its point, nor a plain footprint under 300 m² (40 Charter Street's 179 m on
+# a 189 m² Carbon & Place fragment beside its site)
+max_d = 15.0
+min_area = 300.0
+# M4: a listed tower on a plain footprint holding its podium (Carbon & Place's top over 1.6x its mean: Hilton Park
+# Lane 99.8/29.8, 10 Upper Bank Street, 25 Bank Street, One Bank Street, One Thames City's merged outline) is cut out
+# at its point (OSM's height-less building:part there, else a box of the volume the lidar mean leaves), the rest the
+# podium at OSM's levels or 12 m
+podium = { ratio = 1.6, base = 12.0, area = 1000.0 }
+
+[ground]
+town = true                 # the boroughs beyond the districts: a painted roofscape, not bare paving
+# M3 (Paris's M7 lesson: a painted town reads as farmland round the towers): the boroughs' OSM buildings raised as
+# block masses (06e_masses) over the 4 km ground margin and 3 km on into the backdrop, thinning out there
+masses = true
+# M7 (the M3 critic: the masses ended in a sharp curve 8-10 km north at the overview): 5 km into the backdrop, the
+# last 3 km sinking (was 3 km, 1.5 km), so the roofscape thins into the land cover map's towns
+masses_reach = 5000.0
+masses_fade = 3000.0
+# M3 fix round (critic: the outer ring south and east, Lewisham, Catford, Dulwich, Peckham, read as bare ground with
+# scattered blocks): London's outer boroughs are terraces of 2-3 storey houses (312k of the 736k OSM buildings fetched
+# are building=house), which the default drops beyond the ground area and the viewer drew only within 6 km
+# (city.json masses.housesNear 22000): kept and drawn from the overview too
+masses_houses_far = true
+# the docks are impounded behind their locks (the West India and Millwall docks, the Royal Victoria, St Katharine,
+# Limehouse Basin, Regent's Canal lock by lock), the Thames tidal: OSM's lock gates and weirs split the water,
+# each pool levelled on its own
+pools = true
+# the parks' paths through the lawns (Hyde Park's, St James's, Regent's Park's; the Mall's and Horse Guards' gravel
+# are pedestrian areas), pedestrian areas cut out whole, stone and asphalt squares as their own layers (Paris's)
+paths = { footway = 2.6, path = 2.0, cycleway = 2.6, bridleway = 3.0, steps = 2.5, pedestrian = 4.0 }
+paved = true
+green_min_width = 3.5
+path_relations = true
+# M5 fix round (critic: lawn sticking out over the Serpentine by the Lido and the bridge; paths uniform grey ribbons):
+# the park polygons less the water; the parks' paths on their surface's layer (Hyde Park's and the Mall's gravel buff,
+# the asphalt ones asphalt) instead of the land's paving lots
+green_off_water = true
+path_layers = true
+[ground.green]
+# no cemetery (Bunhill Fields, Tower Hamlets' are stones and paths under trees: 08_trees' "park"); flowerbeds green
+landuse = ["grass", "forest", "meadow", "farmland", "orchard", "recreation_ground", "village_green", "flowerbed"]
+
+[roads]
+lane_w = 3.2                # UK urban lanes 3.0-3.25 m; 3.65 m on trunk roads (DMRB CD 127)
+footbridges = true          # the Millennium Bridge, the Golden Jubilee bridges, the docks' footbridges are footways
+decks_ref = "water"         # the named decks count from the water under them (the Thames at ~3 m ODN, scene 3)
+decks_level = true          # ... from the water's level, not the lowest ground under the span (the river walls drop the water cells beside them 6 m: the decks there stood 3-8 m low)
+# the railway viaducts (London Bridge to Bermondsey and Deptford, Waterloo's, Blackfriars', Cannon Street's approaches,
+# the DLR) run on 8-9 m brick arches that OSM maps as buildings (median 8.0 m by the lines): at the default 7.5 m the
+# tracks ran through the arches' tops by a median 1.6 m (59 % of 473 arch footprints by the tracks over the deck)
+rail_layer_h = 9.5
+# The Thames bridges: deck height over the river's surface in the lidar (~3 m ODN, mid-tide). The PLA's headroom
+# under each at the highest astronomical tide (~+4 m ODN, i.e. +1 m) plus the deck's depth (1.5-2.5 m): the
+# Embankment and the South Bank stand 2-3 m over the water, so the decks rise to their spans as the real ones do.
+# Headrooms (m, HAT): Chelsea 6.5, Grosvenor 5.8, Vauxhall 5.6, Lambeth 6.6, Westminster 5.4, Hungerford 7.0,
+# Waterloo 8.6, Blackfriars 7.0, Millennium 10.8, Southwark 7.4, Cannon Street 7.1, London Bridge 8.9, Tower
+# Bridge 8.6 (bascules down)
+decks = { "Chelsea Bridge" = 9.0, "Grosvenor Bridge" = 8.5, "Vauxhall Bridge" = 8.0, "Lambeth Bridge" = 9.0, "Westminster Bridge" = 8.0, "Hungerford Bridge" = 9.5, "Golden Jubilee Bridge" = 9.5, "Waterloo Bridge" = 11.0, "Blackfriars Railway Bridge" = 9.5, "Blackfriars Bridge" = 9.5, "Millennium Bridge" = 12.0, "Southwark Bridge" = 10.0, "Cannon Street Railway Bridge" = 9.5, "London Bridge" = 11.0, "Tower Bridge" = 11.0, "Albert Bridge" = 8.0 }
+# Deck heights, Oct 2026: with decks_level the decks stand at their values over the river's level (2.7 m in the
+# lidar), not over the foot of the river walls 6 m under it (Blackfriars 6.4 m, Lambeth and Vauxhall 4.7-5.7, London
+# Bridge 7.9: 3-6 m low, dipping under their ends). Tower Bridge's roadway through its two towers is tunnel=building_passage:
+# its nodes were pinned to the ground there (the river) and the deck lay on the water at 2.7 m; counted as bridges
+bridge_ways = [153173956, 153173957]
+# each named deck's OSM man_made=bridge outline drawn whole as a slab with piers in the river (Paris's M3 critic:
+# thin slabs without piers), typed from photos (refs/): Westminster's seven green wrought-iron arches, Lambeth's
+# and Vauxhall's red steel arches, Blackfriars' red-and-white iron arches, Southwark's three green steel arches,
+# Waterloo's Portland-stone-clad concrete spans, London Bridge's concrete box girders, the railway bridges'
+# girders on piers, Tower Bridge's bascule and suspended side spans (its towers are buildings)
+bridge_outlines = true
+# M3 fix round (critic): the Golden Jubilee footbridges are one multipolygon (r5640782) either side of the Hungerford
+# rail bridge, and were drawn as one 35 m slab over all three: each part its own deck; Cannon Street's, Blackfriars'
+# and Grosvenor's tracks carry no bridge:name and drew as fanned track ribbons with water between: their outlines,
+# named as decks spans, are drawn whole under the tracks, with piers
+outline_parts = true
+rail_outlines = true
+[roads.piers]
+"Chelsea Bridge" = { spans = 3, fascia = 1.6, type = "girder", body = "#8a8f8c" }
+"Grosvenor Bridge" = { spans = 4, fascia = 1.4, type = "iron", rise = 0.1, body = "#6d7273" }
+"Vauxhall Bridge" = { spans = 5, fascia = 1.2, type = "iron", rise = 0.1, body = "#7d3a2f" }
+"Lambeth Bridge" = { spans = 5, fascia = 1.2, type = "iron", rise = 0.1, body = "#8b3a30" }
+"Westminster Bridge" = { spans = 7, fascia = 1.2, type = "iron", rise = 0.11, body = "#3f5d48", piers = "#bdb3a0" }
+"Hungerford Bridge" = { spans = 9, fascia = 2.2, type = "girder", body = "#4d4f4e", piers = "#8a5a46" }
+"Golden Jubilee Bridge" = { spans = 7, fascia = 0.8, type = "girder", body = "#c9cbc8", piers = "#c9cbc8" }
+"Waterloo Bridge" = { spans = 5, fascia = 1.6, type = "concrete", rise = 0.07, body = "#c8c2b4", piers = "#c8c2b4" }
+"Blackfriars Bridge" = { spans = 5, fascia = 1.4, type = "iron", rise = 0.12, body = "#7a2e2a" }
+"Blackfriars Railway Bridge" = { spans = 5, fascia = 2.0, type = "girder", body = "#4f5352" }
+"Millennium Bridge" = { spans = 3, fascia = 0.9, type = "girder", body = "#a9aeb0", piers = "#a9aeb0" }
+"Southwark Bridge" = { spans = 3, fascia = 1.3, type = "iron", rise = 0.1, body = "#56684a" }
+"Cannon Street Railway Bridge" = { spans = 5, fascia = 2.2, type = "girder", body = "#4f5352" }
+"London Bridge" = { spans = 3, fascia = 2.2, type = "girder", body = "#b5b2aa", piers = "#b5b2aa" }
+"Tower Bridge" = { spans = 3, fascia = 2.0, type = "girder", body = "#5c7f9b" }
+"Albert Bridge" = { spans = 3, fascia = 1.0, type = "girder", body = "#d9c7a8" }
+
+[markings]
+# M5: UK markings (TSRGD 2016 / Traffic Signs Manual ch. 3, 5, 6; data/region_research.md §1). Lane and centre lines,
+# their dash table and widths are the viewer's (web/city.json markings); here what OSM decides per road:
+# - double red lines along TfL's red routes (the TLRN: OSM trunk in London, and these A-roads where tagged primary),
+#   double yellow along primary and secondary roads, and on the lesser streets' junction mouths only (the last
+#   `warning` m before a junction, where the centre line also turns into the warning line, 4 m marks in 6)
+warning = 24.0
+kerb_lines = { trunk = "red", primary = "yellow", secondary = "yellow" }
+kerb_mouths = { tertiary = "yellow", residential = "yellow", unclassified = "yellow" }
+red_refs = ["A3", "A10", "A11", "A13", "A40", "A100", "A201", "A501", "A1203", "A3211"]
+# - bus lanes on OSM's busway / lanes:bus / bus:lanes (30 km tagged; region research 1.4), half of them red-surfaced
+#   (TfL: red in bus stop cages and at lane entries; the rest plain asphalt with the 300 mm white line)
+bus_lanes = true
+bus_red = 0.5
+cycle_lanes = true
+# - junction arms: OSM's 4,543 traffic signal nodes make a signalled junction (stop line and the crossing's stud
+#   lines); elsewhere a give-way line on the lesser road; zebras only where OSM maps one (~855 crossings) with
+#   white zig-zags (16 m of 2 m units in the TSM; 12 m here, most London sites are short) and Belisha beacons
+junctions = "signals"
+zebras = true
+# M5 fix round: 8 zig-zag marks of 2 m (TSM ch. 6: the standard 8, 2 to 18 by exception) per approach from the give-way
+# line, cut where a junction or the next crossing comes first; signal-controlled crossings between junctions (OSM
+# crossing=traffic_signals and pelican/puffin/toucan nodes; region research 1.1: ~1,300 pelicans, 272 toucans): two
+# broken stud lines 2.4 m apart, a stop line 1.7 m back on each approach and the same zig-zags (TSRGD 1001, 1055.1)
+zigzag = 16.0
+signal_crossings = true
+[markings.sidewalk_w]       # London pavements (region research 1.3: Regent Street 4-5 m, terraced streets 2-3 m, City
+                            # lanes 1.5-2 m; no Haussmann pavements), not europe-west's Paris widths
+trunk = 4.0
+primary = 3.5
+secondary = 3.0
+tertiary = 3.0
+residential = 2.5
+unclassified = 2.0
+living_street = 2.0
+
+[shores]
+# the Thames' banks are river walls (Bazalgette's Victoria, Albert and Chelsea Embankments, the South Bank's
+# and Wapping's wharf walls), the docks' edges stone and concrete quays: masonry faces at the water with a
+# coping, not the default concrete slope (Paris's settings)
+bank_type = "pondedge"
+quay_walls = true
+quay_face = 2.5
+quay_apron = 5.0
+
+[tiles]
+pillars_in_water = true     # the Thames bridges stand on piers in the river
+# M3 fix round (critic: a mansard block sunk in the river at Wapping, pale slabs out of the bank): footprints over
+# 20 % in the tidal Thames (the one water body over 5 km²; the docks' floating restaurants and Crossrail Place stay)
+# and on no deck: clipped to the bank where a fifth of them lies on land, else kept as plain pontoons of at most
+# 4.5 m (Tower Millennium Pier, the lifeboat and river fire stations, the Wapping moorings); Blackfriars' old bridge
+# columns (building=tower) kept
+river = { min_km2 = 5.0, share = 0.2, land = 0.2, pontoon_h = 4.5, keep = ["tower"] }
+
+[blocks]                    # 07b_blocks: 2 km blocks, so the first view waits for less of the dense core (Paris M9)
+size = 2000
+
+[terrain]
+far_reach = 36000.0         # the backdrop: the Thames valley, Hampstead and Highgate, Crystal Palace, Shooters Hill
+peak_radius = 50.0          # M7 fix round: the summit table at the summits themselves (1 km took neighbouring slopes)
+backdrop_cover = "worldcover"   # the backdrop coloured from ESA WorldCover (06e_masses), not by height (Paris M7)
+backdrop_town_rgb = [112, 110, 104]
+# M3 fix round: the town past the roads' 1 km margin had no streets: OSM's roads painted into the 20 m land cover
+# map round the masses (06e_masses), which the town layer shows far out (city.json ground.townFarCover) and the
+# backdrop carries on (widths: kerb to kerb, m)
+cover_roads = { motorway = 24.0, trunk = 18.0, primary = 14.0, secondary = 12.0, tertiary = 10.0, residential = 8.0, unclassified = 8.0, living_street = 6.0 }
+# the lidar kept sharp (Paris's settings): the Embankment's river walls stand 2-3 m over the water at mid-tide,
+# one 5 m cell wide, not a 50 m slope
+work = 5.0
+tin_cell = 5.0
+smooth_bare = 2.5
+tin_error = 2.0
+tin_error_far = 4.0
+tin_error_bank = 0.5
+tin_steps = 3.0
+water_flat = 0.0
+water_ramp = 5.0
+flat_spread = 3.0
+water_all_touched = false
+quay_walls = true           # the river walls: the first land cells along the water take the wall's height, 05e_shores
+                            # draws a vertical face at the water's outline
+# construction pits and basements in the lidar (checks/sources.md §6: 34 regions under -2 m in the boundary, the
+# Tideway's Blackfriars shaft at -31.1 m, Nine Elms -42.5 m, Battersea's basements -3.8 to -6.9, the Isle of Dogs
+# -7.7): every dry pit with a cell under -1 m ODN (no real ground in London is that low) re-filled from its
+# outline, as far as it lies 2 m under the ground round it
+pits = { below = -1.0, grow = 2.0, window = 150.0 }
+# Ground = metres over Ordnance Datum Newlyn minus this datum (inland: 05a_terrain clamps what is lower). 0: ODN itself,
+# about mean sea level. NOT the default "auto" (the lowest cell): the lidar holds construction pits, -31 m at the
+# Tideway shaft off the Victoria Embankment (Blackfriars), -42.5 m at Nine Elms. The Thames reads 2.8-3.2 m (its
+# surface at the flights' tide); 1 % of the ground inside the boundary is under 1.7 m (checks/sources.md §6).
+# M3: kept at 0 (ODN), the river at its lidar level ~3 m as Paris's Seine at 3.55: lowering the datum to the
+# river would clamp the Isle of Dogs' and Battersea's low ground (1-3 m ODN) to the water; the viewer's water
+# mirror is set to the river's level (city.json water.mirror)
+datum = 0.0
+# named summits for checks/dem.md and checks/terrain.md: lon, lat (OSM natural=peak nodes), surveyed height (m ODN;
+# OSM ele, left out where none)
+[terrain.peaks]
+"Greenwich Park (One Tree Hill)" = [0.00098, 51.47993, 43]
+"Primrose Hill" = [-0.16076, 51.53954, 64]
+"Parliament Hill" = [-0.15976, 51.55965, 93]
+"Hampstead Heath (Whitestone Pond)" = [-0.17954, 51.5629, 134]
+"Sydenham Hill (Crystal Palace ridge)" = [-0.07232, 51.4326, 112]
+"Shooters Hill" = [0.06992, 51.47014, 132]
+# M7: two more summits without a surveyed height in OSM: Highgate (Pond Square) and Alexandra Palace's hill (the
+# backdrop, 9 km north)
+"Highgate (Pond Square)" = [-0.1475, 51.5715]
+"Alexandra Palace" = [-0.1300, 51.5942]
+# the North Downs on the southern horizon (OSM natural=peak with ele; the backdrop, 25-27 km south) and Harrow on the Hill
+"North Downs (Betsom's Hill)" = [0.05779, 51.28808, 251]
+"Sanderstead Hill" = [-0.07347, 51.33957, 175]
+"Harrow Hill" = [-0.33763, 51.57438, 124]
+[terrain.spots]
+"Royal Observatory (Flamsteed House)" = [-0.00146, 51.47782]
+"General Wolfe statue, Greenwich Park" = [-0.00122, 51.47729]
+"Thames at Westminster Bridge (the water)" = [-0.12150, 51.50080]
+"Thames at Tower Bridge (the water)" = [-0.07540, 51.50480]
+"Thames at Greenwich (the water)" = [-0.00900, 51.48650]
+"Victoria Embankment (Temple)" = [-0.11240, 51.51010]
+"Parliament Square" = [-0.12720, 51.50070]
+"St Paul's churchyard (Ludgate Hill's top)" = [-0.09830, 51.51340]
+"Canary Wharf (Canada Square)" = [-0.01870, 51.50480]
+"Millwall Outer Dock (the water)" = [-0.02090, 51.49590]
+"Isle of Dogs (Manchester Road)" = [-0.00930, 51.49140]
+
+[trees]
+# M6 fix round (critic round 1): trees on the slab between Victoria's sheds (rail land, platforms and stations: none, census
+# or invented; Victoria has no landuse=railway over its platforms);
+# London's planes reach 30-45 m in the inventory (stored in half metres, not decimetres capped at 25.5 m); street
+# crowns cut into the facades on Whitehall and the Embankment (each crown capped at its distance to the nearest
+# footprint + 0.6 m, not under 2.5 m)
+none_extra = ["landuse=railway", "railway=platform", "public_transport=station"]
+height_q = 2
+clip_walls = { gap = 0.6, min = 2.5 }
+[trees.squares]
+# M6 fix round: the private garden squares (Bedford Square, Bloomsbury's, Belgravia's, Kensington's) are in no
+# council inventory and stood nearly empty: named leisure=garden areas of 0.15-4 ha with under 15 census trees a
+# hectare get a ring of tall planes inside the railings (every 11 m, 4 m in) and ~8 a hectare inside, 18-28 m
+tags = ["leisure=garden"]
+named = true
+area = [1500, 40000]
+per_ha = 15
+step = 11.0
+inset = 4.0
+height = [18.0, 28.0]
+group = "plane"
+inner = 8
+inner_group = "plane"
+[trees.street]
+# M3 fix round (critic: a row of street trees down Ludgate Hill, which has none: a narrow street of shopfronts
+# between Ludgate Circus and St Paul's churchyard)
+none_in = { "Ludgate Hill" = [[-0.10445, 51.51398], [-0.10445, 51.51432], [-0.10190, 51.51405], [-0.10000, 51.51392], [-0.10000, 51.51362], [-0.10190, 51.51373], [-0.10445, 51.51398]] }
+
+# M6: London Public Realm Trees (GLA, OGL v3; the boroughs', the Royal Parks' and TfL's inventories, 1.136 M trees,
+# raw/dl/Borough_tree_list_2025Nov.csv) stands for the street and park trees in every district: 270,900 round the
+# boundary after scripts/m6_trees.py (sizes as text -> metres, 1,861 double listings dropped), which writes
+# trees_census.csv in the data folder. Heights are the file's (88 % known; median 9 m, planes 16 m), else the
+# group's median. Invented street trees only outside the districts; parks with the census's trees (the Royal
+# Parks: Hyde Park, St James's, Green Park, Regent's Park, Greenwich Park) get no invented ones on top
+[trees.street.census]
+file = "trees_census.csv"
+lon = "lon"
+lat = "lat"
+species = "genus"
+height_field = "height"
+height = [8.0, 0.0, 2.5, 35.0]   # (no trunk size used: 12 % of heights unknown take their group's median)
+jitter = 0.08                    # heights are whole metres or class middles
+species_bits = 3
+# the viewer's eight London species (city.json trees.species); a genus takes the first group naming it
+groups = [
+    ["plane", ["Platanus"]],                                   # 14 % (Westminster 29 % of its street trees)
+    ["lime", ["Tilia"]],
+    ["chestnut", ["Aesculus"]],                                # horse chestnut, leaf-miner brown by October
+    ["maple", ["Acer", "Liquidambar", "Parrotia"]],
+    ["birch", ["Betula"]],                                     # white bark, small yellowing leaves
+    ["pine", ["Pinus", "Taxus", "Cedrus", "Chamaecyparis", "Cupressus", "Picea", "Abies", "Thuja", "Sequoiadendron", "Sequoia", "Metasequoia", "Taxodium", "Juniperus", "Larix", "Pseudotsuga", "Cryptomeria", "Cupressocyparis", "Calocedrus", "Araucaria", "Ginkgo", "Cuprocyparis", "Xanthocyparis"]],
+    ["small", ["Prunus", "Pyrus", "Malus", "Sorbus", "Crataegus", "Amelanchier", "Magnolia", "Ilex", "Cercis", "Corylus", "Cornus", "Laburnum", "Sambucus", "Cotoneaster", "Ligustrum", "Photinia", "Syringa", "Arbutus", "Mespilus", "Eriobotrya", "Cotinus", "Lagerstroemia", "Albizia", "Hibiscus", "Euonymus", "Elaeagnus", "Viburnum", "Laurus", "Prunus x", "Trachycarpus"]],
+    ["broadleaf", []],      # the rest: ash, oak, hornbeam, false acacia, poplar, alder, willow, sweet chestnut, elm, beech ...
+]
+# green areas holding >= 10 listed trees a hectare (the Royal Parks hold 25-45) have only those; no invented
+# tree in the 3 x 3 cells round a listed one
+cover = { per_ha = 10, cells = 1 }
+
+# M6: London's traffic (data/region_research.md §2): DfT AADF 2025 on the area's major roads, motor vehicles only:
+# cars and taxis ~65 % (black cabs ~10 % of them), vans 19 %, motorcycles 6-7 %, buses 5-6 % (red double-deckers,
+# ~10 % on the bus corridors), HGVs 3 %. Driving on the left is city.toml's drive = "left" (06d_cars mirrors lanes
+# and parked rows). Everything else (kerbside odds, occupancy, speeds) is europe-west's
+# M8 night: no London lamp inventory exists (region_research.md 6.1; OSM's 3,100 street_lamp nodes are a sample),
+# so 06e_lamps generates posts along the OSM roads at UK spacing (BS 5489 practice: 25-35 m on arterials,
+# staggered; 30-40 m on residential streets, one side), coloured by who runs them: the City of London 4,000 K on
+# main roads, 3,000 K on minor ones, 2,700 K heritage; Westminster's 3,000 K standard, 2,700 K heritage lanterns in
+# its conservation areas; elsewhere LED 4,000 K main / 3,000 K minor with ~5 % of streets still on 2,000 K sodium.
+# Gas lamps where Westminster's ~300 are (Covent Garden, the Temples, St James's, Westminster Abbey, Mayfair) and
+# OSM's gas nodes; the Victoria and Albert Embankments' dolphin lamps as a dense row on the river wall.
+[lamps]
+generate = true
+label = "generated along OSM roads at UK spacing (no London lamp inventory)"
+conservation = "dl/conservation-area.geojson"
+sodium = 0.05
+osm_gas = true
+dedupe = 9.0
+[lamps.classes]
+trunk = { spacing = 28, layout = "staggered", h = 10, flux = 12000, kelvin = 4000, priority = 4 }
+trunk_link = { spacing = 28, layout = "one", h = 10, flux = 10000, kelvin = 4000, priority = 4 }
+primary = { spacing = 30, layout = "staggered", h = 10, flux = 10000, kelvin = 4000, priority = 3 }
+primary_link = { spacing = 30, layout = "one", h = 10, flux = 9000, kelvin = 4000, priority = 3 }
+secondary = { spacing = 32, layout = "staggered", h = 8, flux = 8000, kelvin = 4000, priority = 3 }
+secondary_link = { spacing = 32, layout = "one", h = 8, flux = 7000, kelvin = 4000, priority = 3 }
+tertiary = { spacing = 33, layout = "staggered", h = 8, flux = 6000, kelvin = 3000, priority = 2 }
+tertiary_link = { spacing = 33, layout = "one", h = 8, flux = 6000, kelvin = 3000, priority = 2 }
+residential = { spacing = 36, layout = "one", h = 6, flux = 4000, kelvin = 3000, priority = 1 }
+unclassified = { spacing = 36, layout = "one", h = 6, flux = 4000, kelvin = 3000, priority = 1 }
+living_street = { spacing = 30, layout = "one", h = 5, flux = 3000, kelvin = 3000, priority = 1 }
+pedestrian = { spacing = 25, layout = "one", h = 5, flux = 3000, kelvin = 3000, priority = 1 }
+service = { spacing = 45, layout = "one", h = 5, flux = 2500, kelvin = 3000, share = 0.35 }
+footway = { spacing = 40, layout = "one", h = 4, flux = 1800, kelvin = 3000, share = 0.3 }
+[[lamps.areas]]
+district = "City of Westminster"
+kelvin = { "*" = 3000 }
+heritage = 2700
+sodium = false
+[[lamps.areas]]
+district = "City of London"
+kelvin = { trunk = 4000, trunk_link = 4000, primary = 4000, secondary = 4000, "*" = 3000 }
+heritage = 2700
+sodium = false
+[[lamps.gas]]
+at = [-0.1235, 51.5117]          # Covent Garden
+r = 320
+share = 0.3
+[[lamps.gas]]
+at = [-0.1105, 51.5125]          # Inner and Middle Temple
+r = 200
+share = 0.9
+[[lamps.gas]]
+at = [-0.1365, 51.5060]          # St James's, Pall Mall
+r = 350
+share = 0.15
+[[lamps.gas]]
+at = [-0.1290, 51.4983]          # Westminster Abbey, Dean's Yard
+r = 160
+share = 0.6
+[[lamps.gas]]
+at = [-0.1490, 51.5098]          # Mayfair (Mount Street, Farm Street)
+r = 300
+share = 0.15
+[[lamps.rows]]
+names = ["Victoria Embankment"]
+label = "dolphin lamps, Victoria Embankment"
+side = "water"
+spacing = 21
+h = 4.6
+kelvin = 3500
+flux = 3500
+kerb = 3.5
+near = 40
+[[lamps.rows]]
+names = ["Albert Embankment"]
+label = "dolphin lamps, Albert Embankment"
+side = "water"
+spacing = 21
+h = 4.6
+kelvin = 3500
+flux = 3500
+kerb = 3.0
+near = 40
+
+[cars]
+deck_ends = true            # a lane meeting a bridge deck takes the deck's height at their node, not the ground's (quay walls read the river bed there)
+# vehicle types: name, length, width, height (m), the viewer's model (web/engine/cars.js)
+types = [
+    ["sedan", 4.20, 1.79, 1.47, "hatch"],        # Corsa, Fiesta, Golf, Polo, Prius
+    ["suv", 4.40, 1.83, 1.62, "crossover"],      # Qashqai, Puma, Juke, Sportage, Model Y
+    ["taxi", 4.857, 1.874, 1.888, "taxi_london"],   # LEVC TX black cab
+    ["van", 4.97, 1.99, 1.97],                   # Transit Custom, Vivaro, Sprinter
+    ["bus", 11.2, 2.55, 4.4, "bus_london"],      # New Routemaster, Enviro400: TfL red double-deckers
+    ["truck", 7.5, 2.4, 3.3],
+    ["lorry", 12.0, 2.55, 3.8],
+    ["moto", 2.05, 0.75, 1.2],                   # delivery mopeds, scooters, motorbikes
+]
+parked_mix = [50, 33, 2, 9, 0, 0, 0, 0]
+# Westminster's red routes and bus-lane streets: no kerbside parking
+no_kerbside = ["Victoria Embankment", "Albert Embankment", "Millbank", "Whitehall", "Parliament Street", "Strand",
+    "Oxford Street", "Regent Street", "The Mall", "Northumberland Avenue", "Upper Thames Street", "Lower Thames Street"]
+# M3 critic: cars on open ground: APCOA's Eccleston Bridge car park is on the deck over Victoria's platforms (drawn
+# at the tracks' level, beside the shed); the Westferry Printworks at Millwall is a cleared building site (OSM
+# landuse=construction) whose service roads were parked along
+none_in = { "Victoria (Eccleston Bridge deck)" = [[-0.1460, 51.4935], [-0.1436, 51.4935], [-0.1436, 51.4950], [-0.1460, 51.4950], [-0.1460, 51.4935]], "Westferry Printworks (Millwall)" = [[-0.02369, 51.49447], [-0.02449, 51.4947], [-0.02445, 51.49491], [-0.02522, 51.49491], [-0.02547, 51.49509], [-0.02557, 51.49557], [-0.02488, 51.49563], [-0.02491, 51.49585], [-0.02423, 51.49589], [-0.02416, 51.49567], [-0.01977, 51.49576], [-0.01949, 51.49598], [-0.01934, 51.4959], [-0.01959, 51.49446], [-0.01973, 51.49445], [-0.01975, 51.49424], [-0.02369, 51.49447]] }
+# M6 fix round (critic: a wrong-way car where the Strand splits at its island): OSM draws the Strand, Regent Street,
+# Piccadilly and others as two one-way carriageways 6.5-7 m apart, each at the full road width, so their outer lanes
+# reached into the oncoming half; each now stops at its share of the gap between the two centre lines
+twin_limits = true
+[cars.class]                # speed m/s, mean gap m, queue factor, mix [sedan, suv, taxi, van, bus, truck, lorry, moto]
+motorway = [20, 36, 0.8, [38, 28, 3, 17, 1, 6, 4, 3]]
+trunk = [13, 36, 0.5, [29, 25, 9, 16, 6, 3, 0.5, 7]]          # the Embankment, Euston Road, the A-roads
+primary = [11, 32, 0.5, [26, 22, 12, 14, 10, 2.5, 0, 7]]     # the Strand, Whitehall, Oxford Street: bus corridors
+secondary = [10, 34, 0.5, [30, 25, 9, 16, 5, 2, 0, 7]]
+tertiary = [8, 42, 0.45, [34, 28, 7, 17, 1, 1, 0, 7]]
+residential = [7, 60, 0.4, [37, 31, 4, 19, 0, 0, 0, 6]]
+unclassified = [7, 70, 0.4, [37, 31, 4, 19, 0, 0, 0, 6]]
+living_street = [4, 120, 0.5, [36, 28, 3, 20, 0, 0, 0, 5]]
+road = [7, 70, 0.4, [37, 31, 4, 19, 0, 0, 0, 6]]
+service = [5, 140, 0.5, [36, 26, 2, 24, 0, 0, 0, 6]]
+# colours: SMMT (cars in use: blue 19 %, silver 18, black 16, white 14, grey 12, red 12, green 5; new cars grey 28,
+# black 23, blue 15, white 13), central London's fleet newer than the national one
+[cars.palettes]
+sedan = [["#f0f0ee", "", 14], ["#16171a", "", 18], ["#5a5e64", "", 11], ["#8d9196", "", 7], ["#b4b8bb", "", 14],
+    ["#2c4a78", "", 9], ["#1d2a44", "", 6], ["#46627f", "", 2], ["#a32028", "", 9], ["#4e6a57", "", 3],
+    ["#25392c", "", 1], ["#c9bb9f", "", 2], ["#d9822b", "", 1], ["#6d4f3a", "", 1]]
+suv = [["#f0f0ee", "", 14], ["#16171a", "", 20], ["#5a5e64", "", 13], ["#8d9196", "", 8], ["#b4b8bb", "", 12],
+    ["#2c4a78", "", 9], ["#1d2a44", "", 6], ["#a32028", "", 8], ["#4e6a57", "", 4], ["#c9bb9f", "", 2],
+    ["#6d4f3a", "", 2]]
+taxi = [["#0f1011", "#0f1011", 85], ["#f0f0ee", "#f0f0ee", 4], ["#8d9196", "#8d9196", 4], ["#1d2a44", "#1d2a44", 3],
+    ["#7a1c24", "#7a1c24", 2], ["#2c4a78", "#2c4a78", 2]]
+van = [["#f0f0ee", "", 58], ["#b4b8bb", "", 10], ["#5a5e64", "", 8], ["#16171a", "", 8], ["#2c4a78", "", 6],
+    ["#da291c", "", 3], ["#c9bb9f", "", 3], ["#4e6a57", "", 2], ["#ffcc00", "", 2]]   # (Royal Mail red)
+bus = [["#c4232b", "#3b3d40", 100]]
+# (M6 critic: the black cabs read navy: "#161b1e" has a blue-green cast under the sky's reflection; a neutral
+# near-black, the clear coat's reflection gives the sheen)      # TfL red (sampled New Routemaster #c6292d), a dark grey skirt
+
+# camera presets for the viewer's menu (06_tiles, M3 on): [lon, lat, distance m, elevation deg, azimuth deg (from
+# the target to the camera), lift m (the target over the ground)]. A first set; M3 and M4 frame them in the viewer
+# M4 (builder H): landmark ensembles without a name in the table take a monument kind (variant: 0.3 palace, 0.5
+# gothic, 0.7 blank ashlar): the Tower of London's walls and towers (OSM's castle outline), Tower Bridge's towers
+# and shore towers, the Old Royal Naval College's courts (they had the housing grid: M3 shots)
+[facade.zones]
+"Tower of London (walls and towers)" = { style = "monument", variant = 0.7, tint = "#988e7e", polygon = [[-0.07782, 51.50772], [-0.07805, 51.50777], [-0.07789, 51.50789], [-0.07724, 51.50898], [-0.0757, 51.50911], [-0.0748, 51.50886], [-0.07453, 51.50878], [-0.07467, 51.50837], [-0.07479, 51.50721], [-0.07564, 51.50718], [-0.07674, 51.50745], [-0.07719, 51.50743], [-0.07782, 51.50772]] }
+"Tower Bridge (towers and shore towers)" = { style = "monument", variant = 0.5, polygon = [[-0.07630, 51.50428], [-0.07595, 51.50424], [-0.07440, 51.50672], [-0.07475, 51.50676], [-0.07630, 51.50428]] }
+"Old Royal Naval College" = { style = "monument", variant = 0.3, polygon = [[-0.00466, 51.4846], [-0.00819, 51.48344], [-0.00847, 51.48362], [-0.00943, 51.48345], [-0.00881, 51.48229], [-0.00803, 51.48131], [-0.00325, 51.4829], [-0.00466, 51.4846]] }
+
+[views]
+group_order = true          # M10: each menu group in its [views.groups] order
+[views.areas]
+"London overview" = [-0.0950, 51.5060, 14000, 30, 200]
+"The City" = [-0.0850, 51.5135, 1700, 24, 195]
+"Westminster" = [-0.1265, 51.5000, 1500, 24, 95]
+"Canary Wharf" = [-0.0195, 51.5045, 1900, 20, 200]
+"Greenwich" = [-0.0050, 51.4810, 1600, 24, 340]
+# M10 areas (camera south-south-west unless named, so the afternoon sun lights what is seen): the West End's
+# quarters from 30-35 degrees, the parks from further out, Wapping and Spitalfields at the districts' east edge
+"Bankside" = [-0.0960, 51.5065, 1100, 28, 220]
+"Hyde Park" = [-0.1650, 51.5060, 1900, 28, 150]
+# from over the lake's west end looking east to Horse Guards and Whitehall (the view from the Blue Bridge, higher)
+# M7: the camera 12 m over the escarpment's top (56 m ODN), 60 m east of the General Wolfe statue (from the statue
+# itself Flamsteed House stands in the line to Canary Wharf), over the Queen's House and the ORNC. The viewer keeps
+# the camera at least 4 degrees over its target (maxPolarAngle 86): M4's preset (3.3 km at 0.75 degrees) was lifted
+# to ~230 m. So every hill view aims 4.2-4.6 degrees down at a target 400-800 m ahead, lowered under the eye line
+# (the camera's height from the DEM at its spot plus the eye's)
+# M7 fix round: the same camera (9.6 m over the escarpment by the Observatory), aimed 6.5 degrees down so the park's
+# slope and the Queen's House lie well below the eye line
+"Canary Wharf from Greenwich Park" = [-0.00305, 51.48166, 450, 6.5, 155.7, -5.2]
+"The Thames from over Waterloo Bridge" = [-0.0960, 51.5105, 1500, 1, 263, 20]
+# M3 fix round: the camera on Ludgate Hill's centreline (OSM w901407348's node at -0.10190, 51.51389, 150 m down
+# the hill) at eye level (3 m over its ground, 13.4 m), aimed at the west front: the viewer holds the camera 4 degrees
+# or more over the horizon (maxPolarAngle 86), so the 1-degree preset had sat 14 m up; the target lowered instead
+# M10: moved 8 m north off the carriageway onto the north footway (the M4-M9 camera stood in a traffic lane)
+"Ludgate Hill (street level)" = [-0.09975, 51.51388, 150, 4.5, 271.1, -12.8]
+# M4 fix round (builder F): pavement-level views at eye height (the target lowered as Ludgate Hill's): Shad Thames
+# north-east along its residential stretch behind Butlers Wharf (warehouses both sides); Belgrave Square's north-east
+# side looking south-east along the terrace (the road, not the garden: the critic's earlier view stood in a crown)
+"Shad Thames (street level)" = [-0.07261, 51.50148, 65, 4.5, 225, -2.1]
+"The Shard" = [-0.0865, 51.5045, 1100, 14, 330, 120]
+# M4 fix round: from the SSE (over Eastcheap), the south face and the east side's outward-leaning profile together
+"St Paul's Cathedral" = [-0.0983, 51.5138, 450, 18, 200, 40]
+"Tower Bridge" = [-0.0753, 51.5055, 550, 8, 110, 25]
+"Tower of London" = [-0.0761, 51.5081, 450, 30, 200, 10]
+"Big Ben and Parliament" = [-0.1246, 51.4996, 650, 10, 70, 40]
+"London Eye" = [-0.1197, 51.5033, 550, 12, 300, 60]
+"Battersea Power Station" = [-0.1446, 51.4818, 700, 12, 20, 40]
+"Trafalgar Square" = [-0.1282, 51.5085, 550, 20, 180, 10]
+"The O2" = [0.0032, 51.5030, 1400, 22, 220, 20]
+# M4 (towers): Nine Elms and Vauxhall from over the river by Pimlico (St George Wharf Tower, One Nine Elms, DAMAC,
+# One Thames City, the US Embassy); One Blackfriars over Blackfriars Bridge from the north bank
+"King's Cross and St Pancras" = [-0.1250, 51.5310, 750, 20, 205, 15]
+# M7 hills and far views (cameras at eye height on the summits; the DEM: Parliament Hill 96.6 m, Primrose Hill 66.8,
+# the Wolfe statue 42.7 ... the Observatory 46.9, the Queen's House 11.3): the protected view of St Paul's from
+# Parliament Hill (London View Management Framework 2A.1), Primrose Hill over Regent's Park to the City, the
+# escarpment from the river wall by the ORNC, the Shard's 72nd floor south over Peckham to the Crystal Palace ridge
+# and the North Downs, and the overview turned east (the Thames to the estuary, Shooters Hill) and north
+# (Hampstead, Highgate and Alexandra Palace's hill)
+# M7 fix round: the camera over the 97 m summit, 6 degrees down the slope towards the City; the eye 22 m up (it was 30):
+# at 3 m the scrub and wood polygons round the summit (OSM natural=scrub, drawn as full-size trees) fill the view
+"The City from Parliament Hill" = [-0.15451, 51.5554, 600, 6.0, 320.2, 7.5]
+# M10 landmarks (the target lifted to about a third of the building; azimuth: where the camera stands)
+# M10 fix round: from 265 degrees (25 degrees south of the old 290), the west front and its towers face-on
+# M10 fix round: at 10:00 (the 7th number), the sun in the south-east lights the east front (at 16:15 it was backlit)
+"Buckingham Palace" = [-0.1425, 51.5008, 600, 18, 70, 12, 10.0]
+"British Museum" = [-0.1271, 51.5192, 450, 24, 180, 15]                    # the south portico over Great Russell Street
+# M10 fix round: closer, from the south-west over the Embankment, into the courtyard
+"Piccadilly Circus" = [-0.1345, 51.5099, 290, 27, 205, 8]                # M10 fix round: from over Lower Regent Street, the Lights and Eros
+# M10 dusk and night (a 7th number: the hour the view sets; the viewer's time slider jumps there)
+[views.groups]
+"Street and river" = ["The Thames from over Waterloo Bridge", "Ludgate Hill (street level)", "Shad Thames (street level)"]
+"Skyline and landmarks" = ["The Shard", "St Paul's Cathedral", "Tower Bridge", "Tower of London", "Big Ben and Parliament", "London Eye", "Buckingham Palace", "Trafalgar Square", "British Museum", "Piccadilly Circus", "The O2"]
+"Hills and far views" = ["The City from Parliament Hill", "Canary Wharf from Greenwich Park"]
+# the menu: Areas (every [views.areas] view not named here), then these groups in this order
+
+# M7 fix round (lm7b): the Royal Observatory as seen from the river and Canary Wharf: the Great Equatorial Building's
+# onion dome (dark grey-brown, over its 9.6 m drum; OSM w268533517 roof:shape dome, drawn flat by the table) and
+# Flamsteed House's two lead cupolas over the Octagon Room's front, the red time ball on the eastern one's mast (the
+# house's lidar top 16 m)
+[[structures]]
+kind = "figure"
+name = "Royal Observatory Great Equatorial dome"
+at = [-0.001143, 51.477715]
+facing = 0
+style = "floodlit"
+variant = 0.3
+colour = "#55504a"
+top = 19
+segments = 32
+sections = [[9.2, 0, 0, 5.4, 5.4],
+    [10.2, 0, 0, 5.4, 5.4],
+    [10.2, 0, 0, 5.0, 5.0],
+    [11.4, 0, 0, 5.5, 5.5],
+    [12.6, 0, 0, 5.6, 5.6],
+    [13.8, 0, 0, 5.2, 5.2],
+    [15.0, 0, 0, 4.2, 4.2],
+    [16.2, 0, 0, 2.6, 2.6],
+    [17.0, 0, 0, 1.2, 1.2],
+    [17.6, 0, 0, 0.35, 0.35],
+    [18.6, 0, 0, 0.12, 0.12]]
+
+[[structures]]
+kind = "figure"
+name = "Flamsteed House west cupola"
+at = [-0.002083, 51.478022]
+facing = 0
+style = "floodlit"
+variant = 0.3
+colour = "#5d6266"
+top = 22
+segments = 8
+sections = [[15.5, 0, 0, 1.9, 1.9],
+    [17.6, 0, 0, 1.9, 1.9],
+    [17.6, 0, 0, 2.1, 2.1],
+    [18.0, 0, 0, 2.1, 2.1],
+    [19.4, 0, 0, 1.5, 1.5],
+    [20.3, 0, 0, 0.5, 0.5],
+    [21.2, 0, 0, 0.15, 0.15]]
+
+[[structures]]
+kind = "figure"
+name = "Flamsteed House east cupola and time ball"
+at = [-0.001859, 51.478038]
+facing = 0
+style = "floodlit"
+variant = 0.3
+colour = "#5d6266"
+top = 25
+segments = 8
+sections = [[15.5, 0, 0, 1.9, 1.9],
+    [17.6, 0, 0, 1.9, 1.9],
+    [17.6, 0, 0, 2.1, 2.1],
+    [18.0, 0, 0, 2.1, 2.1],
+    [19.4, 0, 0, 1.5, 1.5],
+    [20.3, 0, 0, 0.5, 0.5],
+    [20.6, 0, 0, 0.2, 0.2]]
+tubes = [[[0, 20.3, 0], [0, 25.0, 0], 0.12, "#3a3633"],
+    [[0, 22.6, 0], [0, 24.0, 0], 0.75, "#b0302a"]]

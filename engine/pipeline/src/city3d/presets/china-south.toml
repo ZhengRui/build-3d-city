@@ -1,0 +1,260 @@
+# Region preset "china-south": western Shenzhen, as built. Chinese urban villages, tiled residential towers
+# and glass offices; Chinese arterial widths and sidewalks; banyans, royal palms and Bauhinia along the
+# streets; BYD taxis and buses; water tanks, solar water heaters and blue sheds on the roofs. Its code (building
+# kinds, facade rules, rooftop programmes) is in presets/china_south/. A city overrides any of it in city.toml.
+
+[buildings.osm_kind]        # OSM building tag -> kind; wins over the shape rules unless the height says tower
+industrial = "factory"
+warehouse = "factory"
+manufacture = "factory"
+house = "house"
+detached = "house"
+villa = "house"
+semidetached_house = "house"
+school = "civic"
+university = "civic"
+hospital = "civic"
+government = "civic"
+public = "civic"
+civic = "civic"
+stadium = "civic"
+train_station = "civic"
+transportation = "civic"
+terminal = "civic"
+sports_hall = "civic"
+kindergarten = "civic"
+
+[roads.default_w]           # typical carriageway width (m) without width or lanes tags: [two-way, one-way]
+motorway = [24, 12]
+trunk = [22, 11]
+primary = [18, 10.5]
+secondary = [14, 8]
+tertiary = [10, 7]
+residential = [7, 5]
+unclassified = [7, 5]
+living_street = [5, 4]
+road = [7, 5]
+service = [4.5, 4]
+pedestrian = [6, 6]
+link = [7, 6.5]
+
+# facade styles in the viewer's order (web/facade.js): floor = nominal floor height (m), palette = wall colours
+# (glass: the glass tint), one picked per building
+[facade.styles.glass]
+floor = 4.2
+palette = ["#5f7a8e", "#6d8790", "#8e9ba6", "#4d5d6b", "#6f8577", "#6a7f99", "#7d8a94", "#56708a"]
+[facade.styles.residential]
+floor = 3.0
+palette = ["#ebe8e1", "#e5dccb", "#d9d6cf", "#e8d6c4", "#cdd0d3", "#f0eadb", "#dccbb0", "#e2e2dc", "#d6cdbf", "#c9c2b8"]
+[facade.styles.village]
+floor = 3.0
+palette = ["#e7e1d5", "#d9cbb3", "#d0c7bb", "#e2cfc0", "#bfbab0", "#c8d1d6", "#e0d8c8", "#cbb9a0", "#b8b2a8"]
+[facade.styles.factory]
+floor = 5.0
+palette = ["#e6e6e2", "#d2d5d6", "#c8ced3", "#ddd7c9", "#cfd4cc"]
+[facade.styles.commercial]
+floor = 4.8
+palette = ["#d8d4cc", "#c9c4bb", "#bbbec2", "#e2ddd2", "#cfc7b8"]
+[facade.styles.civic]
+floor = 3.9
+palette = ["#eae1ce", "#dbc4a6", "#e4e4e0", "#cdae90", "#d9d2c4"]
+[facade.styles.plain]       # rooftop plant rooms: no windows
+floor = 0.0
+palette = ["#bdbab3"]
+# landmark styles, set from data/landmark_facades.csv with the tint sampled from photos
+[facade.styles.fins]        # glass between stainless fins/piers
+floor = 4.4
+palette = ["#6d8290"]
+[facade.styles.bands]       # glass with horizontal spandrel bands
+floor = 4.2
+palette = ["#5e7084"]
+[facade.styles.lattice]     # diamond steel lattice, glass/panel infill
+floor = 5.0
+palette = ["#6a8090"]
+[facade.styles.honeycomb]   # hexagonal cells, metal and glass
+floor = 5.0
+palette = ["#dfe2e4"]
+[facade.styles.panel]       # metal panel cladding (halls)
+floor = 5.0
+palette = ["#a9adb1"]
+
+[facade.osm_style]          # style = OSM building tags that set it
+glass = ["office", "hotel"]
+residential = ["apartments", "residential", "dormitory"]
+village = ["house", "detached", "terrace", "semidetached_house"]
+factory = ["industrial", "warehouse", "factory", "manufacture", "shed", "hangar"]
+commercial = ["commercial", "retail", "supermarket", "mall", "kiosk"]
+civic = ["school", "university", "college", "kindergarten", "hospital", "train_station", "civic", "government",
+    "public", "temple", "church", "transportation", "stadium", "sports_hall", "museum"]
+
+[markings.sidewalk_w]       # sidewalk width (m) each side of two-way ground-level roads; links and motorways none
+trunk = 5.0
+primary = 5.0
+secondary = 4.0
+tertiary = 3.0
+residential = 2.2
+unclassified = 2.0
+[markings.median_w]         # planted median on the inner side of a one-way carriageway (m)
+motorway = 2.5
+trunk = 2.0
+primary = 2.0
+secondary = 1.5
+
+[shores]
+coast_type = "revetment"    # reclaimed land held by rock armour with a promenade on top
+
+[trees.green]               # OSM green tag -> class, first match wins
+"landuse=forest" = "forest"
+"natural=wood" = "forest"
+"leisure=nature_reserve" = "forest"
+"landuse=cemetery" = "forest"            # Chinese cemeteries sit on wooded hillsides
+"leisure=park" = "park"
+"leisure=garden" = "park"
+"landuse=recreation_ground" = "park"
+"landuse=village_green" = "park"
+"landuse=orchard" = "orchard"            # lychee and longan on Bao'an's hills
+"natural=scrub" = "scrub"
+"natural=heath" = "scrub"
+"landuse=grass" = "grass"
+"landuse=meadow" = "grass"
+"natural=grassland" = "grass"
+"landuse=farmland" = "grass"
+"leisure=golf_course" = "grass"
+[trees.street]
+default = "broadleaf"       # banyans and other evergreen broadleaves
+[trees.street.odds]         # royal palms on some boulevards, flowering Bauhinia or flame trees on a few streets
+major = [["palm", 0.14], ["flowering", 0.24]]
+minor = [["palm", 0.05], ["flowering", 0.13]]
+[trees.street.height]       # drawn in this order for every road
+palm = [11, 16]
+flowering = [7, 10]
+broadleaf = {major = [9, 14], minor = [7, 12]}
+
+[cars]
+parked_mix = [55, 28, 3, 10, 0, 4, 0]
+# vehicle types: name, length, width, height (m), in the viewer's order
+types = [
+    ["sedan", 4.75, 1.82, 1.46],
+    ["suv", 4.70, 1.90, 1.72],
+    ["taxi", 4.56, 1.82, 1.63],      # BYD e6, a tall hatchback
+    ["van", 5.05, 1.90, 2.00],       # MPVs and delivery vans
+    ["bus", 12.0, 2.55, 3.20],       # BYD K8/K9
+    ["truck", 7.6, 2.30, 3.20],      # light box truck
+    ["lorry", 16.5, 2.50, 4.00],     # tractor and a 40 ft container
+]
+[cars.link_speed]
+motorway = 14
+trunk = 12
+[cars.kerbside]
+tertiary = 0.2
+residential = 0.55
+unclassified = 0.45
+living_street = 0.6
+road = 0.4
+service = 0.3
+# per road class: free-flow speed (m/s), mean gap front to front (m, per lane at activity 1), queue factor at
+# signalled junction ends, and the mix (sedan, suv, taxi, van, bus, truck, lorry)
+[cars.class]
+motorway = [22, 42, 0.9, [50, 22, 4, 7, 2, 7, 8]]
+trunk = [17, 38, 0.3, [50, 22, 6, 7, 4, 6, 5]]
+primary = [13, 34, 0.26, [50, 22, 11, 7, 6, 3, 1]]
+secondary = [11, 40, 0.26, [52, 22, 10, 8, 5, 3, 0]]
+tertiary = [9, 60, 0.3, [52, 24, 9, 9, 3, 3, 0]]
+residential = [7, 95, 0.4, [54, 26, 8, 10, 0, 2, 0]]
+unclassified = [7, 100, 0.4, [52, 25, 6, 11, 0, 6, 0]]
+living_street = [4, 160, 0.5, [56, 28, 6, 10, 0, 0, 0]]
+road = [7, 100, 0.4, [54, 26, 8, 10, 0, 2, 0]]
+service = [5, 180, 0.5, [55, 25, 4, 12, 0, 4, 0]]
+# colour palettes per type: [body, second colour ("": none), weight]. Chinese car colours by share: white,
+# black, silver and greys make up about four in five
+[cars.palettes]
+sedan = [["#e8e9e8", "", 18], ["#d8d6ce", "", 8], ["#f2f2ef", "", 4],
+    ["#0e0f11", "", 14], ["#1b1d21", "", 4],
+    ["#a6aaae", "", 11], ["#c2c4c4", "", 4],
+    ["#6a6e72", "", 7], ["#44484c", "", 5], ["#2c2f33", "", 3],
+    ["#1c3050", "", 4], ["#3b67a0", "", 2], ["#7ea2c4", "", 1],
+    ["#8e1a1f", "", 4], ["#b3322c", "", 1],
+    ["#b5a386", "", 3], ["#5b4333", "", 2],
+    ["#3c5a46", "", 1], ["#d8b23a", "", 0.5], ["#c9d3cf", "", 1.5]]
+suv = [["#e8e9e8", "", 18], ["#d8d6ce", "", 8], ["#f2f2ef", "", 4],
+    ["#0e0f11", "", 14], ["#1b1d21", "", 4],
+    ["#a6aaae", "", 11], ["#c2c4c4", "", 4],
+    ["#6a6e72", "", 7], ["#44484c", "", 5], ["#2c2f33", "", 3],
+    ["#1c3050", "", 4], ["#3b67a0", "", 2], ["#7ea2c4", "", 1],
+    ["#8e1a1f", "", 4], ["#b3322c", "", 1],
+    ["#b5a386", "", 3], ["#5b4333", "", 2],
+    ["#3c5a46", "", 1], ["#d8b23a", "", 0.5], ["#c9d3cf", "", 1.5]]
+# Shenzhen taxis: blue-and-white BYD e6 (most), red, green (outside the old city)
+taxi = [["#2f86c9", "#f0f0ec", 62], ["#b8262b", "#b8262b", 26], ["#3a9a58", "#eeeeea", 12]]
+van = [["#ecedec", "", 45], ["#a9adb1", "", 15], ["#6a6e72", "", 8], ["#141518", "", 8],
+    ["#274a80", "", 6], ["#c21d24", "#ecedec", 5],     # JD Logistics red and white
+    ["#1b1b1b", "#ecedec", 5], ["#d9d4c5", "", 8]]      # SF Express black and white
+# BYD buses: white with a green, blue or orange livery, some all green
+bus = [["#2f9955", "#eceeec", 50], ["#2a6fb8", "#eceeec", 22], ["#e0742a", "#eceeec", 10],
+    ["#3a8a4c", "#3a8a4c", 12], ["#d6d9d6", "#2f9955", 6]]
+# cab, cargo box
+truck = [["#2a5aa8", "#e6e6e1", 30], ["#b3282a", "#e6e6e1", 14], ["#e9e9e5", "#b9bdc1", 20],
+    ["#e3b021", "#e6e6e1", 8], ["#2c7447", "#dcdcd6", 8], ["#2a5aa8", "#3a6cb4", 10],
+    ["#e9e9e5", "#e9e9e5", 10]]
+# tractor, container
+lorry = [["#2a5aa8", "#1f4f8e", 12], ["#b3282a", "#8f2a22", 12], ["#e9e9e5", "#2c6b3a", 10],
+    ["#2a5aa8", "#d0661f", 8], ["#e9e9e5", "#8b8f93", 12], ["#e3b021", "#d9d9d4", 6],
+    ["#b3282a", "#6f3b25", 8], ["#2a5aa8", "#2a7a7a", 8], ["#e9e9e5", "#76a4c9", 12],
+    ["#2c7447", "#1f4f8e", 6], ["#e9e9e5", "#b3322c", 8]]
+
+[rooftops.parapet_t]        # parapet thickness per facade style (m); others rooftops.parapet_default
+village = 0.2
+glass = 0.3
+[rooftops.named]            # colours the programmes (presets/china_south/rooftops.py) use, sRGB
+stainless = "#cdd1d3"
+stainless2 = "#b7bcbf"
+tank_blue = "#2d6db0"
+tank_blue2 = "#3f88c6"
+tank_white = "#e2e0d8"
+tank_beige = "#d6ccb4"
+tank_green = "#6f8f7a"
+shed_blue = "#4679ad"
+shed_blue2 = "#5588bb"
+shed_cyan = "#6c9fbf"
+shed_white = "#d9dbd8"
+shed_grey = "#9ba1a4"
+shed_red = "#a24a3c"
+shed_green = "#5f8f6f"
+tile_red = "#8c4c3a"
+tile_orange = "#a4674a"
+tile_green = "#4c7058"
+tile_grey = "#5c6166"
+tile_blue = "#4a6583"
+tile_yellow = "#a38a55"
+concrete = "#a9a59c"
+concrete_light = "#cbc7bd"
+concrete_dark = "#86827b"
+white_tile = "#dcdad3"
+hvac = "#cfcec6"
+hvac2 = "#aeb3b3"
+hvac3 = "#bdb7a6"
+cooling = "#8d9898"
+cooling2 = "#7c8f8a"
+cooling_blue = "#6b8fae"
+steel = "#9ea3a6"
+steel_white = "#dddcd7"
+steel_dark = "#4b4f53"
+pv = "#1e2b46"
+tubes = "#1c2330"
+glass = "#8fa6b4"
+green = "#5a753d"
+green2 = "#6c8746"
+foliage = "#3e5d2d"
+foliage2 = "#4e6c33"
+foliage3 = "#5e7b3a"
+foliage4 = "#6a7f3c"
+helipad = "#4b5c53"
+helipad_grey = "#676c6e"
+asphalt = "#3d3f41"
+car_white = "#e6e6e3"
+car_silver = "#b6b9bc"
+car_black = "#1d1e21"
+car_grey = "#5e6267"
+car_red = "#8c2320"
+car_blue = "#27426f"
+car_champagne = "#c6b597"

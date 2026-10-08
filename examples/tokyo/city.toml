@@ -1,0 +1,572 @@
+# Central Tokyo: Phase 0's option D, the core (Marunouchi and the Imperial Palace, Ginza, Nihonbashi, Tsukiji and
+# Shiodome, Toranomon and Azabudai, Tokyo Tower, Roppongi and Akasaka, Tsukishima-Kachidoki-Harumi, the Sumida to
+# its centreline, Rainbow Bridge and Daiba) with two islands: Asakusa and the Skytree, and Nishi-Shinjuku, the
+# Meiji Shrine and Shibuya. Every city-specific setting of the build-3d-city pipeline; the engine
+# (.agents/skills/build-3d-city/engine/pipeline, its README lists every key with its default) and the region preset
+# "china-south" hold the rest. Run a stage with `uv run city3d <stage>` from this folder, everything with
+# `uv run city3d all`.
+
+name = "tokyo"
+title = "Tokyo"
+# Tokyo's own preset (M4): its facade styles and rooftop programmes (presets/jp-tokyo.toml, jp_tokyo/), china-south's
+# other tables (species, cars, road widths) under them
+preset = "jp-tokyo"
+# M4 landmark figures (scripts/m4l_structures.py): Tokyo Tower, the Skytree, Rainbow Bridge, Docomo's spire, the
+# Diet's tower, Tokyo Station's domes, Sensō-ji's pagoda, hall and gate, ...
+# (M4 fix round) the sign streets' projecting vertical signs (scripts/m4f_signs.py)
+include = ["generated/structures-m4l.toml", "generated/structures-m4f-signs.toml"]
+# UTM 54N (central meridian 141 E; Tokyo is 1.2 degrees west of it: scale 0.99978). PLATEAU is JGD2011 lat/lon
+# (EPSG:6697 with heights, 6668 2D), which PROJ relates to WGS 84 by a null transformation (JGD2011 is ITRF2008:
+# sub-metre); the GSI DEM mosaic is web mercator (EPSG:3857) and is warped as it loads
+utm_epsg = 32654
+coast = true                # Tokyo Bay: the coastline of OSM cuts the ground; the Sumida and the canals are tidal
+drive = "left"
+# metres per storey for OSM building:levels: Tokyo's offices 3.8-4.2 m, its mansions 2.9-3.1 m, the 雑居ビル
+# between; M2: 3.5 (PLATEAU 3.45-3.56 m a storey from 3 to 12 storeys, checks/m1_sources.md §5; only OSM fill uses it)
+level_h = 3.5
+user_agent = "city3d (you@example.com)"
+# The local Overpass first (the user's Docker container on 8787, built from BBBike's Tokyo extract of 3 Oct:
+# 139.62-139.95 E, 35.56-35.78 N); while it is down the connection is refused and the public mirrors answer (slow,
+# 429/504: the engine retries and caches every answer in raw/)
+overpass = ["http://127.0.0.1:8787/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter"]
+
+[osm]
+# by each district's clip box, not Overpass area(): a fresh local Overpass may have no area data (Berlin's had
+# none), and the clip box is small anyway
+area = false
+# (M2) underground=yes, location=underground|indoor and level < 0 outlines are not buildings (station concourses,
+# malls under the streets); only OSM fill (where PLATEAU has nothing) could build them
+underground_drop = true
+
+# The user's boundary (6 Oct 2026, "all D"; the Phase 0 boundary note, plans/maps/tokyo.json):
+# three pieces (the core, the Asakusa-Skytree island, the west island) drawn by hand in Phase 0 and snapped in M1 to
+# the streets, rivers and railways by scripts/snap_boundary.py: OSM's blocks inside the drawn line by more than half
+# their area, big faces (the bay, the Sumida, the palace grounds) cut along it, so the Sumida's centreline stays where
+# the line follows the river; M3 carried the west island's edge along Omotesando (scripts/m3_omotesando.py).
+# Boundary change (the user, 6 Oct 13:45: "Tokyo deserves to be the heaviest"): the two gaps between the core and the
+# islands are real buildings too, Phase 0's gaps.json rings snapped to blocks by the same rule and joined to D
+# (scripts/m3g_boundary.py, D as M3 left it in data/boundary_d_m3.geojson): one district area of 56.45 km², 49.11 km²
+# of land (D as M3 left it: 40.28 / 33.47): the Asakusa gap (Akihabara, Kanda, Asakusabashi, Kuramae; +8.52 km²) with Ueno's south
+# to the station and Ameyoko (+0.96) and Kanda Myojin's block, the west gap (Yotsuya, Shinanomachi, Aoyama, Jingu
+# Gaien, Shinjuku Gyoen; +6.84 km²) with CO·MO·RE Yotsuya's block. data/boundary_d.geojson is the area (one polygon),
+# checks/boundary.png the picture.
+# Each ward (admin_level 7) is a district clipped by the area: its clip is the Feature of that name in
+# data/boundary_districts.geojson (the area cut by the ward buffered 25 m; Koto's three parts are Toyosu's and
+# Harumi's water edges). Shinagawa's 0.12 km² at Higashi-Yashio (Odaiba) and Bunkyo's 0.05 km² at Yushima (the
+# Asakusa gap's west edge) are in it too
+[districts]
+"Chiyoda" = { relation = 1761742, clip = "data/boundary_districts.geojson" }
+"Chuo" = { relation = 1758897, clip = "data/boundary_districts.geojson" }
+"Minato" = { relation = 1761717, clip = "data/boundary_districts.geojson" }
+"Koto" = { relation = 3554015, clip = "data/boundary_districts.geojson" }
+"Taito" = { relation = 1758888, clip = "data/boundary_districts.geojson" }
+"Sumida" = { relation = 1758891, clip = "data/boundary_districts.geojson" }
+"Shinjuku" = { relation = 1758858, clip = "data/boundary_districts.geojson" }
+"Shibuya" = { relation = 1759477, clip = "data/boundary_districts.geojson" }
+"Shinagawa" = { relation = 3554304, clip = "data/boundary_districts.geojson" }
+"Bunkyo" = { relation = 1758878, clip = "data/boundary_districts.geojson" }
+
+[sun]                       # mid-October: clear autumn air, leaves still green (city.json's sun.date)
+latitude = 35.68
+declination = -8.5
+
+[sources]
+# PLATEAU 2025 is the primary layer (every building, surveyed measuredHeight; checks/m1_sources.md); OSM fills what it
+# lacks and lends names and building:parts
+footprints = ["plateau", "osm"]
+heights = ["landmark", "plateau", "osm_height", "osm_levels", "default"]
+dem = "geotiff"             # GSI DEM5A, 5 m bare earth (laser), m above Tokyo Peil (T.P.)
+# (M3 fix round) the backdrop from GSI's 10 m bare-earth DEM (dem_png z12, ~31 m, raw/gsi_backdrop/), GLO-30 only
+# where GSI has nothing (the sea, beyond Japan's tiles): GLO-30, a surface model, drew the western plain's roofs and
+# trees as lumpy hills (M3 critic)
+backdrop = "geotiff"
+
+# PLATEAU 2025 CityGML (MLIT, PDL 1.0), raw/plateau/README.txt: one bldg GML per 1 km mesh and ward (142 files, 80
+# meshes; a border mesh is served by each ward: the adapter dedupes by gml:id) from the PLATEAU data catalog API,
+# fetched by w-tokyo-data. The citygml adapter's PLATEAU flavour (in the engine): lat/lon/h order,
+# LOD1-only buildings from lod1Solid / lod0RoofEdge, the appearance block cleared, codelists resolved
+[sources.plateau]
+adapter = "citygml"
+flavour = "plateau"
+path = "plateau/bldg/*_bldg_6697_op.gml.gz"
+crs = "EPSG:6668"           # JGD2011 lat/lon (srsName 6697 = 6668 + JGD2011 heights)
+label = "PLATEAU"
+role = "primary"
+# m above the building's ground (M2): a LoD2 solid's (or roof level's) own roof top; a LOD1-only solid's
+# measuredHeight, else its block's top. measuredHeight runs low on towers (Midtown 224.6 where the LoD2 roof is 245.8
+# and the list 248.1; the Metropolitan Government 226 / 243.05 / 243.4; Scramble Square 220 / 229.0 / 229.7) and
+# takes masts on others (TEPCO's head office 200.6 over a 110 m LoD2 roof, J-Power 149.7 / 70.4, the Fire
+# Department 110 / 62.9); a LOD1-only solid's measuredHeight (its block's top is a median, 1.8 m under it). Towers over
+# big low LOD1 blocks (NHK) are capped one by one in [buildings] fix_h (scripts/m2_fixes.py), not by a rule: a
+# rule flattened 49 real towers (critic round 1: Sumida City Hall, Sophia University)
+# A LOD1 solid of 1,500 m² or more: measuredHeight is its highest point over the whole footprint (the Yoyogi Gymnasium
+# 29.8 m over 14,822 m², its solid 17): its own top, raised to its storeys x 4.5 where measuredHeight goes that high
+# (Sumida City Hall: 19 F, 85.5 m; NHK: 8 F, 36 m) (critic round 2)
+height = """where(lod == 2, roof_top_z - ground_z, where(isnan(measuredHeight), roof_top_z - ground_z,
+    where(area >= 1500, maximum(roof_top_z - ground_z, where(isnan(storeysAboveGround), 0,
+    minimum(measuredHeight, storeysAboveGround * 4.5))), measuredHeight)))"""
+# a tower and its podium are one PLATEAU Building (Roppongi Hills 22,800 m² from one 235 m top, Midtown 15,500 m²,
+# Mori JP 10,700 m²): each LoD2 solid is cut by roof level (the adapter's roof_split, M2), defaults
+# (levels within max(3 m, 5 % of their height) are one; levels and slivers narrower than 3 m, which 04's strip rule
+# would drop, go to their neighbour)
+roof_split = { min_area = 300.0, rel_tol = 0.05, min_width = 3.0 }
+keep = ["gml_id", "parent_id", "part", "lod", "fp_from", "name", "usage", "usage_name", "class", "class_name",
+    "detailedUsage", "detailedUsage_name", "buildingStructureType_name", "storeysAboveGround", "storeysBelowGround",
+    "lod1HeightType", "buildingID", "measuredHeight", "roof_top_z", "eave_z", "roof_area", "n_roof", "n_wall", "tile",
+    "roof_level", "roof_levels"]
+rename = { ground_z = "ground_elevation" }    # T.P., the GSI DEM's datum: 03_compare checks it
+drop = { class = ["3003", "3004"] }
+
+[sources.geotiff]           # GSI DEM5A (GSI terms of use), raw/gsi_dem/README.txt
+# w-tokyo-data's mosaic of the dem5a_png z15 tiles over the ground area, web mercator; the tiles' voids (water) are
+# nodata, filled from GLO-30 by 05a_terrain where the backdrop meets them
+ground = ["gsi_dem/gsi_dem_mosaic.tif"]
+backdrop = ["gsi_backdrop/gsi_z12_mosaic.tif", "Copernicus_DSM_COG_10_N35_00_E139_00_DEM.tif",
+    "Copernicus_DSM_COG_10_N35_00_E140_00_DEM.tif", "Copernicus_DSM_COG_10_N36_00_E139_00_DEM.tif",
+    "Copernicus_DSM_COG_10_N36_00_E140_00_DEM.tif", "Copernicus_DSM_COG_10_N35_00_E138_00_DEM.tif",
+    "Copernicus_DSM_COG_10_N36_00_E138_00_DEM.tif"]   # (M7: E138, Mount Fuji's and Chichibu's sector)
+bare = true
+note = "GSI DEM5A (基盤地図情報 数値標高モデル 5m, laser survey) from the GSI elevation tiles dem5a_png z15, mosaicked in EPSG:3857, metres above T.P. (Tokyo Peil, ~mean sea level of Tokyo Bay). Beyond it Copernicus GLO-30 (1 arc-second, EGM2008): a surface model, roofs and trees included."
+
+[sources.copernicus]
+# the ground area plus 40 km: 35.2-36.2 N, 139.2-140.3 E; (M7) E138: Mount Fuji's sector, Tanzawa, Okutama, Chichibu
+tiles = ["N35_00_E139_00", "N35_00_E140_00", "N36_00_E139_00", "N36_00_E140_00", "N35_00_E138_00", "N36_00_E138_00"]
+
+# The building table (04_buildings, M2): PLATEAU's footprints and heights wherever it has a building, cut by roof
+# level ([sources.plateau] roof_split); OSM fills only where PLATEAU has nothing, below fill_max_h (20 m) or
+# untagged under 300 m² (a taller OSM-only building is a site PLATEAU's survey saw empty or under construction)
+[buildings]
+# canopies, building sites, bridges, boats: never extruded (OSM's construction sites at Toranomon, Azabudai, Yaesu,
+# Shibuya and Tokyo Torch are towers that do not stand yet)
+osm_skip = ["roof", "carport", "shelter", "bridge", "construction", "ship", "boat", "ruins", "no"]
+station_untagged = "drop"   # untagged train_station / transportation outlines: the Metro's concourses
+split_ground = true         # each roof level stands on its own ground (Roppongi, Akasaka, Toranomon are hills)
+own_ground = true           # PLATEAU's solids stand on their own ground (never nested on a taller piece's roof)
+volume_dedupe = true        # OSM fill drawn into a PLATEAU solid is clipped
+# OSM's heights reach a footprint from an OSM building of up to this size, and big untagged halls are no estates
+osm_max_area = 20000
+# Generated by scripts/m2_fixes.py --toml (the reasons per id in checks/m2_fixes.md): OSM outlines PLATEAU leaves
+# out (the government quarter, Kamiyacho Trust Tower, TODA BUILDING), OSM outlines on broken LOD1 solids (Hotel New
+# Otani) and OSM tower outlines over PLATEAU's construction stubs (Azabudai Residence B, World Tower Residence) are
+# built whatever fill_max_h says (heights: OSM's height, else levels x 3.5, else set_h, else 3 storeys); set_h: kept
+# outlines without a height; fix_h: LOD1 towers over big low blocks (NHK) and lone roof levels (masts as prisms)
+# BEGIN m2_fixes (scripts/m2_fixes.py --toml; the reasons in checks/m2_fixes.md)
+keep = { osm = ["r1902643", "r19290024", "r1964472", "r1964562", "r1967902", "r1968066", "r1990754", "r2034771", "r2362078", "r3361370", "r4152284", "r4169294", "r5415359", "r7825626", "r7826113", "r8244681", "w1031369140", "w1068696339", "w1073294162", "w1123118746", "w1134396779", "w1135849069", "w1158721027", "w1158739445", "w1158977078", "w1169516010", "w1169517945", "w1181055646", "w1192782680", "w1194276621", "w1201770129", "w1201770130", "w1211910332", "w1212154884", "w1218483839", "w122343572", "w1228833079", "w1230247562", "w128248384", "w128248385", "w1315534414", "w1318933998", "w1321832502", "w1321832512", "w1322002388", "w1322002389", "w1322157808", "w1333155344", "w1339017340", "w134971942", "w1353054272", "w1357107799", "w135739169", "w135739170", "w135739171", "w135838612", "w136050249", "w136050250", "w136050308", "w1366974172", "w1375153693", "w1375153694", "w1375153695", "w1375153696", "w1375153697", "w1375153698", "w1375153699", "w1375153700", "w1375153701", "w1375153702", "w1375153703", "w1375153704", "w1375153705", "w138522543", "w138671585", "w138871295", "w138910704", "w139078638", "w139086551", "w1394178898", "w139503265", "w139953279", "w139953328", "w139983211", "w140096038", "w140096040", "w140096044", "w140096047", "w140096048", "w140096053", "w140096055", "w140096057", "w140099035", "w140099051", "w140109067", "w140109074", "w140109075", "w140109076", "w140109079", "w140109080", "w140109081", "w140109083", "w140109086", "w140109089", "w141296986", "w1415418652", "w1416539680", "w1416539681", "w1416539683", "w1416539684", "w1416539686", "w1423463429", "w1427113750", "w143359606", "w143359607", "w143359637", "w143359719", "w144483533", "w144483547", "w144483563", "w144483604", "w1447149804", "w1447149806", "w1448344708", "w144852545", "w144866207", "w145096334", "w145108372", "w145108375", "w145108387", "w145108403", "w145108404", "w145108407", "w145108408", "w145108411", "w145108412", "w145108425", "w145115283", "w145115285", "w145115287", "w145227814", "w145227820", "w145230975", "w145231119", "w145246956", "w145247054", "w145289639", "w145289641", "w145402321", "w145403190", "w145403193", "w145404000", "w145404001", "w145404004", "w145404005", "w145404007", "w145404009", "w145404010", "w145404011", "w145409007", "w145409014", "w145495510", "w145495524", "w145495603", "w145495609", "w145495620", "w145495635", "w145495637", "w145501856", "w145501860", "w145501862", "w145501870", "w145501878", "w145501882", "w145501884", "w145501892", "w145501902", "w145501913", "w145501914", "w145501935", "w145501953", "w145501954", "w145501956", "w145501957", "w145501959", "w145501960", "w145582027", "w145660756", "w145660798", "w145660804", "w145660847", "w146168194", "w146182210", "w146193800", "w146371109", "w146431400", "w146609893", "w146610099", "w146689146", "w147399656", "w1475110559", "w147603686", "w148318508", "w148324479", "w148561776", "w148788514", "w148788610", "w1489437773", "w1490888073", "w149124455", "w149144184", "w149147880", "w149379762", "w1493909277", "w1494927094", "w1500659169", "w150797764", "w151350510", "w151354142", "w151354309", "w1525989211", "w1525989882", "w1526726536", "w1526726546", "w1528647621", "w153132992", "w153182186", "w153183026", "w153183193", "w153184862", "w153282639", "w153282797", "w1535489171", "w1539436970", "w1540047191", "w1548304328", "w1548304329", "w155269682", "w155928670", "w156294701", "w157050761", "w157343738", "w157343757", "w157343770", "w157391304", "w157415947", "w157509383", "w157573651", "w157573682", "w158366718", "w158507500", "w158631530", "w158745678", "w158746074", "w159488973", "w161417767", "w161417768", "w161724976", "w161838335", "w161966792", "w161966823", "w162041768", "w166180279", "w170138113", "w170182460", "w170267974", "w171276108", "w171730144", "w173954114", "w174757569", "w175058637", "w175223851", "w176046395", "w176046399", "w176046428", "w176109781", "w176109786", "w176721231", "w176721232", "w176721235", "w176721245", "w176721280", "w179416757", "w181397413", "w181686940", "w182134697", "w184212776", "w184216421", "w187748903", "w192618331", "w195493283", "w195531442", "w195551646", "w196314895", "w208525495", "w208646340", "w208646341", "w208646347", "w209344333", "w210374585", "w217275558", "w217275627", "w219645650", "w220533256", "w228926578", "w229408430", "w230320439", "w236704253", "w244495265", "w275929292", "w284704279", "w297863324", "w297882452", "w309526545", "w312784752", "w322196460", "w328179479", "w328729134", "w338807631", "w355250634", "w355485898", "w355485903", "w374514958", "w39520708", "w414723307", "w428004851", "w428004852", "w431866448", "w431879208", "w43898656", "w43933707", "w43933709", "w43933710", "w43933711", "w44776139", "w449657620", "w454848368", "w454866514", "w454872056", "w454873052", "w460004162", "w484695624", "w509844505", "w511585157", "w512577506", "w513936227", "w515127048", "w527521210", "w548886574", "w548886575", "w562234916", "w562368785", "w562502030", "w569989684", "w574937818", "w583367203", "w583367213", "w585643362", "w585643368", "w585644242", "w607023387", "w616100166", "w617118937", "w625044714", "w626082651", "w654403765", "w657586277", "w669790923", "w675832452", "w678862184", "w679198820", "w679198821", "w679205019", "w680884195", "w680884196", "w680884206", "w682307654", "w686374719", "w686374720", "w715062355", "w715062364", "w719098083", "w723215240", "w746757466", "w760664437", "w762814227", "w762814228", "w778974388", "w778975131", "w800728089", "w819373865", "w823005046", "w843126655", "w851839114", "w87439189", "w89002282", "w92672988", "w93185577", "w94094843", "w94104768", "w958462119", "w961033671", "w961033691", "w961246057", "w961260574", "w963205016", "w963206464", "w968676592", "w97227325", "w97234604", "w97234607", "w97234609", "w97234613", "w980767184", "w981977440", "w989776392"] }
+set_h = { "r3361370" = 20.9, "w428004852" = 30.0, "w145495510" = 48.0, "w145495603" = 44.0, "r4152284" = 24.0, "r4169294" = 16.0, "r7825626" = 15.0, "w145495637" = 24.0, "w328729134" = 32.0, "w355485898" = 28.0, "w140109074" = 90.6, "w1230247562" = 62.1, "w136050250" = 34.4, "w97227325" = 25.0, "w44776139" = 110.0, "w140109067" = 34.4, "w140109076" = 90.3, "w140109080" = 47.3, "w140109081" = 86.0, "w140109086" = 86.0, "w140109089" = 12.9, "w145404001" = 34.4, "w145404005" = 34.4, "w145404009" = 34.4, "w145404010" = 77.4, "w145404011" = 51.6, "w145660756" = 25.8, "w145660804" = 47.3, "w236704253" = 4.3, "w583367213" = 4.3, "w1339017340" = 43.0, "r7826113" = 21.5, "r8244681" = 21.5, "r19290024" = 21.5, "w161966823" = 34.4, "w1333155344" = 17.2, "w1158721027" = 141.0, "w1158739445" = 263.0, "w1158977078" = 185.0, "w139078638" = 63.0, "w1416539686" = 179.6, "w1535489171" = 179.6, "w454866514" = 177.3 }
+fix_h = { gml_id = { "bldg_02423bc1-a8f5-4ce0-a5df-689c762b6f00#r0" = 249.7, "bldg_0399ace5-c951-41fd-a589-78afecc64fc9" = 38.5, "bldg_0b8b2d19-d5c4-487f-be79-f550698542b0#r0" = 6.8, "bldg_274c2940-4f2b-41ea-a5b7-e0d6a485ff28#r0" = 107.3, "bldg_2ec079c8-2f9d-47f8-8838-bf349bc6bfdd" = 59.5, "bldg_3b5ccba2-b456-4b73-b562-f7ec2b3d57cb" = 63.0, "bldg_3f05b6e1-b162-42ca-b776-0d9b3d16b896#r0" = 82.1, "bldg_59dd3426-436e-4634-bc32-34061aa48627" = 38.5, "bldg_5d5dd52d-bfdd-4bb6-9cbf-f865fb6946fb#r2" = 26.0, "bldg_66c4c941-74d8-4a3d-a999-f64b408efd3e" = 249.7, "bldg_96c9d242-0fc6-4364-aeae-c21102718c35#r2" = 10.8, "bldg_a5c21f6b-6ab1-4b43-84d9-27017095a8be" = 31.5, "bldg_bdc7425b-b7b3-4f4c-b260-192dc3b9eb7b" = 24.5, "bldg_c3d6ee36-e148-4050-9211-8b10b3fb5123#r0" = 249.7 } }
+# END m2_fixes
+# never built: Tokyo Tower's lattice and the Skytree's shaft (M4 figures), broken LOD1 solids, the Ichibangai mall
+# BEGIN m2_exclude
+[buildings.exclude]
+gml_id = ["bldg_0514524a-175c-4b3b-8f02-61b3751caf0a", "bldg_1382637b-c7d6-4a87-a10b-f8443056d158", "bldg_1fdbd438-9a08-4a9d-967f-a9c6afb86d61", "bldg_21dd3d7c-9139-4b98-8e64-24186a29ac45", "bldg_21dffe01-ad28-4d17-8aa2-4b459cc281aa", "bldg_2627d1ca-ecd9-4669-8d4f-af4268633add", "bldg_26f0a449-7c73-4979-a9b7-2ab3149331ca", "bldg_28038965-d339-4dbd-83dc-c1f751f8ce73", "bldg_30375799-92ce-4000-9b74-c1f92c89da56", "bldg_347d2f60-9146-4079-a574-d4dd013ed1c3", "bldg_358ef99a-9a03-4074-82b9-bc500564a478", "bldg_35c5b4c7-e260-4424-89bf-fb0f16e79d5a", "bldg_370134a6-bc09-46d6-a233-4625e46f867a", "bldg_39c3ea17-6632-4888-8ccb-8022c6e40cac#r0", "bldg_3d919af6-b8d1-4761-825e-5e9691350731", "bldg_52945d0d-a897-4d55-b35c-a8bcca773e53#r0", "bldg_52945d0d-a897-4d55-b35c-a8bcca773e53#r1", "bldg_58ab8c46-8369-49c4-86cf-6912bbc4efe1#r0", "bldg_58ab8c46-8369-49c4-86cf-6912bbc4efe1#r1", "bldg_5b98d995-4632-4767-a99f-237bb1bda0d6", "bldg_5c608412-ff18-4f3b-8b19-5e27889c3fc2", "bldg_6af58cef-669e-4aca-bc01-355e870d1ad5#r0", "bldg_78dad87f-c4aa-4616-ac91-1013bf3aed81", "bldg_7aff4a51-be8b-405b-abe4-ac489697cbc8", "bldg_7ee9cd77-d02a-4822-82d7-ad583522bda2", "bldg_7f419285-f0a8-4d9b-9a1e-b369a6b330a8", "bldg_82bd69b3-99c3-4c88-850d-8e33b9b43829#r0", "bldg_8760bd58-39ef-476c-997c-773ba8e3018a#r0", "bldg_8760bd58-39ef-476c-997c-773ba8e3018a#r1", "bldg_89e579d5-6c3b-41ec-b0f4-8050d8f6e4ed#r0", "bldg_89e579d5-6c3b-41ec-b0f4-8050d8f6e4ed#r1", "bldg_89e579d5-6c3b-41ec-b0f4-8050d8f6e4ed#r2", "bldg_8d5dd81c-b752-4aad-a194-cb9e81fc96a2", "bldg_8fb128df-7bf7-4ca6-8b38-47f6e484c97a", "bldg_93c138dd-c621-4d2e-a7ed-960b0c3c5166", "bldg_996a54c5-6e60-4e72-9b80-02e7bbce6645", "bldg_9b06fdb5-5c33-4b12-ba88-76e36ca98371", "bldg_a314ac33-d4ed-48c2-b886-5e83537c4a2b", "bldg_ad4eae38-bc6b-4ae6-bf8f-c25fe927a3c0", "bldg_b11159cd-b2c7-4479-bb42-c80fe0019121", "bldg_b6aecc4a-5d3f-480c-a8a5-13ae721a013e", "bldg_b9141e64-a2c8-4da1-97a6-e427459a44dc", "bldg_c40ea709-60f4-48ca-920a-cb5e9cd60cac", "bldg_d25eb57f-6784-425d-8959-94dbdf4f92e5", "bldg_d68af8a5-3d4c-44e7-af2a-4ddbfb330279", "bldg_d8185f9a-1123-4b26-b953-4b27aed14abe", "bldg_d8cc76dc-a21d-4324-b022-c23cfe043e4a", "bldg_dfba8941-7f17-45bc-9fd9-25739edce566", "bldg_e10b086f-0dff-4d98-83fc-041515978c09", "bldg_e677ff31-5e0f-44b3-a300-4264ec5c500d", "bldg_e9fb4049-708e-4d2c-aeae-10a08d7dfdf0", "bldg_ea11c3f6-48b5-4e3f-a7a2-f90305c2f8ec", "bldg_ecf0af31-eb0d-4cac-be67-40274365a61d#r1", "bldg_ecf0af31-eb0d-4cac-be67-40274365a61d#r2", "bldg_eef8fd7f-e8ae-41be-8543-1b847c400d5c", "bldg_fd1573b3-1981-4526-958f-b6e64f09f390#r0", "bldg_fd1573b3-1981-4526-958f-b6e64f09f390#r2", "bldg_6e34aabb-cd4f-45b2-bc3e-b2e2f9e426df", "bldg_270f2c2f-d736-42fb-81fb-6381489434f9", "bldg_78173e70-ccf4-4072-895f-99b9f7e59f05", "bldg_3e0c7196-a266-4df9-adc0-d47f14e2aec5"]
+osm = ["w624764359"]
+# END m2_exclude
+[buildings.osm_kind]        # (with china-south's) temples, shrines, churches, palaces are civic; offices, shops and
+palace = "civic"            # hotels never factories (round 2: Suntory Hall's neighbours, the Expressway arcades)
+office = "midrise"
+commercial = "midrise"
+retail = "midrise"
+hotel = "midrise"
+temple = "civic"
+shrine = "civic"
+church = "civic"
+museum = "civic"
+[buildings.landmarks]
+match = "best"              # the tower's level, not the podium or the theatre the point lies on (Kabuki-za)
+radius = 60.0
+# PLATEAU's heights (and the table's) count from the lowest ground under the outline, the list's from the tower's own
+# ground: on Roppongi's, Toranomon's and Azabudai's slopes the difference is added
+ground = "point"
+
+# Tokyo's facade rules' areas (presets/jp_tokyo; [lon0, lat0, lon1, lat1] boxes): Nishi-Shinjuku's 1970s-90s granite
+# and precast towers (Keio Plaza, Sumitomo, Mitsui, Nomura, Center, NS, the TMG), the flagship streets (Ginza's
+# Chuo-dori blocks, Omotesando) where mid-size commercial fronts are glass or stone flagships
+[facade.tokyo]
+granite_areas = [[139.6880, 35.6840, 139.6990, 35.6970]]
+government_areas = [[139.7440, 35.6710, 139.7540, 35.6790]]     # Kasumigaseki and Nagatacho (OSM outlines)
+flagship_areas = [[139.7625, 35.6680, 139.7685, 35.6745], [139.7050, 35.6645, 139.7125, 35.6685]]
+# (M4 fix round) Tokyo's street-level signature: the sign streets. Commercial buildings under 60 m fronting the named
+# streets take the `signs` style (wall-sized boards and screens) on `share`, and projecting vertical sign boxes
+# (scripts/m4f_signs.py -> generated/structures-m4f-signs.toml) on `boxes` of the fronting ones
+sign_zones = [
+    { name = "Akihabara Chuo-dori", box = [139.7695, 35.6975, 139.7735, 35.7040], roads = ["中央通り"], dist = 6, share = 0.45, boxes = 1.0 },
+    { name = "Kabukicho", box = [139.6995, 35.6930, 139.7050, 35.6965], roads = "*", dist = 4, share = 0.35, boxes = 0.7 },
+    { name = "Yasukuni-dori, Shinjuku east", box = [139.6995, 35.6900, 139.7085, 35.6935], roads = ["靖国通り", "新宿通り", "明治通り"], dist = 6, share = 0.35, boxes = 0.7 },
+    { name = "Shibuya Center-gai", box = [139.6970, 35.6590, 139.7002, 35.6615], roads = "*", dist = 4, share = 0.4, boxes = 0.8 },
+]
+# the screens of Shibuya's crossing (Q-Front, the corner blocks): us-northeast's billboards, glass above
+[facade.zones."Shibuya crossing"]
+style = "signs"
+polygon = [[139.6999, 35.6594], [139.7011, 35.6594], [139.7011, 35.6602], [139.6999, 35.6602], [139.6999, 35.6594]]
+
+# (M4 landmarks) Tokyo Station's Marunouchi building (1914): red brick (sampled #955b4c) with white granite bands, on
+# PLATEAU's pieces under OSM's outline r4856156 (its domes are figures); the Docomo Yoyogi Building's dark grey-brown
+# stone shaft (sampled #5c4b43; its spire's top, clock and derrick are figures)
+[facade.zones."Tokyo Station"]
+style = "civic"
+tint = "#955b4c"
+polygon = [[139.765447, 35.680281], [139.765395, 35.680287], [139.765269, 35.680484], [139.76537, 35.680762], [139.765614, 35.680879], [139.765683, 35.680819], [139.765757, 35.681082], [139.765793, 35.681108], [139.765886, 35.681347], [139.765825, 35.681367], [139.765815, 35.681411], [139.765855, 35.68149], [139.765938, 35.68148], [139.766138, 35.682007], [139.766042, 35.681992], [139.765918, 35.682188], [139.766021, 35.682474], [139.766259, 35.682587], [139.766314, 35.682549], [139.766334, 35.682615], [139.766388, 35.682641], [139.766451, 35.682628], [139.766481, 35.682584], [139.766663, 35.682571], [139.766696, 35.682507], [139.766595, 35.682341], [139.766657, 35.682276], [139.766585, 35.682071], [139.76648, 35.682037], [139.765949, 35.680637], [139.766014, 35.680569], [139.765946, 35.680371], [139.765835, 35.680336], [139.765802, 35.68025], [139.765978, 35.679971], [139.765991, 35.679895], [139.765944, 35.679758], [139.765854, 35.679722], [139.765765, 35.679757], [139.765454, 35.680195], [139.765447, 35.680281]]
+[facade.zones."Docomo Yoyogi"]
+style = "granite"
+tint = "#5c4b43"
+polygon = [[139.7033, 35.684591], [139.703381, 35.684302], [139.70333, 35.684218], [139.703111, 35.684154], [139.703009, 35.684161], [139.702931, 35.684205], [139.702854, 35.684493], [139.702909, 35.684574], [139.703123, 35.684642], [139.7033, 35.684591]]
+
+# (M4 landmarks) Fuji TV's headquarters (1996): Kenzo Tange's light grey precast frames over grey-green glass (sampled
+# #c4c4c6 frames, #6f828c glass); its sphere is a figure
+[facade.zones."Fuji TV"]
+style = "granite"
+tint = "#c4c4c6"
+polygon = [[139.773289, 35.625916], [139.772976, 35.626301], [139.772987, 35.626356], [139.773113, 35.626416], [139.773165, 35.62637], [139.77325, 35.626399], [139.773333, 35.626319], [139.773307, 35.626362], [139.773324, 35.626399], [139.773873, 35.626694], [139.773875, 35.626754], [139.774163, 35.62691], [139.774139, 35.626958], [139.774183, 35.627002], [139.774185, 35.62707], [139.774701, 35.627347], [139.774712, 35.627403], [139.775107, 35.627615], [139.775148, 35.627609], [139.775209, 35.627534], [139.775259, 35.627533], [139.775427, 35.627325], [139.775421, 35.627274], [139.775532, 35.62707], [139.775467, 35.627007], [139.775457, 35.62695], [139.773796, 35.626058], [139.773755, 35.626065], [139.773668, 35.62617], [139.773538, 35.626102], [139.77348, 35.626139], [139.773527, 35.626011], [139.773335, 35.625904], [139.773289, 35.625916]]
+[ground]
+margin = 3000               # the ground area: the districts' box plus 3 km (Tokyo is flat; the bay is south-east)
+town = true                 # beyond the districts: a painted roofscape (Phase 0 "Edges": a full ring would be 55k)
+# block masses only on the bay rim now (the gaps are districts since the boundary change of 6 Oct 13:45): Toyosu
+# (1.88 km²), Ariake (2.40) and Shibaura with the Konan wharves on the Keihin canal (3.16), blocks and the canals'
+# edges (scripts/m3_rim.py), minus the district area (scripts/m3g_boundary.py), all inside the ground area
+masses = true
+masses_within = "data/masses_within.geojson"
+# (M7, engine opt-ins) the Kanto plain's high-rise clusters beyond the area as masses (Singapore M7's tall-only clip):
+# every OSM building tagged 60 m or more (height, or 19 storeys) within ~32 km (Ikebukuro's Sunshine 60, Shinagawa and
+# Osaki, Musashi-Kosugi, Kawasaki, Minato Mirai, Makuhari, Saitama Shintoshin), fetched by Overpass with a tag filter
+# (not every building of the plain); standing at their heights however far (no thinning); the low town stays the
+# painted roofscape and the inner cover map keeps its reach
+masses_reach = 27000.0
+masses_thin = false
+masses_tall_within = { file = "data/masses_tall_within.geojson", min_h = 60.0, tagged = true }
+# (M3 fix round) mass outlines of 5,000 m² or more are held at 45 m (engine opt-in masses_tall): Big Sight, the market
+# halls and podiums in the bay rim (first for CO·MO·RE Yotsuya's 10,570 m² outline at 145 m in the west gap, a real
+# building since the boundary change); towers on their own outlines keep their heights
+masses_tall = { area = 5000.0, h = 45.0 }
+# (M7 fix round 1, engine opt-in; a decision for the user, drop the key to undo) a 2.5 km ring of town round the districts
+# as masses (scripts/m7f_ring.py: D buffered 2.5 km, less D and the bay rim, inside the ground area): every OSM footprint
+# there (from cover_buildings.gpkg, already fetched for the painted roofs), so the roofscape goes on past the area's edge
+# (north of Ueno to Yanaka and Nippori, west of Nishi-Shinjuku, Sumida and Koto east of the Skytree) instead of a
+# painted plain with 3D trunk roads and no buildings (M7 critic 1, item 2). Untagged footprints by the built cover round
+# them at Tokyo's 2-4 storeys (6.5-13 m), not Paris's 7-17 m. No minor roads, trees or cars come with it
+# (M8, engine opt-in masses_ring.edge: over the last 750 m to the ring's outer edge, data/masses_ring_outer.geojson from
+# scripts/m7f_ring.py, the untagged masses fall to half height and 40 % of them drop out: the M7 critic's seam west of the TMG)
+masses_ring = { file = "data/masses_ring.geojson", cover_h = [[0.15, 0.3, 0.45, 0.6], [6.5, 8.0, 10.0, 13.0]], edge = { file = "data/masses_ring_outer.geojson", width = 750.0, h = 0.5, thin = 0.4 } }
+# M5: Kokyo Gaien (the palace's outer garden: the plaza before the Imperial Palace) is raked gravel round its lawns and
+# black pines; OSM maps the lawns (18 landuse=grass, 14.6 ha of the way's 31 ha) and the pine woods inside it, so the
+# park is gravel less those (engine gravel_parks, Paris's Tuileries)
+gravel_parks = ["皇居外苑"]
+# M5: surface car parks inside parks drawn on the asphalt layer, not the lawn (engine opt-in, Singapore's)
+lots_off_green = true
+
+[roads]
+margin = 1000
+lane_w = 3.25               # Japanese urban lanes 3.0-3.5 m (道路構造令: 3.25 m on class 4 roads)
+# (M3) footways on bridges: the pedestrian decks over Shinjuku's and Shibuya's streets (歩道橋), the Rainbow Bridge's
+# promenades, the Sumida's footbridges (Sakura-bashi); tunnels and layer < 0 (the Yamate tunnel, the subways, the
+# Shuto's underground sections) are never drawn
+footbridges = true
+# (M3) the Rainbow Bridge (東京港連絡橋, 1993): the Shuto's Daiba line on the upper deck, the general road, the
+# Yurikamome and the promenades on the lower; 52 m navigational clearance under the girder [believed: JA Wikipedia].
+# OSM puts them at layers 4 and 3 (31.5 m and 16-24 m): the lower deck's roads carry no name, the Yurikamome only
+# the line's, so they are listed by id (engine opt-in span_ways). The Shibaura loop (layer 2) climbs to them
+decks = { "東京港連絡橋" = { deck = 60.0, lower = 52.0 } }
+# (M3 fix round) minor ground roads, and with them street trees and cars, end 50 m beyond the districts and the gaps'
+# masses (engine opt-in built_only); the trunk roads run on to the 1 km margin (M3 critic: a pale halo of streets on
+# bare ground stopping on a rounded outline)
+built_only = { margin = 50.0, keep = ["motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link"] }
+span_ways = { "東京港連絡橋 lower" = [4848879, 316305913, 275936305, 749205417] }
+
+[markings]
+# M5: Japan's markings (道路標識、区画線及び道路標示に関する命令): every signalled junction arm a zebra (横断歩道: 0.45 m bars
+# and gaps, 4 m) and a stop line (city.json zebra.atSignals); an arm without signals on the lesser road a stop line
+# (止まれ, city.json giveWay "stop"); OSM's crossings between junctions zebras too, without the UK's zig-zags, give-way
+# lines or beacons; the cycle lanes OSM maps as lanes (自転車専用通行帯, 387 ways) painted blue along the kerb
+junctions = "signals"
+zebras = true
+zigzag = 0.0
+beacons = false
+cycle_lanes = true
+# M5: Shibuya's scramble crossing: its two diagonals over the box (Hachikō plaza to Q-Front, Mark City's corner to
+# MAGNET), from kerb to kerb, 4 m wide like the arms' crossings
+scrambles = { "Shibuya" = { lines = [[[139.700714, 35.659393], [139.700384, 35.659617]], [[139.700413, 35.659370], [139.700731, 35.659612]]], w = 4.0 } }
+
+[trees]
+# M6: Tokyo's trees by place (engine opt-in zones; web/city.json trees.classes gives each its mix): Kokyo Gaien's
+# ~2,000 black pines over the lawns (the park and its pine woods); the cherries of Sumida Park (both banks,
+# Asakusa and Mukojima) and of Chidorigafuchi on the moat
+zones = { pine = { parks = ["皇居外苑", "国民公園皇居外苑半蔵門園地"], from = ["park", "grass", "forest"] }, sakura = { parks = ["隅田公園", "千鳥ヶ淵公園"], from = ["park", "grass", "forest"] } }
+# (M3) no invented trees on the port and warehouse yards (Shibaura, Shinagawa's and Ariake's terminals, Tatsumi):
+# Singapore's M3 critic caught trees on port yards
+none_extra = ["landuse=industrial", "landuse=port", "landuse=railway"]
+# (tk2, the user 8 Oct: "small dark trees scattered all over the pale gravel plaza", engine opt-in) no area trees on the
+# gravel layer: Kokyo Gaien's raked-gravel plaza and paths are open, its pines stand in the lawn panels only (1,770 of
+# the zone's 4,326 cells, ~560 of its ~1,370 pines, stood on the gravel)
+none_on_layers = ["gravel"]
+# (M3 fix round) area trees only within 50 m of the districts (the masses' gaps have their own): avenues of trees ran
+# across the painted town 1 km out (M3 critic)
+urban_margin = 50.0
+
+# M6 (engine opt-in named, Singapore's): Tokyo's avenues. Ginkgo (the first broadleaf slot) on Yasukuni-dori, Aoyama-dori
+# and Hibiya-dori, and Gyoko-dori's four rows from Tokyo Station to the palace; zelkova (the second slot) on Omotesando
+# (its keyaki, planted 1921) and Marunouchi Naka-dori; cherries (flowering) on Bokutei-dori along the Sumida
+[trees.street.named]
+"靖国通り" = { species = "broadleaf", height = [12.0, 17.0], step = 9.0, first = true }
+"青山通り" = { species = "broadleaf", height = [12.0, 17.0], step = 9.0, first = true }
+"日比谷通り" = { species = "broadleaf", height = [12.0, 17.0], step = 9.0, first = true }
+"行幸通り" = { species = "broadleaf", height = [12.0, 16.0], step = 8.0, rows = [2.6, 9.0], first = true }
+"表参道" = { species = "broadleaf", height = [15.0, 20.0], step = 11.0, rows = [2.8], second = true }
+"丸の内仲通り" = { species = "broadleaf", height = [10.0, 14.0], step = 9.0, second = true }
+"墨堤通り" = { species = "flowering", height = [7.0, 10.0], step = 8.0 }
+# M6 (critic M3, gaps): Akihabara's Chuo-dori from Manseibashi to Suehirocho has no street trees (signs and 雑居ビル)
+[trees.street.none_in]
+"Akihabara Chuo-dori" = [[139.7706, 35.6972], [139.7716, 35.6972], [139.7730, 35.7070], [139.7720, 35.7070]]
+
+[cars]
+# (tk2, the user 8 Oct: a car half under Kachidoki's deck edge) a lane meeting a bridge deck takes the deck's height at their
+# node, not the ground's (engine opt-in, Paris's)
+deck_ends = true
+# M6: a surface car park holds no more cars than its OSM capacity (engine opt-in, Singapore's)
+lot_capacity = true
+parking_margin = 50.0       # (M3 fix round) car parks only within 50 m of the districts' box, not on the painted town
+
+[shores]
+# (M3) Odaiba Kaihin Koen's beach and the bay's revetments: everything seaward of the edge fitted into 3 m (beach) and
+# 7 m (revetment), the shader's across coordinate kept (Singapore M3: the sand glowed 10-20 m into the water); small
+# closed coast loops (breakwater islets, the Daiba batteries' rims) are revetment, not sand
+water_side = { beach = 3.0, revetment = 7.0 }
+islet_max = 120.0
+islet_type = "revetment"
+quay_walls = true           # the Sumida's, the canals' and the moats' walls as vertical faces ([terrain] quay_walls)
+
+[terrain]
+far_reach = 40000.0         # Yokohama, Kawasaki and the Chiba shore of the bay
+# (M7, engine opt-in) the reach per side [west, south, east, north]: Mount Fuji 98 km west-south-west of Tokyo Tower,
+# Tanzawa (50-65 km), Okutama and Chichibu (60-90 km) to the west; the Boso hills (Nokogiri-yama, Kano-zan) across the bay
+# to the south-east; Tsukuba (60 km) to the north-east. The GLO-30 tiles end at 35.0 N (Izu and Oshima are left out)
+far_reach_sides = [105000.0, 55000.0, 40000.0, 65000.0]
+back_error = [6.0, 35.0]       # (the far mountains: 35 m over the TIN at 40 km and beyond)
+# (M7, engine opt-in) the zero-metre lowlands (Katsushika, Edogawa, Koto's east: -1 to -3 m T.P. behind the levees) are
+# land: the sea only where GSI's tiles are void (and GLO-30 fills them at sea level); they were the sea's -3 m and the
+# sea plane showed through them as blue blob "lakes" across the far north-east plain (M6 critic, item 6)
+back_sea = "void"
+# (M7, engine opt-in) the earth's curvature on the backdrop past 12.5 km from the origin (the ground area's corners lie
+# within it): Fuji stands ~3,300 m over the plain as seen from the city, not 3,776 (24 % too tall without it)
+curvature = { from = 12500.0, k = 0.13 }
+back_peaks = true           # Fuji pinned at its surveyed height (the 200 m average takes ~40 m off the crater rim)
+# (M7, engine opt-in) Fuji's cap in mid-October (sun.date 10-15): a first snow on the summit cone from ~3,100 m, patchy
+snow = { from = 3050.0, full = 3400.0, rgb = [228, 232, 238], patchy = 0.6 }
+cover_cell = 60.0           # the outer map 60 m a pixel over the 160 x 120 km backdrop (at 50 m it was 3,300 x 2,400)
+# (M3) GSI DEM5A is bare earth in T.P. (~ the bay's mean sea level): the default sea knee (everything under 3 m to 0,
+# 5 m off the rest) would flatten Marunouchi, Ginza and the reclaimed piers (3-6 m T.P.) to the sea. Ground under
+# 0.5 m T.P. is the scene's 0 (1 m over the drawn sea at -1), the rest keeps its relief less ~1 m. The lowlands below
+# T.P. (Sumida's Oshiage and Mukojima, Koto: -1 to -3.5 m, behind the levees) are real but would lie under the sea
+# plane: they stand at 0, the levees and seawalls at their own height
+sea_drop = 0.5
+sea_knee = 0.5
+# the piers and seawalls drop to the sea within a short ramp (10 m flat at the edge, 60 m ramp), not 200 m: Tokyo's
+# reclaimed land meets the bay at quays and seawalls 3-6 m over it, not at beaches
+coast_flat = 10.0
+coast_ramp = 60.0
+# the Sumida's and the canals' embankments and the palace's moat walls, a 5 m bare-earth DEM (Paris's lidar settings):
+# no flat band and long ramp round the water (they levelled the Sumida's kamisori walls to the river over 25 m and
+# ramped them over 90 m), the cells by a wall the quay's, not the water's, the TIN held within 0.5 m by the water;
+# quay_walls: the step from the water to the quay in one cell, which 05e_shores covers with a vertical wall
+water_flat = 0.0
+water_ramp = 5.0
+water_all_touched = false
+tin_error_bank = 0.5
+quay_walls = true
+# the tidal waters at the sea's 0 (engine opt-in, M3): the 5 m DEM reads 0.5-2.5 m over them (the Sumida body 0.91,
+# the Keihin canal 1.10), ~2 m over the bay at their mouths. A point in each body (checks/terrain.md's water levels)
+water_levels = { "Sumida and the Chuo canals" = [139.79356, 35.69193, 0.0], "Keihin canal" = [139.75262, 35.62384, 0.0], "Ariake and Shinonome canals" = [139.78096, 35.63283, 0.0], "Hamarikyu and the Tsukiji river" = [139.77189, 35.65214, 0.0] }
+edge_land = true            # the ground area's edge cells take the land of the cells inside (Singapore M3's pyramids)
+dem_window = true           # each DEM run warped over the grid it fills, from a temporary tiled GeoTIFF
+# GLO-30 reads 0.7 m under GSI's T.P. by median over the bay (checks/m1_sources.md): the backdrop let up by it, so
+# its sea is 0 again and the coast is where it crosses the sea plane
+back_shift = 0.7            # (GSI's land, T.P. already, is raised 0.7 m with it: within the backdrop's 6 m error)
+# GSI's pit of -10 m at 35.6222 N 139.7700 E (by Odaiba, a tunnel approach or a dug site) and any like it: dry cells
+# under -5 m T.P. seed a pit, re-filled from its outline (the lowlands reach -3.5 m; nothing real is under -5 m)
+pits = { below = -5.0, grow = 2.0, window = 150.0 }
+# (tk2, the user 8 Oct: the Sumida bridges' approaches dropped from the deck's end to the river's levelled ground, Kiyosu
+# west 1.6 m over a -2.8 m node, Kachidoki's 2.6-3.1 m ends over -1.5 and 0.4 m: the 5 m DEM's cells at the abutments
+# are the quay wall's foot) bridge abutments (engine opt-in): the ground under a road deck's end raised to the road it
+# meets, so the deck ends on it and the approach runs on level; at the highest dry ground within 20 m along the roads
+# (level "high", reach 20 m: Kachidoki's west ends lie on the quay's edge, the TIN's slope from the 2.9 m street down to the
+# quay wall's -6 m foot under the road's first 12-15 m, where the fitted line and a 12 m reach ended the decks at -1.4 and 0.5 m)
+# (audit, 8 Oct: of the 2,338 deck ends 156 rose over 4 m at the node, the largest 10.3 m (Nijubashi over the palace moat),
+# all layer-1 road bridges over moats and canals whose node had read the quay wall's foot; no expressway or ramp end (an
+# elevated way meets a ground road only at its foot). Ground TIN 59.7k -> 91.4k triangles: settled and drag ms within
+# 2 % of the old ground (speedtest --quick, WebGPU))
+deck_ends = { level = "high", reach = 20.0 }
+# the town and the backdrop coloured from ESA WorldCover 2021 (London's and Singapore's settings)
+backdrop_cover = "worldcover"
+# (far-field fix, critic 2) the outer map's town at the inner map's mean seen from afar (pale roofs over dark streets),
+# no longer a dark grey: the land past the inner map read as a dark bare plain to the horizon
+backdrop_town_rgb = [122, 122, 121]   # (M7 fix round: 136 read as a pale blanket beyond the Arakawa from the overview, against
+                                      # the 10 m map's roofs over dark streets and the ring's masses; with city.json ground.coverBlend)
+cover_roads = { motorway = 26.0, trunk = 22.0, primary = 18.0, secondary = 14.0, tertiary = 11.0, residential = 8.0, unclassified = 7.0, living_street = 5.0 }
+# (M3 fix round) every OSM footprint over the inner map painted in the town colour (engine opt-in "all"), not only the
+# gaps': Ueno, Ryogoku and Shinagawa read as an empty tan plain (M3 critic); a grey town colour, darker wider streets
+cover_buildings = "all"
+# (far-field fix, critic 2; engine opt-ins) the inner map at 10 m a pixel (20 m averaged Tokyo's 40-80 m blocks and 4-8 m
+# streets into one grey), its footprints as roofs in Tokyo's colours seen from Tokyo Tower (white and pale grey concrete,
+# grey and beige, a few darker or green-grey), one per footprint, and the built-up land between them (alleys, yards,
+# parking) dark: roofs lighter than streets
+cover_inner_cell = 10.0
+cover_inner_reach = 0.0     # (M7) the inner map at the ground area + 1 km, as before the far masses_reach
+cover_roofs = { rgb = [[210, 208, 202], [196, 195, 190], [182, 182, 178], [168, 168, 165], [200, 192, 176], [150, 152, 152], [158, 166, 164]], gaps = [98, 98, 100], under_masses = true }
+# (M7 fix round 1, engine opt-ins) under_masses above: the footprints standing as masses (the rim, the ring) not painted
+# as roofs (pale blobs round the merged masses, Ariake); the Kanto plain's major roads painted into the outer map
+# (60 m a pixel, widths exaggerated to show), so the street network goes on past the inner map (M7 critic, item 3)
+cover_outer_roads = { widths = { motorway = 45.0, trunk = 35.0, primary = 26.0, secondary = 18.0 }, rgb = [100, 100, 102] }
+# the line map (roads and rail beds at 10 m) for the town layer within ~5-9 km, where it draws its own paving: the
+# street grid there as asphalt (Berlin's settings)
+cover_lines = { cell = 10.0, rail = 4.0, yard = 0.6 }
+# named summits for checks/dem.md and checks/terrain.md: lon, lat, surveyed height (m T.P.)
+[terrain.peaks]
+"Atago-yama (愛宕山)" = [139.748746, 35.664768, 26]
+# (M7) the far peaks seen from the city: Fuji pinned (back_peaks); the others are checked only (no height: not pinned)
+"Mount Fuji (富士山, Kengamine)" = [138.727361, 35.360625, 3776]
+"Tanzawa: Hiru-ga-take (蛭ヶ岳)" = [139.1384, 35.4752]
+"Tanzawa: Oyama (大山)" = [139.2436, 35.4406]
+"Kumotori-yama (雲取山)" = [138.9437, 35.8552]
+"Tsukuba-san (筑波山)" = [140.1006, 36.2253]
+"Nokogiri-yama (鋸山)" = [139.8295, 35.1603]
+"Kano-zan (鹿野山)" = [139.9547, 35.2527]
+# named points, their expected heights (GSI DEM5A values read in Phase 0)
+[terrain.spots]
+"Imperial Palace (East Gardens, Honmaru)" = [139.7550, 35.6880, 22]
+"Tokyo Station" = [139.7660, 35.6810, 3.5]
+"Diet hill (Nagatacho)" = [139.7450, 35.6758, 25.8]
+"Akasaka Palace" = [139.7282, 35.6805, 31.6]
+"Roppongi Hills" = [139.7290, 35.6605, 20.3]
+"Nishi-Shinjuku (TMG plaza)" = [139.6917, 35.6896, 40.9]
+"Meiji Shrine" = [139.6996, 35.6760, 37.3]
+"Shibuya Crossing" = [139.7006, 35.6595, 15.2]
+"Tsukiji" = [139.7700, 35.6655, 3.7]
+"Asakusa" = [139.7966, 35.7112, 3.6]
+"Daiba" = [139.7745, 35.6268, 5.9]
+"Tokyo Bay (inner harbour off Daiba)" = [139.7700, 35.6350, 0]
+
+# camera presets for the viewer's menu (06_tiles): name = [lon, lat of the point looked at, distance m, elevation deg]
+# (M10) five groups ([views.groups], in their lists' order): Areas (every [views.areas] entry not listed below), Street
+# level, Landmarks, Horizons, Night. Every preset looked at in the browser (eval/m10/) and checked for a camera inside a
+# building or a wall over the line of sight against buildings.gpkg; near-copies dropped: the 9 km "Overview" (the speed
+# test's "Tokyo overview" stays), the M3 point views "Tokyo Tower", "Tokyo Skytree" and "Docomo Yoyogi" (the landmark
+# views frame them), the pipeline's "Marunouchi Building" (in "Marunouchi towers") and "Fuji TV" ("Fuji TV and its
+# sphere"); the speed test's three names ("Tokyo overview", "Ginza Chuo-dori (street level)", "Marunouchi and the
+# Imperial Palace") and the start view kept
+[views]
+group_order = true
+
+[views.areas]
+# (M3) the standard set's views: name = [lon, lat, distance, elevation, azimuth (the camera's bearing from the point),
+# lift (the point's height over the ground), hour]
+"Tokyo overview" = [139.7600, 35.6750, 14000, 40, 200]
+"Marunouchi and the Imperial Palace" = [139.7610, 35.6830, 2200, 30]
+# (M10: was "Tokyo Station (Marunouchi)": from 240 m over Gyoko-dori the station is a sliver behind the towers; the
+# station itself is "Tokyo Station" under Landmarks)
+"Marunouchi along Gyoko-dori" = [139.7660, 35.6812, 700, 20, 292]
+"Ginza and Tsukiji" = [139.7670, 35.6700, 2000, 30]
+"Shiodome and Hamarikyu" = [139.7620, 35.6620, 1800, 30]
+"Toranomon and Azabudai" = [139.7440, 35.6620, 2200, 28]
+"Roppongi and Akasaka" = [139.7300, 35.6650, 2200, 28]
+"Odaiba and Rainbow Bridge" = [139.7720, 35.6330, 2500, 28]
+"Tsukishima and Harumi" = [139.7820, 35.6550, 2200, 28]
+"Sumida River and the Skytree" = [139.8040, 35.7095, 1300, 8, 255]
+"Asakusa and the Skytree" = [139.8020, 35.7110, 2500, 28]
+# (M10: was "Asakusa gap (from the core to the Skytree)": "gap" was the build's word)
+"Kuramae to the Skytree" = [139.7920, 35.7050, 3800, 12, 225]
+"Ueno and Akihabara" = [139.7735, 35.7060, 2200, 26, 195]
+# (M10: was "Surugadai and Awajicho toward Akihabara" at 650 m and 11 degrees: two towers in front filled the frame;
+# now from 900 m and 22 degrees over Kanda to Akihabara and the Skytree)
+"Kanda and Akihabara" = [139.7712, 35.6985, 900, 22, 250]
+"Nishi-Shinjuku" = [139.6930, 35.6890, 2000, 28]
+"Yotsuya and Aoyama toward Shinjuku" = [139.7120, 35.6840, 3200, 13, 105]
+"Meiji Shrine and Harajuku" = [139.7000, 35.6720, 2200, 32]
+"Omotesando" = [139.7100, 35.6670, 900, 30, 300]
+"Shibuya" = [139.7010, 35.6590, 1500, 30]
+"Shibuya Crossing" = [139.70060, 35.65950, 210, 42, 175, 0]
+# Street level ([views.groups])
+"Ginza Chuo-dori (street level)" = [139.7650, 35.6715, 220, 9, 210]
+"Shibuya Crossing (street level)" = [139.70060, 35.65950, 58, 5, 172, 4]       # (M4 fix round: from Hachikō Square over the scramble to Q-Front and Center-gai)
+# (M10: was "Kabukicho, Shinjuku" [139.7020, 35.6942, 160, 9, 200, 6]: the camera stood inside a 44 m building and
+# looked over roofs; now 28 m over Central Road (セントラルロード), 30 m in from Yasukuni-dori, looking up the street over
+# its (invented) street trees: at 14 m and at 4 m the camera stood in their crowns)
+"Kabukicho (歌舞伎町)" = [139.70194, 35.69485, 110, 4, 197, 20]
+"Akihabara Chuo-dori (street level)" = [139.7716, 35.7020, 220, 7, 187]
+# (M10: the M6 shots stood inside the zelkovas' crowns; now 33 m over the avenue's middle, above the crowns, looking
+# down it to the Omotesando crossing with the afternoon sun behind)
+"Omotesando's zelkova avenue" = [139.7072, 35.6677, 300, 4, 300, 12]
+# (M4 facades) Asakusa's back streets north-west of Sensō-ji: low wooden houses, shop houses, 雑居ビル
+"Asakusa back streets" = [139.7945, 35.7175, 200, 14, 200, 4]      # (M4 fix round: over Asakusa 3-chome behind Sensō-ji, half its houses under 12 m)
+"Azumabashi back streets (Sumida)" = [139.8010, 35.7068, 200, 12, 230, 3]   # (the lowest blocks in the data: median 9 m, 60-70 % wooden)
+# M4 landmark figures (scripts/m4l_structures.py) and named towers (data/landmark_facades.csv): area presets aimed
+# at them ([lon, lat, distance, elevation, azimuth looked from, lift]), listed under Landmarks ([views.groups])
+"Tokyo Tower from Shiba Park" = [139.74543, 35.65858, 750, 10, 150, 130]
+"Tokyo Skytree from Oshiage" = [139.81070, 35.71006, 1200, 12, 215, 280]
+"Rainbow Bridge from Daiba" = [139.76320, 35.63660, 950, 9, 195, 50]
+"Rainbow Bridge from Odaiba" = [139.7630, 35.6365, 1300, 6, 128]
+# (M10: was "Tokyo Station domes" [.., 330, 12, 292, 18]: from the west at 87 m the Marunouchi towers stood in front
+# and one dome showed; now from 265 m up over Gyoko-dori, looking down on both domes and the brick front over the
+# plaza: a sight-line sweep found no lower spot that sees both domes and the middle past the towers, and from 40
+# degrees in the west-south-west a tower's roof filled the foreground)
+"Tokyo Station" = [139.76605, 35.68137, 300, 55, 290, 18]
+"Sensō-ji (浅草寺)" = [139.79640, 35.71440, 200, 12, 180, 20]   # (M10: closer, 200 m from Nakamise's end: the pagoda, the main hall and Hōzōmon; was 260 m, 16 degrees)
+"Docomo Yoyogi clock spire" = [139.70313, 35.68440, 560, 6, 345, 150]
+"National Diet Building" = [139.74505, 35.67589, 420, 14, 100, 30]
+# (M10: the pipeline's frame stood the camera beside the north tower with its top cut off; now from the east-south-east)
+"Tokyo Metropolitan Government" = [139.69170, 35.68960, 650, 10, 120, 110]
+"Fuji TV and its sphere" = [139.77440, 35.62680, 420, 9, 340, 80]
+"Tokyo International Forum" = [139.76400, 35.67690, 420, 24, 150, 30]
+# (M10: was [.., 170, 28, 190, 30] over the roofs south of the 4-chome crossing, the tower small among them; now 35 m
+# over Harumi-dori from the south-south-east, the clock tower over the crossing)
+"Wakō clock tower, Ginza (和光)" = [139.76505, 35.67153, 110, 6, 155, 22]
+"Nikolai-dō (ニコライ堂)" = [139.76554, 35.69801, 150, 8, 20, 18]   # (M4 fix round: from Hongo-dori to the north, by Hijiri-bashi)
+"Eitai Bridge" = [139.78737, 35.67637, 360, 9, 200, 8]
+"Kachidoki Bridge" = [139.77497, 35.66235, 500, 7, 232, 8]   # (M7: from over the river to the south-west, the bascule spans against Tsukishima and Tsukuda)
+"Kiyosu Bridge" = [139.79197, 35.68236, 380, 6, 15, 8]     # (M7: from over the river upstream, Nakasu and Hakozaki on the right)
+"Nishi-Shinjuku towers" = [139.69300, 35.69050, 1000, 12, 110, 120]
+"Roppongi and Azabudai towers" = [139.73700, 35.66150, 1500, 10, 200, 160]
+"Marunouchi towers" = [139.76500, 35.68200, 900, 12, 250, 100]
+"Nihonbashi: Tokyo Midtown Nihonbashi" = [139.77521, 35.68321, 900, 12, 200, 120]
+"Tsukishima: Grand City Tower" = [139.77958, 35.66315, 800, 12, 250, 90]
+# (M7) the horizons from the observatories and the bay: Mount Fuji 95-106 km west-south-west, Tanzawa and Chichibu to the
+# west, the Boso hills across the bay ([lon, lat] out along the bearing, the camera on the deck); the Fuji views at
+# 9:00, Fuji's clear-morning hour from Tokyo: by afternoon the sun stands behind it and its east face is a dark
+# silhouette. (M7 fix round: the controls hold the camera 4 degrees or more over the horizon, so the point is 500-600 m
+# out at 4 degrees, the camera at the deck: Tokyo Tower's Main Deck ~150 m, the Skytree's Tembo Deck 350, the TMG's
+# observatories 202; the bay view's at ~70 m over Shinonome)
+"Fuji from Tokyo Tower (Main Deck)" = [139.73915, 35.65688, 600, 4, 71, 133, 9]
+"Fuji from the Skytree (Tembo Deck)" = [139.80447, 35.70824, 530, 4, 69, 313, 9]   # (the camera 70 m out from the shaft: at 600 it stood inside the deck)
+"Fuji from the Metropolitan Government" = [139.68553, 35.68765, 510, 4, 68, 163, 9]   # (M10: was "West from the Metropolitan Government"; 90 m out from the north tower)
+"Tokyo Bay from Ariake" = [139.80480, 35.61518, 1500, 4, 320, -45]   # (M7 fix round: ~60 m over the Ariake quay by Big Sight, down the bay toward Futtsu and the Boso hills)
+# Night (M10): [lon, lat, distance, elevation, azimuth, lift, hour]; each sets the clock to 21:00 JST
+"Tokyo Tower at night" = [139.74543, 35.65858, 1300, 5, 350, 130, 21]     # from the north over Kamiyacho and Toranomon, the tower between the towers
+"Tokyo Skytree at night" = [139.81070, 35.71006, 1300, 3, 245, 200, 21]   # from over the Sumida by Azumabashi: the Iki's blue lattice
+"Shibuya Crossing at night" = [139.70060, 35.65950, 210, 42, 175, 0, 21]
+"Rainbow Bridge at night" = [139.7630, 35.6365, 1300, 6, 128, 0, 21]       # from Odaiba: the bridge's necklace, Tokyo Tower behind, the bay's streaks
+"Tokyo Station at night" = [139.76605, 35.68137, 300, 55, 290, 18, 21]
+"Kabukicho at night" = [139.70194, 35.69485, 110, 4, 197, 20, 21]
+
+[views.groups]
+"Street level" = ["Ginza Chuo-dori (street level)", "Shibuya Crossing (street level)", "Kabukicho (歌舞伎町)",
+    "Akihabara Chuo-dori (street level)", "Omotesando's zelkova avenue", "Asakusa back streets",
+    "Azumabashi back streets (Sumida)"]
+Landmarks = ["Tokyo Tower from Shiba Park", "Tokyo Skytree from Oshiage", "Rainbow Bridge from Daiba",
+    "Rainbow Bridge from Odaiba", "Tokyo Station", "Sensō-ji (浅草寺)", "Docomo Yoyogi clock spire",
+    "National Diet Building", "Tokyo Metropolitan Government", "Fuji TV and its sphere", "Tokyo International Forum",
+    "Wakō clock tower, Ginza (和光)", "Nikolai-dō (ニコライ堂)", "Eitai Bridge", "Kachidoki Bridge", "Kiyosu Bridge",
+    "Nishi-Shinjuku towers", "Roppongi and Azabudai towers", "Marunouchi towers", "Azabudai Hills Mori JP Tower",
+    "Toranomon Hills", "Roppongi Hills", "Tokyo Midtown", "Shibuya Scramble Square", "Tokiwabashi Tower",
+    "Nihonbashi: Tokyo Midtown Nihonbashi", "Tsukishima: Grand City Tower"]
+Horizons = ["Fuji from Tokyo Tower (Main Deck)", "Fuji from the Skytree (Tembo Deck)",
+    "Fuji from the Metropolitan Government", "Tokyo Bay from Ariake"]
+Night = ["Tokyo Tower at night", "Tokyo Skytree at night", "Shibuya Crossing at night", "Rainbow Bridge at night",
+    "Tokyo Station at night", "Kabukicho at night"]
+
+# landmarks: menu name = building name as in buildings.gpkg (data/landmarks_tokyo.csv name_zh); M2 checks they match
+[views.landmarks]
+"Azabudai Hills Mori JP Tower" = "麻布台ヒルズ森JPタワー"
+"Toranomon Hills" = "虎ノ門ヒルズ森タワー"
+"Roppongi Hills" = "六本木ヒルズ森タワー"
+"Tokyo Midtown" = "ミッドタウン・タワー"
+"Shibuya Scramble Square" = "渋谷スクランブルスクエア"
+"Tokiwabashi Tower" = "常盤橋タワー"

@@ -1,0 +1,60 @@
+{
+  "_note": "PLATEAU (i-UR 3.x / CityGML 2.0) standard codelists for buildings, as shipped in each FY2025 dataset's codelists/ folder (fetched 2026-10-06 from the Chiyoda 13101 2025 dataset): code -> [English gloss, Japanese original]. Used by sources/citygml.py with flavour = \"plateau\" for the <field>_name columns.",
+  "usage": {
+    "401": ["business", "業務施設"], "402": ["commercial", "商業施設"], "403": ["accommodation", "宿泊施設"],
+    "404": ["mixed commercial", "商業系複合施設"], "411": ["house", "住宅"], "412": ["apartment building", "共同住宅"],
+    "413": ["house with shop", "店舗等併用住宅"], "414": ["apartment building with shops", "店舗等併用共同住宅"],
+    "415": ["house with workshop", "作業所併用住宅"], "421": ["government", "官公庁施設"],
+    "422": ["education, culture, welfare", "文教厚生施設"], "431": ["transport and warehouse", "運輸倉庫施設"],
+    "441": ["factory", "工場"], "451": ["agriculture, forestry, fishery", "農林漁業用施設"],
+    "452": ["utility (supply, treatment)", "供給処理施設"], "453": ["defence", "防衛施設"], "454": ["other", "その他"],
+    "461": ["unknown", "不明"]
+  },
+  "class": {
+    "3001": ["ordinary building", "普通建物"], "3002": ["solid building (fireproof, mostly 3+ storeys)", "堅ろう建物"],
+    "3003": ["ordinary roofed structure without walls", "普通無壁舎"], "3004": ["solid roofed structure without walls", "堅ろう無壁舎"],
+    "3000": ["not classified", "分類しない建物"], "9999": ["unknown", "不明"]
+  },
+  "roofType": {
+    "1": ["gable", "切妻屋根"], "2": ["hip", "寄棟屋根"], "3": ["pyramid", "方形屋根"], "4": ["flat", "陸屋根"],
+    "5": ["shed (mono-pitch)", "片流れ屋根"], "6": ["half-hip", "袴腰屋根/半切妻屋根"], "7": ["hip-and-gable (irimoya)", "入母屋屋根"],
+    "8": ["shikoro (stepped hip-and-gable)", "錣（しころ）屋根"], "9": ["mansard", "マンサード屋根"], "10": ["monitor (clerestory)", "越屋根"],
+    "11": ["uneven gable", "招き屋根"], "12": ["lean-to", "差し掛け屋根"], "13": ["butterfly", "バタフライ屋根"], "14": ["sawtooth", "鋸屋根"],
+    "15": ["six-post", "六柱屋根"], "16": ["eight-post", "八柱屋根"], "17": ["M-shaped", "M型屋根"], "18": ["uneven gable with pent", "下屋付招き屋根"],
+    "19": ["offset ridge", "棟違い屋根"], "20": ["stepped (norikoshi)", "乗り越し屋根"], "21": ["gambrel", "腰折れ屋根"],
+    "22": ["clipped corner", "隅切屋根"], "23": ["arch", "アーチ屋根"], "24": ["dome", "ドーム屋根"], "25": ["shell", "シェル屋根"],
+    "26": ["catenary", "カテナリー屋根"], "27": ["membrane", "膜構造"], "28": ["other", "その他"], "9020": ["unknown", "不明"]
+  },
+  "detailedUsage": {
+    "1110": ["government", "官公庁施設"], "1121": ["education", "教育施設"], "1122": ["culture", "文化施設"], "1123": ["religion", "宗教施設"],
+    "1131": ["medical", "医療施設"], "1132": ["welfare", "厚生施設"], "1141": ["supply facility", "供給施設"], "1142": ["treatment facility", "処理施設"],
+    "1210": ["office", "事務所建築物"], "1221": ["commercial", "商業施設"], "1222": ["public bath etc.", "公衆浴場等"],
+    "1230": ["residential-commercial", "住商併用建物"], "1241": ["accommodation", "宿泊施設"], "1242": ["entertainment", "遊興施設"],
+    "1251": ["sports", "スポーツ施設"], "1252": ["performance venue", "興行施設"], "1310": ["detached house", "独立住宅"],
+    "1320": ["apartment building", "集合住宅"], "1410": ["factory", "専用工場"], "1420": ["factory with residence", "住居併用工場"],
+    "1431": ["transport", "運輸施設等"], "1432": ["warehouse", "倉庫施設等"], "1500": ["agriculture, forestry, fishery", "農林漁業施設"],
+    "2101": ["outdoor/temporary: solar", "屋外利用地・仮設建物(太陽光発電)"], "2102": ["outdoor/temporary: parking", "屋外利用地・仮設建物(屋外駐車場)"],
+    "2103": ["outdoor/temporary: other", "屋外利用地・仮設建物(その他)"], "3001": ["park, sports ground: golf", "公園、運動場等(ゴルフ場)"],
+    "3002": ["park, sports ground: other", "公園、運動場等(その他)"], "4000": ["unused land", "未利用地等"], "5100": ["road", "道路"],
+    "5200": ["railway, port", "鉄道・港湾等"], "6110": ["paddy", "田"], "6120": ["field", "畑"], "6130": ["orchard", "樹園地"],
+    "6200": ["pasture", "採草放牧地"], "7000": ["water", "水面・河川・水路"], "8000": ["wild land", "原野"], "9000": ["forest", "森林"],
+    "2200": ["other", "その他"], "0": ["unknown", "不明"], "90": ["inconsistent", "不整合"]
+  },
+  "buildingStructureType": {
+    "601": ["wood, earthen storehouse", "木造・土蔵造"], "602": ["steel-reinforced concrete (SRC)", "鉄骨鉄筋コンクリート造"],
+    "603": ["reinforced concrete (RC)", "鉄筋コンクリート造"], "604": ["steel", "鉄骨造"], "605": ["light steel", "軽量鉄骨造"],
+    "606": ["brick, concrete block, stone", "レンガ造・コンクリートブロック造・石造"], "610": ["non-wood", "非木造"], "611": ["unknown", "不明"]
+  },
+  "fireproofStructureType": {
+    "1001": ["fireproof", "耐火"], "1002": ["semi-fireproof", "準耐火造"], "1003": ["other", "その他"], "1011": ["unknown", "不明"]
+  },
+  "lod1HeightType": {
+    "1": ["point cloud: maximum", "点群から取得_最高高さ"], "2": ["point cloud: median", "点群から取得_中央値"],
+    "3": ["point cloud: mean", "点群から取得_平均値"], "4": ["point cloud: mode", "点群から取得_最頻値"],
+    "5": ["point cloud: minimum", "点群から取得_最低値"], "6": ["aerial photogrammetry: maximum", "航空写真図化_最高高さ"],
+    "7": ["building permit height", "建築確認申請書類等に記載された「建築物の高さ」"],
+    "8": ["urban planning survey height", "都市計画基礎調査（建物利用現況）の「高さ（m）」"],
+    "9": ["3 m x storeys (urban planning survey)", "階高3m×都市計画基礎調査（建物利用現況）の「階数・地上（階）」による推定値"],
+    "10": ["from drawings", "図面から取得した高さ"], "0": ["uniform 3 m (not obtainable)", "取得不可のため一律値（3m）"]
+  }
+}

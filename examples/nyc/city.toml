@@ -1,0 +1,299 @@
+# Manhattan (New York County). Every city-specific setting of the build-3d-city pipeline; the engine
+# (.agents/skills/build-3d-city/engine/pipeline, its README lists every key with its default) and the region
+# preset "us-northeast" hold the rest. Run a stage with `uv run city3d <stage>` from this folder, everything
+# with `uv run city3d all`.
+
+name = "nyc"
+title = "New York"
+preset = "us-northeast"
+utm_epsg = 32618            # UTM 18N
+coast = true                # New York Harbor, the Hudson, East and Harlem rivers
+drive = "right"
+user_agent = "3D-Fun nyc reconstruction (hobby project)"
+# the main Overpass servers answered 504 for the ground area's queries (Sept 2026); VK's mirror first
+overpass = ["https://maps.mail.ru/osm/tools/overpass/api/interpreter", "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"]
+
+# the borough of Manhattan = New York County (admin_level 6; the borough relation 8398124 is level 7). Its
+# boundary runs to the New Jersey line in the Hudson and takes in Roosevelt, Randalls and Wards, Governors,
+# Liberty and part of Ellis Island, and Marble Hill
+[districts]
+"New York County" = 2552485
+# added at the user's request (28 Sept 2026): the waterfronts facing Manhattan. Brooklyn from Atlantic Avenue
+# to the Navy Yard and Classon Avenue: DUMBO, Vinegar Hill, Brooklyn Heights, Downtown Brooklyn, Fort Greene
+"Brooklyn (DUMBO to Fort Greene)" = { relation = 369518, clip = [[-74.0120, 40.6930], [-74.0035, 40.6918], [-73.9925, 40.6905], [-73.9785, 40.6838], [-73.9687, 40.6810], [-73.9594, 40.6799], [-73.9606, 40.6975], [-73.9640, 40.7010], [-73.9640, 40.7060], [-73.9700, 40.7120], [-73.9950, 40.7090], [-74.0150, 40.7000], [-74.0120, 40.6930]] }
+# New Jersey: Hoboken, Weehawken and Union City whole; Jersey City east of JFK Boulevard and north of the
+# Morris Canal: the Heights and Downtown (Newport, Grove Street, Hamilton Park, Van Vorst Park, Paulus Hook,
+# Exchange Place)
+"Hoboken" = 170708
+"Weehawken" = 957238
+"Union City" = 170709
+"Jersey City (Heights and Downtown)" = { relation = 170953, clip = [[-74.0240, 40.7040], [-74.0460, 40.7090], [-74.0520, 40.7230], [-74.0600, 40.7300], [-74.0660, 40.7330], [-74.0500, 40.7700], [-74.0100, 40.7700], [-74.0050, 40.7200], [-74.0240, 40.7040]] }
+
+[sun]                       # 10 October, leaves still green (the viewer works its sun out from city.json's sun.date)
+latitude = 40.75
+declination = -6.5
+
+[sources]
+# NYC's official footprints first (every building, with its roof height), OSM fills what they lack and gives
+# the towers their setbacks (building:part)
+footprints = ["arcgis", "osm"]
+heights = ["landmark", "arcgis", "osm_height", "overture", "osm_levels", "default"]
+dem = "usgs3dep"            # bare earth from the city's 2017 lidar
+backdrop = "usgs3dep"       # bare earth to 36 km (the Palisades, Watchung ridges, Staten Island, Long Island): no towns as lumps, no datum step
+# New Jersey has no official 3D buildings and OSM heights on 0.3 % of them: Overture's USGS-lidar heights, by
+# OSM id, on 59 % (raw/overture_heights.csv); no official New Jersey layer has heights
+[sources.overture]
+release = "2026-09-23.1"
+[sources.arcgis]            # NYC OTI BUILDING layer (= NYC Open Data "Building Footprints", 5zhs-2jue)
+url = "https://services6.arcgis.com/yG5s3afENB5iO9fj/arcgis/rest/services/BUILDING_view/FeatureServer/0"
+where = "(BIN >= 1000000 AND BIN < 2000000) OR (BIN >= 3000000 AND BIN < 4000000)"     # Manhattan's and Brooklyn's building numbers (the bbox limits them)
+drop = { FEATURE_CODE = [2110, 1003, 1005] }    # skybridges, placeholder triangles, temporary structures
+height = "HEIGHT_ROOF"      # roof above the building's ground, feet
+districts = ["New York County", "Brooklyn (DUMBO to Fort Greene)"]   # it covers New York City only: OSM is the footprint source in New Jersey
+height_scale = 0.3048       # (also the unit of GROUND_ELEVATION)
+keep = ["BIN", "DOITT_ID", "CONSTRUCTION_YEAR", "FEATURE_CODE", "GROUND_ELEVATION", "NAME", "MAPPLUTO_BBL"]
+# NYC Planning's MapPLUTO lots (building class: row house, walk-up, elevator building, office...; floors; land use)
+join = { url = "https://services5.arcgis.com/GfwWNkhOj9bNBqoJ/arcgis/rest/services/MAPPLUTO/FeatureServer/0", where = "Borough='MN' OR CD=302", key = "BBL", on = "mappluto_bbl", fields = ["BldgClass", "NumFloors", "LandUse", "YearBuilt", "HistDist"] }
+
+[buildings]
+parts = true
+exclude = { bin = [1015191] }   # Hotel Pennsylvania, demolished 2022-23 (still in the official layer)
+
+[ground]
+piers = true                # Hudson River Park, Chelsea Piers, the heliport: buildings stand on them
+tidal = 1.0                 # the Hudson, East and Harlem rivers are tidal straits: sea, not river
+town = true                 # Brooklyn, Queens, the Bronx and New Jersey: a painted roofscape, not bare paving
+# Central Park's and the other parks' paths through the lawns (asphalt paths 3-5 m, bridle path 4 m)
+paths = { footway = 2.6, path = 2.0, cycleway = 2.6, bridleway = 3.0, steps = 2.5, pedestrian = 4.0 }
+
+[roads]
+lane_w = 3.2                # Manhattan's lanes are 10-11 ft
+# the river crossings' roadways over the water (navigational clearance at mid-span, NYC DOT / PANYNJ)
+decks = { "Brooklyn Bridge" = 41.0, "Manhattan Bridge" = { deck = 48.5, lower = 42.0, rail_lower = true }, "Williamsburg Bridge" = 43.0, "Queensboro Bridge" = 41.0, "George Washington Bridge" = { deck = 75.0, lower = 66.5 }, "Robert F. Kennedy" = 45.0, "Hell Gate Bridge" = 43.0 }   # heights: data/bridges_audit.md
+
+[cars]
+cars_only = ["Brooklyn Bridge"]   # passenger cars only (NYC DOT: no trucks, buses or commercial vans)
+# box trucks keep to the avenues and highways (New York's truck routes; through trucks may not use lesser streets),
+# and none are parked: on DUMBO's and the Village's narrow streets one filled the view (the user's feedback)
+parked_mix = [48, 34, 3, 15, 0, 0, 0]
+[cars.class]
+tertiary = [9, 40, 0.35, [34, 28, 20, 17, 1, 0, 0]]   # (DUMBO's Front and Washington Streets are tertiary: a truck stood across one)
+residential = [7, 70, 0.4, [36, 32, 14, 18, 0, 0, 0]]
+unclassified = [7, 80, 0.4, [38, 30, 12, 20, 0, 0, 0]]
+living_street = [4, 140, 0.5, [40, 34, 10, 16, 0, 0, 0]]
+road = [7, 80, 0.4, [38, 30, 12, 20, 0, 0, 0]]
+service = [5, 150, 0.5, [40, 30, 6, 24, 0, 0, 0]]
+
+[tiles]
+pillars_in_water = false    # the rivers' crossings are suspension, cantilever and arch spans ([[structures]])
+
+[compare]
+detail = [-73.9855, 40.7580, "Times Square"]
+
+[terrain]
+far_reach = 36000.0
+# the lidar DTM is accurate to decimetres and the waterfront stands 1-3 m over the harbour on bulkheads: only a
+# small drop to meet the scene's sea at 0, over a short ramp
+sea_drop = 1.0
+sea_knee = 0.8
+coast_flat = 12.0
+coast_ramp = 60.0
+tin_error = 2.0             # lidar is worth keeping: the Palisades' cliff, Inwood Hill, Central Park's rock
+tin_error_far = 4.0
+far_cell = 100.0            # the backdrop's shores (Long Island Sound, Flushing Bay, Newark Bay) less jagged
+backdrop_town = 0.6         # the flats: towns and leafy suburbs (fields colour) about evenly beyond the city
+backdrop_town_rgb = [124, 120, 112]   # the roofscape's mean seen from far, so the town layer fades into it
+backdrop_forest = [45.0, 130.0]    # wooded from 45 m: the Palisades plateau, Staten Island's Greenbelt, the Watchungs, Westchester's ridges
+# named summits, for checks/terrain.md: lon, lat, surveyed height (m; left out: not checked)
+[terrain.peaks]
+"Fort Tryon Park (Manhattan's high point)" = [-73.9317, 40.8621, 81]
+"Central Park, Summit Rock" = [-73.9706, 40.7837, 42]
+"Todt Hill (Staten Island)" = [-74.1164, 40.6003, 125]
+"Palisades, Englewood Cliffs" = [-73.9580, 40.8830]
+
+# camera presets for the viewer's menu. Areas: name = [lon, lat of the point looked at, distance m, elevation
+# degrees(, azimuth looked from(, target height over the ground))]. Landmarks: menu name = building name in
+# buildings.gpkg (from data/landmarks*.csv), or [name, azimuth]; the camera looks at a third of its height
+# from a distance that fits the whole building in view
+[views]
+landmark_frame = [1.6, 0.5, 14]   # closer and aimed higher than the default: Midtown hides the lower floors
+
+[views.areas]
+"Manhattan overview" = [-73.978, 40.758, 13000, 32, 200]
+"Lower Manhattan" = [-74.0105, 40.7085, 2600, 24, 205]
+"Midtown" = [-73.9830, 40.7545, 3200, 24, 200]
+"Central Park" = [-73.9670, 40.7800, 4200, 34, 200]
+"Hudson Yards" = [-74.0005, 40.7545, 1500, 20, 235]
+"Brooklyn Bridge" = [-73.99435, 40.70410, 420, 3, 146, 50]   # from over DUMBO near deck height, 10 degrees off the bridge's axis (136 to Brooklyn), looking north-west through the Brooklyn tower's arches at Lower Manhattan
+"Times Square (street level)" = [-73.9858, 40.7579, 130, 4, 29, 12]   # (the target 12 m up: the screens, not the pavement, fill the frame)
+"Times Square" = [-73.9855, 40.7580, 650, 38, 200]
+"Manhattan Bridge" = [-73.9905, 40.7070, 900, 9, 25, 40]   # from over the Lower East Side, the Brooklyn Bridge behind it rather than in front
+"Statue of Liberty" = [-74.04453, 40.68925, 330, 10, 150, 40]
+"Central Park Reservoir" = [-73.9626, 40.7857, 1300, 26, 200]   # the Jacqueline Kennedy Onassis Reservoir
+# the waterfronts facing Manhattan (data/landmarks_waterfronts.md has what each shows)
+"Hoboken" = [-74.0300, 40.7430, 2200, 25, 110, 0]
+"Jersey City waterfront (Exchange Place)" = [-74.0350, 40.7160, 1500, 6, 100, 60]
+"Newport" = [-74.0335, 40.7270, 1600, 8, 80, 50]
+"Grove Street" = [-74.0431, 40.7196, 450, 16, 250, 5]
+"DUMBO (Washington Street)" = [-73.98958, 40.70386, 300, 8, 180, 30]   # over Washington Street's lofts, looking north up the street to the Manhattan Bridge's tower at its end
+"Brooklyn Heights Promenade" = [-74.0026, 40.7010, 700, 4, 140, 0]
+"Downtown Brooklyn" = [-73.9840, 40.6905, 1600, 8, 335, 60]   # from over the Navy Yard, the towers against Fort Greene (the district's edge low in the frame)
+[views.landmarks]
+"One World Trade Center" = "One World Trade Center"
+"Empire State Building" = ["Empire State Building", 235]
+"Chrysler Building" = "Chrysler Building"
+"432 Park Avenue" = "432 Park Avenue"
+"Central Park Tower" = "Central Park Tower"
+"One Vanderbilt" = ["One Vanderbilt", 250]   # from the west, the Chrysler behind it rather than beside
+"111 West 57th Street (Steinway Tower)" = "Steinway Tower"
+"30 Hudson Yards" = "30 Hudson Yards"
+"Flatiron Building" = ["Flatiron Building", 20, 300, 30]   # from over Madison Square, at the 23rd Street prow
+"The Brooklyn Tower" = "The Brooklyn Tower"
+"99 Hudson Street" = "99 Hudson Street"
+
+# the menu's groups: Manhattan's areas, the waterfronts across the rivers, then the landmarks with the bridges and
+# the Statue among them (a first-time visitor finds the must-sees in one place)
+[views.groups]
+"Waterfronts" = ["Hoboken", "Jersey City waterfront (Exchange Place)", "Newport", "Grove Street", "DUMBO (Washington Street)",
+  "Brooklyn Heights Promenade", "Downtown Brooklyn"]
+"Landmarks" = ["Statue of Liberty", "Brooklyn Bridge", "Manhattan Bridge"]
+
+# landmark structures the building table can't make (stages/structures.py): the East River bridges' towers and
+# main cables, the Statue of Liberty on its pedestal (data/bridges_statue.md has the sources)
+[[structures]]
+kind = "suspension"
+name = "Brooklyn Bridge"
+towers = [[-73.998334, 40.707269], [-73.994354, 40.704104]]
+tower = { width = 43.0, depth = 18.0, height = 84.8, deck = 36.35, arches = 2, arch_width = 10.3, arch_height = 35.7, pilaster = 1.2, style = "floodlit", variant = 0.15, colour = "#d6cbbb", pier_colour = "#bdb2a2" }
+# the roadways between the inner (the promenade's) and outer trusses, 7.8 m each side of the towers' line (05b_roads
+# moves OSM's carriageways there: they were at -7.7 and +9.0 m, the promenade over one of them)
+roadways = { centre = 7.8, width = 10.4 }
+cables = { across = [-17.35, -2.2, 2.2, 17.35], low = 47.5, side = 283.5, anchor = 26.0, radius = 0.3, below_top = 3.0, colour = "#b9ad9c", deck = 42.5, hangers = 3.8, stays = { count = 12, reach = 125.0 } }
+# stiffening trusses about 5 m deep rising over the roadways (41 m); the promenade (5.5 m over the roadways)
+# between the inner pair
+truss = [{ top = 45.5, depth = 5.2, across = [-13.0, 13.0], panel = 5.0, width = 0.45, colour = "#a89f8c" }, { top = 48.5, depth = 5.5, across = [-2.6, 2.6], panel = 5.0, width = 0.45, floors = [46.6], colour = "#a89f8c" }]
+anchorage = { length = 36.0, width = 39.0, height = 27.0, colour = "#c3b39f" }
+[[structures]]
+kind = "suspension"
+name = "Manhattan Bridge"
+towers = [[-73.991488, 40.708812], [-73.989436, 40.705115]]
+tower = { width = 29.2, depth = 9.8, height = 100.6, pier = 7.0, portal_bay = 20.0, columns = [-14.6, -6.1, 6.1, 14.6], column_width = 1.5, column_depth = 9.8, column_top = 3.0, open_legs = 1.4, bracing = [9.0, 95.0], cap = 5.0, finials = [106.7, 1.4], style = "spire", colour = "#9fb0b6", pier_colour = "#b9ab94" }
+cables = { across = [-14.6, -6.1, 6.1, 14.6], low = 52.0, side = 221.0, anchor = 36.0, radius = 0.4, below_top = 1.0, colour = "#9fb0b6", deck = 49.0, hangers = 4.6 }
+anchorage = { length = 72.0, width = 55.0, height = 41.0, colour = "#b9ab94" }
+# four Warren trusses 7.6 m deep: the upper roadways on top, the lower roadway and the subway on the bottom chord
+truss = { top = 49.0, depth = 7.6, across = [-14.6, -6.1, 6.1, 14.6], panel = 9.0, floors = [48.4, 41.4], colour = "#8fa0a6" }
+[[structures]]
+kind = "figure"
+name = "Statue of Liberty"
+at = [-74.044530, 40.689253]
+base = 46.94                # the pedestal's top over the ground (NPS)
+facing = 135.0              # south-east, towards the Narrows
+colour = "#7fb3a3"            # verdigris
+style = "floodlit"
+variant = 0.97              # floodlight strength (0.98 or more: a flame)
+# the figure from a 3D scan of a replica ("Statue of Liberty 3D Scan", gomeasure3d, Zenodo 10307962, CC BY 4.0),
+# its own souvenir pedestal cut off, scaled to the real 46.05 m from heel to torch (NPS), the flame gilded
+model = { file = "raw/models/statue_of_liberty_scan.glb", cut = -25.0, up = "+z", front = "-y", height = 46.05, triangles = 60000, tip = [3.2, "#d9a93a"] }
+
+# 30 Hudson Yards' Edge: a triangular deck at the 100th floor (340 m) jutting 24 m south of the tower (Wikipedia)
+[[structures]]
+kind = "figure"
+name = "Edge"
+at = [-74.000786, 40.754015]  # the tower's centroid above 300 m; its south face is 28 m out along 209 degrees
+facing = 209.0                # grid south
+style = "spire"
+colour = "#b8bcc0"
+prisms = [[[[-15.0, 27.0], [15.0, 27.0], [0.0, 52.0]], 333.5, 340.5]]
+
+# Times Square's bow tie (Broadway and Seventh Avenue, 42nd to 47th Street): the buildings round it are
+# wrapped in billboards and screens
+[facade.zones.signs]
+polygon = [[-73.9881, 40.7556], [-73.9858, 40.7547], [-73.9833, 40.7583], [-73.9843, 40.7609], [-73.9869, 40.7600], [-73.9881, 40.7556]]
+# NYC Parks' 2015 street tree census (TreesCount!, NYC Open Data uvpi-gqnh, via an ArcGIS mirror: NYC Open Data
+# refuses this machine), Manhattan's 62,427 live trees: raw/street_trees_2015_manhattan.csv. Height from the
+# trunk: 4 m + 0.6 m per inch, 4-25 m (Manhattan's mature planes reach the 5th floor). Groups by crown habit, drawn by
+# the viewer's species slots as city.json's trees.species dresses them
+[trees.street.census]
+file = "raw/street_trees_2015.csv"         # Manhattan and Brooklyn Community District 2
+districts = ["New York County", "Brooklyn (DUMBO to Fort Greene)"]
+lon = "longitude"
+lat = "latitude"
+dbh = "tree_dbh"
+species = "spc_common"
+height = [4.0, 0.6, 4.0, 25.0]   # a 12 inch honey locust about 11 m, a 30 inch plane about 22 m
+groups = [
+    ["acacia", ["honeylocust", "Sophora", "Kentucky coffeetree", "golden raintree", "black locust", "Amur maackia", "Japanese zelkova"]],
+    ["banyan", ["London planetree", "American elm", "pin oak", "northern red oak", "willow oak", "swamp white oak", "red maple", "silver maple", "Norway maple", "sycamore maple", "American sycamore", "green ash", "white ash", "Chinese elm", "sawtooth oak", "shingle oak", "scarlet oak", "English oak", "hackberry", "Siberian elm", "tulip-poplar", "sweetgum"]],
+    ["bloom", ["Callery pear", "cherry", "crab apple", "eastern redbud", "flowering dogwood", "hawthorn", "serviceberry", "Japanese tree lilac", "purple-leaf plum", "Kousa dogwood"]],
+    ["camphor", []],          # the rest: lindens, ginkgos and others
+]
+[trees.street.none_in]       # Broadway and Seventh Avenue through Times Square have no street trees
+"Times Square" = [[-73.9881, 40.7556], [-73.9858, 40.7547], [-73.9833, 40.7583], [-73.9843, 40.7609], [-73.9869, 40.7600], [-73.9881, 40.7556]]
+
+[[structures]]
+kind = "suspension"
+name = "George Washington Bridge"
+towers = [[-73.958774, 40.852866], [-73.946531, 40.850467]]   # OSM pylons, 1,066 m apart
+# two lattice legs (four columns each face) and the great portal over the decks
+tower = { width = 65.0, depth = 23.0, height = 184.0, pier = 5.0, columns = [-32.0, -15.5, 15.5, 32.0], column_width = 3.5, column_depth = 23.0, column_top = 15.0, open_legs = 2.5, bracing = [5.0, 180.0], tier = 16.0, portal_bay = 20.0, portal_arch = [118.0, 158.0], cap = 8.0, style = "spire", colour = "#a8aeb2", pier_colour = "#a89f90" }
+cables = { across = [-17.5, -14.8, 14.8, 17.5], low = 80.0, side = [186.0, 198.0], anchor = 60.0, radius = 0.46, below_top = 2.0, colour = "#a8aeb2", deck = 76.0, hangers = 18.0 }
+anchorage = { length = 55.0, width = 85.0, height = 60.0, colour = "#a89f90", which = [1] }
+# the two decks, open side trusses between them
+truss = { top = 75.5, depth = 9.5, across = [-18.0, 18.0], panel = 12.0, floors = [75.0, 66.5], colour = "#9aa0a3" }
+[[structures]]
+kind = "suspension"
+name = "Robert F. Kennedy"
+towers = [[-73.927945, 40.781308], [-73.925444, 40.778032]]   # OSM pylons, 421 m apart
+tower = { width = 30.0, depth = 8.0, height = 96.0, pier = 6.0, columns = [-14.0, 14.0], column_width = 4.0, column_depth = 8.0, column_top = 5.0, bracing = [60.0, 92.0], cap = 5.0, style = "spire", colour = "#8e9a8f", pier_colour = "#a89f90" }
+cables = { across = [-14.0, 14.0], low = 50.0, side = 213.0, anchor = 30.0, radius = 0.3, below_top = 1.0, colour = "#8e9a8f", deck = 46.0, hangers = 12.0 }
+truss = { top = 46.0, depth = 6.1, across = [-14.0, 14.0], panel = 8.0, colour = "#8e9a8f" }
+[[structures]]
+kind = "truss"
+name = "Queensboro Bridge"  # a cantilever truss over both channels, piers on the shores and Roosevelt Island
+width = 18.3                # truss planes 60 ft apart
+piers = [[-73.959130, 40.758877], [-73.955417, 40.757267], [-73.953453, 40.756410], [-73.950357, 40.755072]]   # OSM
+anchors = [[-73.960590, 40.759515], [-73.948926, 40.754441]]
+pier_size = [40.0, 12.0]
+pier_towers = { height = 96.0, spire = 11.0, width = 2.0, depth = 10.0 }
+deck = 41.0
+low = 55.0
+peak = 96.0
+fall = 160.0
+style = "spire"
+colour = "#b09b82"           # tan (repainted), not blue-grey
+pier_colour = "#b4a992"
+[[structures]]
+kind = "truss"
+name = "Hell Gate Bridge"   # the 310 m steel through-arch between stone towers
+shape = "arch"
+width = 18.0
+deck = 43.0
+low = 51.0                  # the upper chord at the towers
+peak = 93.0
+rib = [7.0, 81.0]           # the lower chord: springs from hinges near the water, crowns at 81 m
+tower = { height = 67.0, across = 43.0, along = 30.0 }   # granite-clad towers, 220 ft
+style = "spire"
+colour = "#7a4a44"
+pier_colour = "#b4a992"
+[[structures]]
+kind = "suspension"
+name = "Williamsburg Bridge"
+towers = [[-73.974820, 40.714395], [-73.969458, 40.712758]]   # OSM pylons, 488 m apart
+tower = { width = 38.0, depth = 12.2, height = 101.0, pier = 7.0, columns = [-18.5, -11.2, 11.2, 18.5], column_width = 1.2, column_depth = 12.2, column_top = 10.0, open_legs = 1.5, portal_bay = 15.0, bracing = [7.0, 96.0], cap = 4.0, style = "spire", colour = "#8a8c92", pier_colour = "#b4a992" }
+cables = { across = [-18.2, -11.5, 11.5, 18.2], low = 55.0, side = 180.0, anchor = 25.0, radius = 0.3, below_top = 1.0, colour = "#8a8c92", deck = 55.0, hangers = 6.1 }
+anchorage = { length = 54.0, width = 47.0, height = 24.0, colour = "#b4a992" }
+# two trusses 12.2 m deep, 20.4 m apart, from anchorage to anchorage: the bridge's dominant feature
+truss = { top = 55.0, depth = 12.2, across = [-10.2, 10.2], panel = 9.0, floors = [43.0], colour = "#8a8c92" }
+side_piers = true           # its side spans stand on piers
+
+# The Narrows (far view from Lower Manhattan): the Verrazzano-Narrows Bridge, 1,298 m main span, 211 m towers,
+# two decks about 70 m over the water; towers at the ends of the main span along the OSM outline (way 375153091)
+[[structures]]
+kind = "suspension"
+name = "Verrazzano-Narrows Bridge"
+towers = [[-74.038533, 40.608568], [-74.052668, 40.604000]]
+tower = { width = 36.0, depth = 12.0, height = 211.0, pier = 8.0, columns = [-16.0, 16.0], column_width = 5.5, column_depth = 12.0, column_top = 7.0, bracing = [66.0, 205.0], tier = 46.0, portal_bay = 50.0, cap = 6.0, style = "spire", colour = "#9ca3a8", pier_colour = "#a89f90" }
+cables = { across = [-16.0, -13.5, 13.5, 16.0], low = 80.0, side = 370.5, anchor = 40.0, radius = 0.45, below_top = 2.0, colour = "#9ca3a8", deck = 72.0, hangers = 16.0 }
+anchorage = { length = 70.0, width = 60.0, height = 45.0, colour = "#a89f90" }
+truss = { top = 72.0, depth = 7.3, across = [-15.0, 15.0], panel = 16.0, floors = [71.6, 65.2], colour = "#8f969b" }

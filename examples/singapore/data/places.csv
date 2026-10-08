@@ -1,0 +1,10 @@
+name,lat,lon,kind,note
+The Padang,1.29056,103.85306,park,"Cricket green opposite the former City Hall and Supreme Court (National Gallery) and the Singapore Cricket Club; OSM w21587770 (leisure=pitch, 35,550 m2). Chinese 政府大厦大草场. Camera view: from the Esplanade side or the Cricket Club, the towers of Raffles Place behind."
+Fort Canning Hill,1.29358,103.8466,hill,"Wooded hill over the river, summit ~48 m (OSM node ele 48; Fort Canning Park w16892550, 309,845 m2). Chinese 福康宁山. Not a building: a terrain feature the DEM already holds."
+Boat Quay,1.28685,103.8496,waterfront,"Row of low shophouses on the river bend under the CBD towers; position from Wikidata Q4931498 [believed], not checked against a footprint. Chinese 驳船码头."
+Clarke Quay,1.29002,103.84608,waterfront,"Riverside godowns with the canopy roofs, upstream of Boat Quay; Wikipedia/Wikidata coordinate. Chinese 克拉码头."
+Tiong Bahru estate,1.2861,103.8294,district,"1930s Streamline Moderne SIT flats; Wikidata Q7808727 point (estate centre), outside the Marina Bay-CBD core. Chinese 中峇鲁."
+Tanjong Pagar container terminal,1.268,103.842,port,"Gantry cranes and container yards, being vacated for the Greater Southern Waterfront; APPROXIMATE position [believed] (MP2019 City Terminals subzone), not a footprint. Chinese 丹戎巴葛码头."
+Mount Faber (Faber Point),1.27359,103.81767,hill,"Hill with the cable car to Sentosa; Faber Point ele 106 m in OSM (w46671412), Wikipedia gives ~94-105 m for the hill; Mount Faber Park w343746558 (809,134 m2). Chinese 花柏山."
+Resorts World Sentosa,1.25323,103.82108,resort,"Integrated resort and Universal Studios on Sentosa's north shore: a complex of many buildings, not one footprint; Wikidata Q5955134 point. Chinese 圣淘沙名胜世界."
+Marina Barrage,1.28068,103.87033,waterfront,"Dam that turned Marina Bay into a freshwater reservoir, with the grass-roofed pump house (OSM w150819013, building=service, 22,276 m2, tourism=attraction, no height). A structure across the water, not a tall building. Chinese 滨海堤坝."

@@ -1,0 +1,176 @@
+# Region preset "uk-london": London (M4, 1 Oct 2026), built on "europe-west" (base below): every table of
+# europe-west's (building kinds, roads, markings, trees, cars, shores, rooftop colours) holds here unless this file
+# sets it; [facade.styles] and [facade.osm_style] are London's own (replace: none of Paris's Haussmann, faubourg,
+# house, HBM and post-war styles). Why a preset of its own, not a London section in europe-west.toml: europe-west's
+# facade_styles() and roof_shapes() are APUR's (Paris's period and roof fields, which London has none of), and Paris
+# must stay byte-identical; London's code (presets/uk_london/) takes europe-west's building kinds and rooftop items
+# and adds London's style rules, roof shapes and rooftop programmes.
+#
+# Research: demos/london/data/region_research.md §4 (roofs) and §5 (facades, palettes sampled on Commons photos,
+# demos/data/london/research/region_refs/), listed buildings and conservation areas (planning.data.gov.uk, OGL).
+#
+# LONDON'S FACADE STYLES (new names; the viewer's facade.js draws each, see its "London" section):
+#   georgian   Georgian and early Victorian terraces (1714-1850): London stock brick (yellow-grey, sooted), tall
+#              six-over-six sashes in white frames, a stucco ground floor on some, an iron balcony on the first
+#              floor (piano nobile) on some, a parapet hiding a slate roof (a slate mansard storey on some), party
+#              stacks with pots (Bloomsbury, Marylebone, Mayfair, Kennington, Spitalfields, Greenwich)
+#   stucco     Regency and Nash stucco terraces (1800-1850): painted cream-white stucco all over, rusticated ground
+#              floor, cornice, continuous first-floor balconies, slate mansards on some (Belgravia, Pimlico,
+#              Regent's Park, Bayswater, Carlton House Terrace)
+#   victorian  Victorian terraces (1837-1901): stock brick with red brick bands, white sashes, pitched slate roofs,
+#              party-wall stacks with 4-8 pots (most of Southwark, Lambeth, Tower Hamlets)
+#   mansion    Edwardian and late-Victorian mansion blocks (1880-1914): red brick with Portland stone bands, 5-8
+#              storeys, white frames, slate or red tile roofs (Victoria Street, Marylebone, Pimlico, Hans Town)
+#   portland   Portland stone offices and institutions (Whitehall, the Strand, Kingsway, Regent Street, the City's
+#              banks): rusticated base, punched windows, cornice, flat lead roofs and a slate mansard on some
+#   estate     post-war council estates and slabs (1945-1980): buff and brown brick slabs with concrete deck-access
+#              balconies and window ribbons, flat roofs (Churchill Gardens, Golden Lane, the East End)
+#   warehouse  docks warehouses (1800-1900; Wapping, Shad Thames, Bermondsey, West India Dock): brown stock brick,
+#              small segmental windows, a column of loading doors with iron platforms, flat or low slate roofs
+# Kept (London palettes): glass (curtain walls: dark, grey, green-grey, bronze and silver, not light blue), modern
+# (2000s flats and offices: buff and red brick, render, metal), civic (red brick and stone: schools, hospitals,
+# churches, stations), factory, shed, plain, spire; the landmark styles builders use in landmark_facades.csv: stone,
+# fins, bands, piers, lattice, panel, monument, floodlit, concretepanel (the Barbican, Guy's, Centre Point),
+# brickstone, limestone.
+
+base = "europe-west"
+replace = ["facade.styles", "facade.osm_style"]
+
+[facade.styles.georgian]    # stock brick terraces, tall sashes, parapets (region_research.md §5.2: Cowley St mid #a48e77)
+floor = 3.3
+palette = ["#8f7f68", "#968670", "#857660", "#7a6d5c", "#9c8a6e", "#8a7a64", "#6f6456", "#938268", "#a08d72",
+    "#8f5c46", "#94604a"]                    # (two red: Queen Anne and early Georgian red brick)
+                            # (M4 fix round, critic: Fitzrovia's stock brick read cream in the low sun: pulled a
+                            # step darker and greyer, the sooted yellow-grey of stock brick, not the sampled sunlit mid)
+[facade.styles.stucco]      # painted stucco, Belgravia mid #d8d3cb (p25 #d3ccc2, p50 #d9d3c5)
+floor = 3.5                 # (M4 fix round: cream-white, no yellow ones)
+palette = ["#e2ddd3", "#d8d3cb", "#dcd6ca", "#e6e2da", "#d3cdc3", "#e4e0d8", "#d9d4cc", "#cfcac0"]
+[facade.styles.victorian]   # Ada Rd (Southwark) mid #b89f74, p50 #a88766; sooted #9c8a72; red brick rows
+floor = 3.0
+palette = ["#a48e6c", "#9a8062", "#a08a68", "#8f7f68", "#968670", "#857660", "#9c8a6e", "#9c5f42", "#a46a4e"]   # (M4 fix: a step darker)
+[facade.styles.mansion]     # Cheyne Walk mansion block mid #be7e54, p50 #9c5f42 (pulled to albedo); a few buff ones
+floor = 3.2
+palette = ["#94604a", "#9c6650", "#875444", "#a3705e", "#8c5a4e", "#9a6a56", "#b0a080"]   # (M4 fix round: a little browner, the low sun made them orange)
+[facade.styles.portland]    # Old War Office (sun) #cdbca3, FCO (overcast) #b2ac9d, weathered #a59984
+floor = 4.3                 # (M4 fix round: greyer, fewer warm creams; the low sun makes them beige)
+palette = ["#c4bcaa", "#bdb5a2", "#b2ac9d", "#b9b1a0", "#a59f92", "#cac3b2", "#aea697", "#c1baa9"]
+[facade.styles.estate]      # Churchill Gardens slab #a8a19c (p50 #ac8b68), brown brick #8a4a44, concrete #c8c5bd
+floor = 2.8
+palette = ["#a8a19c", "#ac8b68", "#b09a7a", "#8a4a44", "#9a7a62", "#c8c5bd", "#a39a8c", "#8f6a52"]
+[facade.styles.warehouse]   # Butlers Wharf mid #b89f78, p50 #a0825c
+floor = 3.4
+palette = ["#5f5a54", "#57524c", "#67605a", "#4f4a45", "#6a6159", "#5c544d", "#4a4541"]   # (dark brown-grey stock
+                            # brick: the sampled tones went orange in the low sun, M4 and its fix round's Shad Thames
+                            # critique: "saturated ochre-orange"; the fix round's first try, #6b5e52 and kin,
+                            # still read orange-brown in the 16:15 October sun: near-neutral grey-browns)
+[facade.styles.modern]      # 1990s-2020s flats and lower offices: buff and red brick, white render, grey cladding, terracotta
+floor = 3.2
+palette = ["#b49a78", "#a88a68", "#8e5642", "#8d8a84", "#dcd8cf", "#9a9c9c", "#b0745a", "#5d6266", "#c4bcae", "#a5a39d"]
+[facade.styles.glass]       # curtain walls (the City, Canary Wharf, Nine Elms): dark #2e3744, blue-grey #585e6f,
+floor = 4.0                 # green-grey #6c7f86, silver #afb8c0 sampled; muted, never light blue
+# (M4 fix round, critic: every tower the same near-black navy; the City's cluster is pale silver-grey and grey-blue
+# in daylight, refs/area-city-from-south-bank/02): silver, pale green-grey, blue-grey, grey and a bronze, dark glass
+# one in eight; facade.js (city.json facade.glass.silverFrom) reads the pale ones as coated silver glass
+palette = ["#a9b2b8", "#98a3aa", "#8d9ca0", "#93a09a", "#8496a4", "#7d8b98", "#9aa0a2", "#7f8c90", "#8a8070",
+    "#3d4650", "#a3acb4", "#88979c"]
+[facade.styles.civic]       # schools, hospitals, churches, stations: red brick, stock brick, Portland stone
+floor = 4.4
+palette = ["#8f5440", "#9c5f42", "#a8957a", "#cdbca3", "#b2ac9d", "#8a7e6c", "#a46a4e"]
+[facade.styles.factory]     # depots, workshops, big low halls: brick and grey cladding
+floor = 4.6
+palette = ["#8a8580", "#7f766c", "#9a8f84", "#8a5a46", "#6f6a64", "#a39d94"]
+[facade.styles.shed]        # garages, kiosks, backland sheds
+floor = 3.0
+palette = ["#8a7c68", "#9a958c", "#a9a397", "#7f766c", "#8f5c46"]
+[facade.styles.plain]       # rooftop plant rooms and bulkheads: no windows
+floor = 0.0
+palette = ["#8f8c86"]
+[facade.styles.spire]       # masts and spires: steel
+floor = 0.0
+palette = ["#b8bcc0"]
+# landmark styles (landmark_facades.csv sets their tint)
+[facade.styles.stone]
+floor = 3.8
+palette = ["#cbc5a6", "#e0ded8", "#b8ae9c"]
+[facade.styles.fins]
+floor = 4.1
+palette = ["#55607a"]
+[facade.styles.bands]
+floor = 4.0
+palette = ["#5e7084"]
+[facade.styles.piers]
+floor = 4.1
+palette = ["#3a3d4c"]
+[facade.styles.lattice]
+floor = 5.0
+palette = ["#6a8090"]
+[facade.styles.panel]
+floor = 5.0
+palette = ["#a9adb1"]
+[facade.styles.monument]
+floor = 8.0
+palette = ["#cdbca3"]
+[facade.styles.floodlit]
+floor = 0.0
+palette = ["#9c978d"]
+[facade.styles.concretepanel]   # the Barbican's towers, Guy's, Centre Point (landmark rows)
+floor = 2.9
+palette = ["#c1c4c8", "#b9b0a8", "#a9acb3"]
+[facade.styles.brickstone]  # brick with stone dressings (landmark rows)
+floor = 3.6
+palette = ["#a5674e", "#9c7a64"]
+[facade.styles.limestone]   # cut stone (landmark rows)
+floor = 4.5
+palette = ["#d6ccb6", "#cfc4ab"]
+
+[facade.osm_style]          # style = OSM building tags that set it on the kinds without a style rule of their own
+factory = ["industrial", "manufacture", "hangar", "garages", "parking", "service", "depot"]
+warehouse = ["warehouse"]
+shed = ["kiosk", "shed", "hut", "toilets", "garage"]
+
+# London's style rules (presets/uk_london/__init__.py facade_styles) read these; a city sets the areas
+[facade.london]
+# share of each choice where the rules leave a mix
+stucco_ground = 0.45        # (facade.js) georgian terraces with a stucco ground floor
+office_portland = 0.45      # the City's and Westminster's mid-rise offices: Portland stone, else modern or glass
+office_glass = 0.25
+mansion_west = 0.55         # 5-8 storey blocks west of the City: mansion blocks, the rest modern or estate
+tower_glass_resi = 0.35     # residential towers outside the glass areas: glass, else modern
+georgian_west = 0.6         # low rows in the west outside the Georgian areas: Georgian, the rest Victorian
+
+[rooftops]
+# London's stacks: stock brick (sooted), some red; terracotta pots (region_research.md §4.3: chimney #8a7a62, pots #a5563a)
+stack_cols = [["stock", 5], ["stock2", 3], ["sooty", 3], ["redbrick", 2]]
+pot_cols = [["pot", 6], ["pot2", 3], ["pot_dark", 2]]
+# terraces behind parapets: their stacks stand on the party walls of the flat (hidden) roof
+flat_party = ["georgian", "stucco", "victorian", "mansion", "warehouse"]
+[rooftops.london]
+# London's party-wall stacks (presets/uk_london/rooftops.py london_stack): a flue (pot) every pot_pitch m, two rows
+# from two_rows pots, rising `above` m over the roof; on a footprint of several houses (>= multi_area m2) one every
+# `every` m along each front within `street` m of a street centre line (Georgian house widths), front_d m in from it
+pot_pitch = 0.36
+two_rows = 8
+above = [1.5, 2.5]
+every = [5.0, 7.0]
+front_d = [3.5, 5.5]
+multi_area = 350.0
+street = 14.0
+[rooftops.parapet_t]
+georgian = 0.25
+stucco = 0.3
+mansion = 0.3
+portland = 0.35
+warehouse = 0.3
+estate = 0.25
+modern = 0.25
+glass = 0.3
+[rooftops.named]
+stock = "#8a7a62"
+stock2 = "#9c8a6c"
+sooty = "#6d6253"
+redbrick = "#8a4e3a"
+pot = "#a5563a"
+pot2 = "#93533a"
+pot_dark = "#6e4434"
+slate = "#4d4e4b"
+lead = "#7b7f83"

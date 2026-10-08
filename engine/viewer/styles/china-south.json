@@ -1,0 +1,17 @@
+{
+  "notes": "Southern China's styles (Shenzhen), the root preset: curtain-wall glass, apartment towers, urban villages, factories, malls, civic buildings, blank walls and the landmark skins (stainless fins, spandrel bands, steel lattice, honeycomb, metal panels). The other presets build on it. Keys: styles.js.",
+  "styles": {
+    "glass": { "bay": 1.5, "window": [0.03, 0.24, 0.995], "zone": "office", "roof": { "flat": true }, "parapet": "glass" },
+    "residential": { "bay": 3.4, "window": [0.2, 0.3, 0.86], "shops": "all", "ac": 0.28, "balconies": true, "night": "home", "zone": 2, "parapet": "block" },
+    "village": { "bay": 2.7, "window": [0.24, 0.32, 0.82], "shops": "all", "ac": 0.45, "night": "village", "zone": 1, "parapet": "village" },
+    "factory": { "bay": 6.0, "window": [0.06, 0.55, 0.86], "night": "factory", "zone": 4, "parapet": "factory" },
+    "commercial": { "bay": 4.2, "window": [0.08, 0.22, 0.92], "shops": "all", "night": "mall", "zone": 4, "parapet": "block" },
+    "civic": { "bay": 3.6, "window": [0.12, 0.34, 0.84], "zone": 4, "roof": { "flat": true }, "parapet": "block" },
+    "plain": { "night": "none" },
+    "fins": { "bay": 1.5, "window": [null, 0.03, 0.995], "zone": "office" },
+    "bands": { "bay": 1.5, "window": [0.015, 0.22, 0.995], "zone": "office" },
+    "lattice": { "cell": 10, "pattern": "lattice" },
+    "honeycomb": { "cell": 3, "pattern": "honeycomb" },
+    "panel": { "pattern": "panel" }
+  }
+}

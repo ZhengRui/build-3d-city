@@ -1,0 +1,231 @@
+# Region preset "jp-tokyo": Tokyo (M4, 6 Oct 2026), built on "china-south" (base below): every table of china-south's
+# (roads, markings, trees, cars, shores, rooftop colours) holds here unless this file sets it; [facade.styles] and
+# [facade.osm_style] are Tokyo's own (replace). Its code (presets/jp_tokyo/) gives each BUILDING one kind and one
+# style (PLATEAU's pieces grouped by their parent building, OSM's by their outline) from PLATEAU's usage
+# (usage_name, detailedusage_name), its structure class (wooden "ordinary" or fireproof), storeys, height and lot
+# size; OSM's tag where PLATEAU has none.
+#
+# TOKYO'S FACADE STYLES (the viewer's styles/jp-tokyo.json draws each):
+#   zakkyo     雑居ビル and pencil buildings: narrow (lots under ~300 m²) 4-12 storey shops, bars and offices; tile,
+#              aluminium or painted panel fronts, punched windows, a shop on the ground floor, a stack of vertical
+#              signboards (袖看板) on the street end of the front (Akihabara, Kanda, Shinjuku east, Shibuya Center
+#              Gai, Ginza's side streets, Ueno)
+#   tiled      tiled mid-rise offices and hotels (1960s-90s): beige, brown and white tile (二丁掛, mosaic), horizontal
+#              window bands between tiled spandrels, a light slab edge at each floor
+#   mansion    apartment blocks (マンション) and tower mansions: continuous balconies on every floor with railing
+#              panels (frosted glass, solid or metal bars) and partition boards, sliding doors behind
+#   glass      curtain-wall towers and new offices (Marunouchi, Otemachi, Toranomon, Shiodome, Shibuya): grey,
+#              silver, grey-green and bronze-grey glass (not light blue)
+#   granite    1970s-90s granite and precast towers and the newer towers' stone podiums (Nishi-Shinjuku's first
+#              skyscrapers, the Marunouchi towers' 31 m stone bases): punched windows in a stone grid
+#   depato     department stores and flagships (Ginza, Nihonbashi, Shinjuku, Ikebukuro): stone fronts, few windows
+#   wooden     low houses (木造, 2-3 storeys) of the shitamachi and the residential back streets: mortar, siding,
+#              aluminium sashes, a shop shutter on some
+#   temple     temples and shrines: vermilion or dark timber posts and beams over white plaster
+#   government Kasumigaseki's ministries and public offices: precast and stone grids
+#   civic      schools, hospitals, halls and stations
+# Kept from china-south (landmark styles in landmark_facades.csv): factory, plain, fins, bands, lattice, honeycomb,
+# panel; and `signs` (us-northeast's billboards: the screens of Shibuya's crossing and Shinjuku's east exit, set by
+# [facade.zones] in city.toml).
+#
+# Palettes: sampled from photos of each type (Kanda and Akihabara side streets, Ginza, Nishi-Shinjuku, Asakusa,
+# Kasumigaseki; Wikimedia Commons), pulled to albedo.
+
+base = "china-south"
+replace = ["facade.styles", "facade.osm_style"]
+
+[buildings.osm_kind]        # (with china-south's) temples, shrines, churches, palaces civic; offices, shops and hotels
+palace = "civic"            # never factories
+office = "midrise"
+commercial = "midrise"
+retail = "midrise"
+hotel = "midrise"
+temple = "civic"
+shrine = "civic"
+church = "civic"
+museum = "civic"
+
+# facade styles in the viewer's order: floor = nominal floor height (m), palette = wall colours (glass: the tint)
+[facade.styles.zakkyo]
+floor = 3.3
+palette = ["#c9b9a0", "#a9a7a2", "#dedbd3", "#8a6e57", "#5e5f62", "#d8cfbd", "#c2a899", "#e3ded2", "#b8bbbd",
+    "#9b8a76", "#7d7f82", "#cbbfae"]
+[facade.styles.tiled]
+floor = 3.6
+palette = ["#b49a7c", "#c8b79c", "#8f7660", "#d4cbbb", "#a5998a", "#bfb3a1", "#9c8f80", "#cfc6b6", "#a88a72",
+    "#d9d3c6"]
+[facade.styles.mansion]
+floor = 3.0
+palette = ["#e4e0d6", "#d6c9b3", "#b7a28a", "#8b735f", "#cfcfca", "#e9e3d3", "#c3b8a8", "#dad5ca", "#a8927c",
+    "#bdb9b2"]
+[facade.styles.glass]
+floor = 4.1
+# (M4 fix round: lighter, more silver and light grey; the critic saw near-black slabs in Marunouchi, Toranomon, Odaiba)
+palette = ["#8796a0", "#9aa5ab", "#7a8790", "#aab3b8", "#86948f", "#8f9aa6", "#a19c93", "#73808a", "#b4babd"]
+[facade.styles.granite]
+floor = 3.9
+# (M4 fix round: lighter stone, beige and pale grey granite; the darkest two gone)
+palette = ["#a39e97", "#b5ada2", "#8d8279", "#c4bcb0", "#9c9690", "#ab9d8c", "#d0c9bd", "#968c86"]
+[facade.styles.depato]
+floor = 5.0
+palette = ["#e8e2d4", "#d9cfbb", "#cbc4b8", "#e3d9c5", "#c2bdb4", "#ddd8cf"]   # (M4 fix round: light stone, Ginza's flagships)
+[facade.styles.wooden]
+floor = 2.9
+palette = ["#b9ae9d", "#a99d8b", "#d3cbbb", "#8e8578", "#c7b9a1", "#7c6a58", "#e0d9ca", "#9da2a3", "#6a5f55",
+    "#c4c0b6"]
+[facade.styles.temple]
+floor = 6.0
+palette = ["#d9d2c3", "#5a463a", "#e2ddd1", "#6b5444", "#cfc7b6", "#4e3f35", "#c9c1b0"]   # (M4 fix round) dark timber and white plaster: no all-vermilion boxes (the critic's random red blocks; the vermilion halls are figures)
+[facade.styles.government]
+floor = 3.9
+palette = ["#b3aa9c", "#9f9486", "#c9c2b5", "#8d8478", "#a7a39b", "#bdb4a5"]
+[facade.styles.civic]
+floor = 3.9
+palette = ["#d6cfc0", "#c4b8a5", "#e0ddd4", "#b49d85", "#cfc9bd", "#bfb9ae"]
+[facade.styles.factory]
+floor = 5.0
+palette = ["#e6e6e2", "#d2d5d6", "#c8ced3", "#ddd7c9", "#cfd4cc"]
+[facade.styles.signs]       # walls covered in screens and billboards to 26-58 m, glass above (Shibuya, Shinjuku east)
+floor = 4.0
+palette = ["#4a545e", "#5d6b75", "#3e464e"]
+[facade.styles.plain]       # rooftop plant rooms: no windows
+floor = 0.0
+palette = ["#bdbab3"]
+# landmark styles, set from data/landmark_facades.csv with the tint sampled from photos
+[facade.styles.fins]
+floor = 4.4
+palette = ["#6d8290"]
+[facade.styles.bands]
+floor = 4.2
+palette = ["#5e7084"]
+[facade.styles.lattice]
+floor = 5.0
+palette = ["#6a8090"]
+[facade.styles.honeycomb]
+floor = 5.0
+palette = ["#dfe2e4"]
+[facade.styles.panel]
+floor = 5.0
+palette = ["#a9adb1"]
+
+# (M4 landmarks) figure styles: masts, spires and bridge towers (steel, no windows), monuments floodlit after dark
+# (us-northeast's, by name; after every other style, so no building's style id changes)
+[facade.styles.spire]
+floor = 0.0
+palette = ["#a8adb0"]
+[facade.styles.floodlit]
+floor = 0.0
+palette = ["#9c978d"]
+
+[facade.osm_style]          # style = OSM building tags (OSM-only buildings; PLATEAU's usage wins where it has one)
+tiled = ["office", "hotel", "commercial", "retail"]
+mansion = ["apartments", "residential", "dormitory"]
+wooden = ["house", "detached", "terrace", "semidetached_house"]
+factory = ["industrial", "warehouse", "factory", "manufacture", "shed", "hangar"]
+civic = ["school", "university", "college", "kindergarten", "hospital", "train_station", "civic", "public",
+    "transportation", "stadium", "sports_hall", "museum"]
+government = ["government"]
+temple = ["temple", "shrine", "church"]
+
+# Tokyo's rules' numbers (presets/jp_tokyo/__init__.py); a city may set areas ([lon0, lat0, lon1, lat1] boxes)
+[facade.tokyo]
+zakkyo_area = 300.0         # m²: a commercial building's lot under this is a 雑居ビル / pencil building
+zakkyo_min_h = 8.0          # (lower: a shop house)
+depato_area = 1500.0        # m²: a commercial building over this and under depato_max_h a department store
+depato_max_h = 70.0
+tower_h = 100.0             # from here offices are towers: glass, granite on granite_share
+granite_share = 0.25        # towers in granite/precast outside the granite areas
+granite_area_share = 0.7    # in the granite areas (Nishi-Shinjuku's 1970s towers)
+podium_h = 40.0             # a tower's pieces under this (and under podium_k of its top) are its stone podium
+podium_k = 0.45
+granite_areas = []
+government_areas = []       # OSM-only buildings here are government (PLATEAU leaves out Kasumigaseki)
+flagship_areas = []         # Ginza Chuo-dori, Omotesando: mid-size commercial fronts glass or stone flagships
+
+[rooftops.parapet_t]
+zakkyo = 0.2
+glass = 0.3
+[rooftops.named]            # (with china-south's) rooftop billboards' boards
+sign_white = "#e8e6df"
+sign_red = "#b3262b"
+sign_yellow = "#e0b52a"
+sign_blue = "#2c4f93"
+sign_green = "#2f7a4a"
+
+# ---------------------------------------------------------------- M6 (7 Oct 2026): Tokyo's street trees and traffic
+# Street trees (the viewer's slots as web/city.json trees.species dresses them: broadleaf = ginkgo (first slot, 3 roads
+# in 5) or zelkova (second), flowering = cherry (Somei Yoshino) and dogwood; no palms). Tokyo's roadside trees by count:
+# ginkgo first, then cherry, zelkova, dogwood, plane (Tokyo Metropolitan Government's street-tree survey); many narrow
+# streets and the zakkyo back streets have none (no sidewalk to plant): planted 0.75 of the major roads, 0.3 of the minor
+[trees.street]
+planted = { major = 0.75, minor = 0.3 }
+[trees.street.odds]
+major = [["flowering", 0.12]]
+minor = [["flowering", 0.25]]
+[trees.street.height]
+flowering = [6, 9]
+broadleaf = { major = [10, 15], minor = [7, 11] }
+
+# Cars driving on the left (city.toml drive): Japan's mix, white and pearl ~30 %, black ~20 %, silver and grey ~20 %;
+# kei cars (the 3.4 m box wagons: N-BOX, Tanto, Spacia) on the van's model, about a third of the small streets'
+# traffic; Toyota's JPN Taxi (deep indigo, most of Tokyo's fleet since 2017) and the companies' black, green, yellow
+# and cream cabs; Toei's and the private lines' buses; white delivery vans and box trucks (Yamato, Sagawa, Japan Post)
+[cars]
+types = [
+    ["sedan", 4.70, 1.80, 1.45],     # Prius, Crown, Corolla, Camry, the German imports
+    ["suv", 4.60, 1.85, 1.70, "crossover"],   # RAV4, Harrier, Yaris Cross, CX-5
+    ["taxi", 4.40, 1.70, 1.75],      # JPN Taxi, Crown Comfort, with the roof sign
+    ["van", 4.70, 1.70, 1.95],       # HiAce, Alphard and Noah MPVs
+    ["bus", 10.5, 2.49, 3.10],       # Toei's and the private lines' single-deckers (Hino Blue Ribbon, Isuzu Erga)
+    ["truck", 6.5, 2.20, 3.00],      # 2-4 t box trucks (Elf, Dutro, Canter)
+    ["lorry", 12.0, 2.49, 3.80],     # 10 t box trucks and the bay's container tractors
+    ["kei", 3.40, 1.48, 1.75, "van"],          # kei box wagons (N-BOX, Tanto, Spacia, Hustler)
+    ["moto", 1.95, 0.72, 1.15],      # scooters (delivery and commuters)
+]
+parked_mix = [34, 16, 0, 20, 0, 4, 0, 26, 0]
+# Tokyo has little kerb parking (garage certificates, metered bays on a few streets; coin parking lots instead)
+[cars.kerbside]
+tertiary = 0.03
+residential = 0.1
+unclassified = 0.1
+living_street = 0.15
+road = 0.08
+service = 0.12
+# speed m/s, mean gap m, queue factor, mix [sedan, suv, taxi, van, bus, truck, lorry, kei, moto]
+[cars.class]
+motorway = [17, 40, 0.9, [36, 18, 6, 12, 1, 12, 8, 5, 2]]
+trunk = [13, 34, 0.35, [30, 15, 18, 12, 3, 9, 3, 8, 2]]
+primary = [11, 32, 0.3, [28, 13, 24, 11, 4, 7, 1, 10, 2]]
+secondary = [10, 38, 0.3, [28, 13, 22, 12, 3, 6, 0, 13, 3]]
+tertiary = [8, 55, 0.3, [27, 13, 18, 13, 2, 5, 0, 18, 4]]
+residential = [6, 100, 0.4, [24, 12, 8, 16, 0, 4, 0, 32, 4]]
+unclassified = [6, 100, 0.4, [24, 12, 8, 16, 0, 5, 0, 30, 5]]
+living_street = [4, 160, 0.5, [24, 12, 5, 16, 0, 3, 0, 36, 4]]
+road = [6, 100, 0.4, [24, 12, 8, 16, 0, 4, 0, 32, 4]]
+service = [5, 180, 0.5, [26, 12, 4, 18, 0, 5, 0, 31, 4]]
+[cars.palettes]
+sedan = [["#ecedeb", "", 18], ["#f4f3ee", "", 10], ["#d9d7cf", "", 3], ["#b5b8bb", "", 11], ["#8d9196", "", 6],
+    ["#5c6066", "", 5], ["#16171a", "", 17], ["#25272b", "", 4], ["#1f3254", "", 6], ["#7d1d22", "", 4],
+    ["#6b5442", "", 3], ["#a99d86", "", 2], ["#3d4f45", "", 1]]
+suv = [["#ecedeb", "", 20], ["#f4f3ee", "", 10], ["#b5b8bb", "", 11], ["#8d9196", "", 7], ["#5c6066", "", 7],
+    ["#16171a", "", 18], ["#1f3254", "", 6], ["#7d1d22", "", 5], ["#6b5442", "", 3], ["#3d4f45", "", 3]]
+# JPN Taxi deep indigo (Nihon Kotsu, the Tokyo Musen group, most fleets), black, Checker green and orange-cream,
+# yellow, the cream-and-green and white-and-red company liveries, maroon
+taxi = [["#1d2445", "#1d2445", 52], ["#141518", "#141518", 18], ["#2b6e4a", "#e6e2d2", 7], ["#e8b221", "#e8b221", 5],
+    ["#e3dfcf", "#2c6a3e", 6], ["#ecedeb", "#c03a2b", 5], ["#6e1f2a", "#6e1f2a", 4], ["#2f4f8a", "#e6e2d2", 3]]
+van = [["#ecedeb", "", 55], ["#b5b8bb", "", 12], ["#16171a", "", 14], ["#5c6066", "", 6], ["#2c4a78", "", 3],
+    ["#c8281f", "", 3], ["#a99d86", "", 4], ["#f4f3ee", "", 3]]
+# Toei: ivory with the yellow-green band and skirt; Tokyu red band, Keio and Odakyu blue, Seibu blue-green (shares
+# over the area; the lines don't keep to districts in the core)
+bus = [["#76ad3e", "#eceee6", 60], ["#c8333a", "#eceee8", 12], ["#2f5fa8", "#eceee8", 12], ["#7a2f3a", "#eceee8", 6],
+    ["#3b8a7a", "#eceee8", 6], ["#e2a33a", "#eceee8", 4]]
+# cab, cargo box: white boxes (Yamato's, Sagawa's lettering), Japan Post red, blue and green cabs
+truck = [["#ecedeb", "#ecedeb", 34], ["#ecedeb", "#3d6e47", 10], ["#ecedeb", "#2a5aa8", 12], ["#c8281f", "#c8281f", 9],
+    ["#2a5aa8", "#e6e6e1", 12], ["#5c6066", "#c9ccc6", 10], ["#2c7447", "#e6e6e1", 8], ["#e3b021", "#e6e6e1", 5]]
+lorry = [["#ecedeb", "#d9d9d4", 30], ["#2a5aa8", "#d9d9d4", 15], ["#2c7447", "#d0d2cc", 12], ["#e9e9e5", "#2a5aa8", 13],
+    ["#5c6066", "#b9bdc1", 15], ["#c9332c", "#d9d9d4", 8], ["#e3b021", "#d9d9d4", 7]]
+kei = [["#ecedeb", "", 24], ["#f4f3ee", "", 10], ["#b5b8bb", "", 8], ["#16171a", "", 12], ["#c9c3a8", "", 8],
+    ["#8fb3c4", "", 6], ["#d9c46a", "", 5], ["#a8c49a", "", 4], ["#c25a4e", "", 5], ["#5c6066", "", 6],
+    ["#e9d6c2", "", 6], ["#2c4a78", "", 6]]
+moto = [["#16171a", "", 30], ["#ecedeb", "", 25], ["#b5b8bb", "", 15], ["#a32028", "", 12], ["#2c4a78", "", 10],
+    ["#2e7d46", "", 8]]

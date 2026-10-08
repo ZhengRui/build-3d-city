@@ -1,0 +1,572 @@
+# Paris: the 20 arrondissements, La Défense and the Axe historique through Neuilly. Every city-specific setting
+# of the build-3d-city pipeline; the engine (.agents/skills/build-3d-city/engine/pipeline, its README lists every
+# key with its default) and the region preset "europe-west" hold the rest. Run a stage with
+# `uv run city3d <stage>` from this folder, everything with `uv run city3d all`.
+
+name = "paris"
+title = "Paris"
+preset = "europe-west"      # Western Europe's (its building kinds are Paris's since M2, facades and roofs since M4; rooftops Paris's since M6: chimney stacks and pots, Velux, lanterns; flat-roof plant)
+utm_epsg = 32631            # UTM 31N (Paris is at 2.35 E, zone 31 spans 0-6 E); Lambert-93 (2154) is the French data's
+coast = false               # inland: the Seine is a river 26 m above the sea, no coastline within 100 km
+drive = "right"
+# metres per storey for OSM building:levels (on ~60-70 % of Paris's buildings; height on 0-2 %, Phase 0): a
+# Haussmann block is a 4-4.5 m ground floor and entresol, 3.2-3.5 m étages nobles and 2.8-3.0 m upper and
+# mansard floors, about 20 m to the cornice and 23 m to the ridge for its 7 levels (R+6): 3.3 m on average
+level_h = 3.3
+user_agent = "3D-Fun paris reconstruction (hobby project)"
+# overpass-api.de answered best for Paris during Phase 0 (30 Sept 2026; the others mostly timed out)
+# Local Overpass first: the public servers were blocked/overloaded from this network on 30 Sept 2026 (and answer
+# heavy queries with 429/504). 127.0.0.1:8799 is Docker container city3d-overpass, built from BBBike's Paris
+# extract of 26 Sept 2026 (demos/data/overpass/README.txt); if it is down: `docker start city3d-overpass`.
+overpass = ["http://127.0.0.1:8799/api/interpreter", "https://overpass-api.de/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter", "https://overpass.private.coffee/api/interpreter"]
+
+# the user's boundary (30 Sept 2026): all 20 arrondissements (admin_level 9; together the Ville de Paris,
+# relation 7444, 105.4 km² with the Bois de Boulogne and de Vincennes), one district each so the reports count
+# them apart
+[districts]
+"Paris 1er" = 20727
+"Paris 2e" = 9542
+"Paris 3e" = 20742
+"Paris 4e" = 9597
+"Paris 5e" = 20873
+"Paris 6e" = 9527
+"Paris 7e" = 9521
+"Paris 8e" = 20872
+"Paris 9e" = 9537
+"Paris 10e" = 9528
+"Paris 11e" = 9533
+"Paris 12e" = 9525
+"Paris 13e" = 9530
+"Paris 14e" = 9522
+"Paris 15e" = 9520
+"Paris 16e" = 9517
+"Paris 17e" = 9519
+"Paris 18e" = 9531
+"Paris 19e" = 9552
+"Paris 20e" = 9529
+# La Défense's business district, one clip over the three communes it spans: the dalle inside the Boulevard
+# circulaire (now Boulevard Patrick-Devedjian) with the towers just outside it (Société Générale's Chassagne and
+# Alicante to the west in Nanterre, Emblem, Hopen and Sequana to the north; M2: Les Poissons and Les Gémeaux at
+# Place Charras to the north-east, Tour France on the Puteaux quay to the south), the Grande Arche, the CNIT and Les
+# Quatre Temps, and the Esplanade down to the Seine at the Pont de Neuilly (the communes end mid-river, where
+# Neuilly's strip begins). South edge along the ring's outer side, clear of old Puteaux
+"La Défense (Puteaux)" = { relation = 91776, clip = [[2.2288, 48.8878], [2.2288, 48.8935], [2.2335, 48.8952], [2.2375, 48.8975], [2.2425, 48.8977], [2.2475, 48.8962], [2.2540, 48.8963], [2.2565, 48.8932], [2.2600, 48.8925], [2.2600, 48.8840], [2.2495, 48.8845], [2.2495, 48.8823], [2.2458, 48.8823], [2.2458, 48.8848], [2.2400, 48.8849], [2.2335, 48.8858], [2.2288, 48.8878]] }
+"La Défense (Courbevoie)" = { relation = 91768, clip = [[2.2288, 48.8878], [2.2288, 48.8935], [2.2335, 48.8952], [2.2375, 48.8975], [2.2425, 48.8977], [2.2475, 48.8962], [2.2540, 48.8963], [2.2565, 48.8932], [2.2600, 48.8925], [2.2600, 48.8840], [2.2495, 48.8845], [2.2495, 48.8823], [2.2458, 48.8823], [2.2458, 48.8848], [2.2400, 48.8849], [2.2335, 48.8858], [2.2288, 48.8878]] }
+"La Défense (Nanterre)" = { relation = 85799, clip = [[2.2288, 48.8878], [2.2288, 48.8935], [2.2335, 48.8952], [2.2375, 48.8975], [2.2425, 48.8977], [2.2475, 48.8962], [2.2540, 48.8963], [2.2565, 48.8932], [2.2600, 48.8925], [2.2600, 48.8840], [2.2495, 48.8845], [2.2495, 48.8823], [2.2458, 48.8823], [2.2458, 48.8848], [2.2400, 48.8849], [2.2335, 48.8858], [2.2288, 48.8878]] }
+# Neuilly-sur-Seine: 275 m either side of Avenue Charles-de-Gaulle (the N13, bearing 116°, 1.9 km from the
+# Pont de Neuilly to the Porte Maillot), so the Axe historique from the Arc de Triomphe to the Grande Arche has
+# buildings all the way; the clip runs past both ends and the commune's own boundary trims it
+"Neuilly-sur-Seine (Axe historique)" = { relation = 85802, clip = [[2.2548, 48.8892], [2.2846, 48.8797], [2.2814, 48.8752], [2.2516, 48.8847], [2.2548, 48.8892]] }
+
+[sun]                       # 10 October, leaves still green (the viewer works its sun out from city.json's sun.date)
+latitude = 48.86
+declination = -6.8
+
+[sources]
+# official footprints first (M1, checks/report.md): APUR's Emprise bâtie in the 20 arrondissements (one polygon per
+# building part, heights measured from its surface model), IGN's BD TOPO in La Défense and Neuilly (APUR's
+# Paris layer stops at the Périphérique; its metropolitan layer merges the towers with the dalle there). OSM
+# fills what they lack and gives the towers and monuments their building:parts
+footprints = ["apur", "bdtopo", "osm"]
+# APUR's measured heights where it is the footprint; BD TOPO's own in La Défense and Neuilly, and BD TOPO's under
+# any other footprint it covers (OSM's fill in Paris, the few APUR parts without a height); OSM's tags after
+# (height on 0-2 % of Paris's buildings, levels on ~60 %). Why this order: checks/report.md §8
+heights = ["landmark", "apur", "bdtopo", "osm_height", "osm_levels", "default"]
+dem = "ign"                 # bare earth: IGN LiDAR HD MNT (1 m), its voids and pits filled from RGE ALTI 5 m
+backdrop = "ign"            # RGE ALTI at 25 m out to 36 km: bare earth in the same datum (NGF-IGN69), no step at the edge
+
+[sources.apur]              # APUR Emprise bâtie Paris (ODbL; "Source : Apur, DGFiP, Ville de Paris (STDF), Orthophotoplans (Aerodata)")
+adapter = "file"
+path = "footprints/apur/emprise_batie_paris.geojson"
+# opendata.apur.org's Hub download API (the service behind it, carto2.apur.org, resets TLS from China)
+url = "https://opendata.apur.org/api/download/v1/items/85fa0a4303744ad4ab6e2a89882b5fca/geojson?layers=0"
+label = "APUR"
+districts = ["Paris 1er", "Paris 2e", "Paris 3e", "Paris 4e", "Paris 5e", "Paris 6e", "Paris 7e", "Paris 8e",
+    "Paris 9e", "Paris 10e", "Paris 11e", "Paris 12e", "Paris 13e", "Paris 14e", "Paris 15e", "Paris 16e",
+    "Paris 17e", "Paris 18e", "Paris 19e", "Paris 20e"]
+# heights above ground from APUR's surface model less its terrain model, over the footprint: the median for
+# ordinary buildings (it matches BD TOPO's hauteur to 0.04 m), the maximum for high-rise parts (b_igh, the
+# IGH flag) over 60 m, where the median reads a stepped tower's lower wings (Tours Duo 83 m for 180). Not the
+# maximum on every part over 60 m: on 43 ordinary parts it is a crane, a chimney or a spire; nor on an IGH part
+# whose median is under 0.4 of its maximum (M2): a podium with a tower's edge in it (the Tribunal's 8,965 m²
+# base, median 30 m, maximum 98 m) or a low piece beside one (39 m² at 3.6 m median, 95 m maximum). Every IGH
+# tower's median is 0.45 of its maximum or more (Duo 1: 83 of 185)
+height = "where((b_igh == 'O') & (h_max >= 60) & (h_med >= 0.4 * h_max), h_max, h_med)"
+# (M2: c_perconst, the construction period, 98 % filled; c_tissu, the urban fabric (HBM, IGH, ER remarkable, TPE
+# small-scale, TI industrial...); b_dalle, courtyard covers: the building kinds, region_research.md §5.3)
+keep = ["n_sq_eb", "an_const", "c_perconst", "c_tissu", "b_dalle", "c_forme_toit", "c_toiture_mat", "b_terrasse", "b_igh",
+    "c_morpho", "h_med", "h_max"]
+rename = { al_med_mnt = "ground_elevation" }    # the ground's altitude (m NGF), for 03_compare's check against the DEM
+# the Eiffel Tower is a [[structures]] figure (M4), not a building: APUR draws it as 8 stacked and footing parts
+# (1889, high-rise flag; 41-321 m at the centre, the four pillars' feet 33-38 m)
+drop = { n_sq_eb = [750072856, 750131110, 750102857, 750118957, 750100068, 750006810, 750011556, 750040628] }
+
+[sources.bdtopo]            # IGN BD TOPO v3, layer batiment (Licence Ouverte Etalab 2.0; "Source : IGN, BD TOPO")
+adapter = "file"
+# from the Géoplateforme WFS (BDTOPO_V3:batiment, EPSG:2154, 1 km cells, paged; raw/footprints/README.txt)
+# (+ M2: the strip south of La Défense's first box, 48.8818-48.8856 N, fetched the same way for the widened clip's
+# Puteaux notch: Tour France)
+path = ["footprints/bdtopo/bdtopo_v3_batiment_paris_defense_neuilly.gpkg", "footprints/bdtopo/bdtopo_v3_batiment_defense_south.gpkg"]
+layer = "batiment"
+label = "BD TOPO"
+districts = ["La Défense (Puteaux)", "La Défense (Courbevoie)", "La Défense (Nanterre)", "Neuilly-sur-Seine (Axe historique)"]
+height = "hauteur"          # m above the ground (one per building); exact on La Défense's towers (First 228.9)
+keep = ["cleabs", "nature", "usage_1", "construction_legere", "nombre_d_etages", "date_d_apparition", "etat_de_l_objet"]
+rename = { altitude_minimale_sol = "ground_elevation" }
+# its use, nature and light-construction flag and date onto APUR's footprints in Paris too (the building kinds:
+# churches, monuments, industrial buildings, annexes; a year where APUR has none)
+lend = ["usage_1", "nature", "construction_legere", "date_d_apparition"]
+# planned and ruined buildings; the Eiffel Tower's four nested outlines ("Tour, donjon", 42-286 m)
+drop = { etat_de_l_objet = ["En projet", "En ruine"], cleabs = ["BATIMENT0000000000162158", "BATIMENT0000000000162159", "BATIMENT0000000000162160", "BATIMENT0000000000162699"] }
+
+[sources.ign]               # IGN (Licence Ouverte Etalab 2.0): raw rasters from the Géoplateforme WMS-Raster (raw/dem/README.txt)
+ground = "dem/ground/paris_ground_mnt_lidarhd_1m_l93.tif"
+fill = "dem/ground/paris_ground_rgealti_5m_l93.tif"
+backdrop = "dem/backdrop/paris_backdrop_rgealti_25m_l93.tif"
+
+[buildings]
+parts = true                # ~7.2k building:part outlines in Paris (the Louvre, Notre-Dame, the Invalides; La Défense's towers)
+# the Eiffel Tower is a [[structures]] figure (M4), not a building: OSM draws it as its 330 m outline (way 5013364,
+# building=tower) and stacked building:parts (the platforms, piers and roofs, the 1st floor's pavilions, the
+# pillars' feet), all solid prisms. APUR's and BD TOPO's own parts of it are dropped in [sources.*] drop
+exclude = { osm = ["w5013364", "w1462597762", "w308021389", "w308687753", "w308687752", "w308687748", "w308687745",
+    "w308687744", "w1462597765", "w1462597764", "w1462597763", "r4114842", "r4114839", "w308689164", "w308689165",
+    "w308689166", "w308689167", "w308145239", "w308145258", "w308145259", "w69034135", "w69034180", "w69034179",
+    "w69034127",
+    "w229301758"] }         # Hyatt Regency Étoile: a 0 m² part at 137-174 m (the hotel is 137 m)
+# wrong OSM height tags (M2; landmarks_paris.csv): the Hyatt's outline 174 (137); Tour Duo 2 tagged like Duo 1 (180
+# for 122); Notre-Dame's two 73 m parts on its 69 m towers
+osm_fix = { r3074643 = 137.0, w942459281 = 122.0, w201611273 = 69.0, w201611274 = 69.0 }
+# La Défense's dalle (and the Front de Seine's, the Olympiades'): BD TOPO's and APUR's heights count from the old
+# ground under the slab, the terrain carries the slab: lower a building by the difference where it is over 5 m
+# (a slope under a footprint gives 1-3 m); see 04_buildings slab_base and checks/buildings.md
+slab_drop = 5.0
+# BD TOPO's only (La Défense; Neuilly has no slab): APUR's ground altitude is its own terrain model, which already
+# carries the slabs in Paris (median −0.13 m against the lidar); where it differs by 5+ m inside Paris it is noise
+# on the hills and under big buildings (Belleville 30 m, Saint-Sulpice 5-7 m), not a slab. Tried on all sources
+# in M2: 352 lowered and 47 dropped, many of them wrongly
+slab_sources = ["bdtopo"]
+# second opinions: OSM's height tag only (the preset's). NOT BD TOPO's (tried in M2): its polygons hold a building
+# with its courtyard sheds and decks, which APUR draws apart, so it raised 1,159 APUR pieces by a median 21.6 m, 396
+# of them under 50 m² (courtyard sheds to their building's roof) and the BnF's 46,800 m² esplanade deck from 0.1 m
+# to 90 m. APUR's low readings on monuments (the Sacré-Cœur) are covered by their OSM parts
+
+[ground]
+town = true                 # the petite couronne beyond the districts: a painted roofscape, not bare paving
+# M7: past the Périphérique the painted town read as "an empty beige plain ... like farmland", La Défense alone in a
+# field. The petite couronne's OSM buildings (Overpass) raised as block masses (06e_masses) over the ground margin
+# and 3 km on into the backdrop (buildings of 9 m and more), thinning out there so the town has no edge
+masses = true
+masses_reach = 3000.0
+# the Seine steps down at its dams (Port-à-l'Anglais above Paris, Suresnes below: 26.7 m NGF through Paris, 23.4
+# below), the Marne at Saint-Maurice, the canals at their locks (Canal Saint-Martin: 9 locks, 25 m): each pool
+# is levelled on its own
+pools = true
+# French formal gardens: their allées and parterres are "stabilisé" (compacted gravel) round the mapped lawns and
+# beds (OSM maps the lawns inside: 18-27 % of these gardens); the Champ de Mars is lawns, left green
+gravel_parks = ["Jardin des Tuileries", "Jardin du Luxembourg", "Jardin du Palais Royal"]
+# the parks' and the Bois' paths through the lawns (the Champ de Mars' and Tuileries' gravel allées are
+# pedestrian areas; footpaths 2-3 m, the Bois' bridle paths 3 m); pedestrian areas (area=yes) are cut out whole
+paths = { footway = 2.6, path = 2.0, cycleway = 2.6, bridleway = 3.0, steps = 2.5, pedestrian = 4.0 }
+# M5: the squares and parvis cut out of the lawns (Notre-Dame's parvis read as bare brown soil and weedy lots):
+# stone pedestrian areas (paving_stones, sett, concrete, untagged) and asphalt ones as layers of their own
+paved = true
+# M5 critic: saturated lawn strips along sidewalks where the street has none (Bd Saint-Germain, Quai de Conti): OSM
+# grass slivers narrower than this left out
+green_min_width = 3.5
+# M5 critic: the Notre-Dame parvis a flat grey field: it is a multipolygon (r8726561), which the paths query missed
+path_relations = true
+[ground.green]
+# no cemetery: Père-Lachaise, Montparnasse and Montmartre are stone tombs and paved alleys under trees, not
+# lawn (their trees come from 08_trees' "landuse=cemetery" = "park"); flowerbeds are green
+landuse = ["grass", "forest", "meadow", "farmland", "orchard", "recreation_ground", "village_green", "flowerbed"]
+
+[roads]
+lane_w = 3.2                # French city lanes are 3.0-3.25 m (CERTU), 3.5 m only on the big arterials and the Périphérique
+footbridges = true          # the Pont des Arts, the Passerelles Senghor, Debilly and Simone-de-Beauvoir are footways
+decks_ref = "water"         # the named decks below count from the water under them, level across the islands
+decks_level = true          # ... from the water's level, not the lowest ground under the span (the quay walls drop the water cells beside the quays 6 m: the decks there stood 6 m low)
+# The Seine's bridges: deck height over the water (the Paris pool at 3.55, below Suresnes 0.47; m). Paris's arch
+# bridges run nearly level from quay to quay, their crowns about 0.8 m over the upper quays' lidar height at their
+# ends (lower quartile of the deck ends from 05b's pins, + 0.8 m, less the water; scratch decks.py, 30 Sept), not
+# the default 5 % ramps from both ends that humped them 2-4 m over the quays. Two-level crossings: the Métro 6
+# viaduct 7 m over its boulevards (OSM's layer 2 made it 15) and 7 m over the road decks of the Pont de Bir-Hakeim
+# and the Pont de Bercy where it crosses the river; line 5 onto the Viaduc d'Austerlitz; line 1 inside the Pont de
+# Neuilly under its roadway; tram T3a on the Pont du Garigliano's deck; Métro 2 7.5 m over the Boulevards de la
+# Chapelle and de la Villette, level over the Gare du Nord's and the Gare de l'Est's tracks (the grade line had it 11-14 m up)
+decks = { "Pont Alexandre III" = 8.4, "Pont Charles de Gaulle" = 10.7, "Pont Louis-Philippe" = 8.9, "Pont Marie" = 10.6, "Pont Mirabeau" = 7.4, "Pont National" = 12.5, "Pont Nelson Mandela" = 10.8, "Pont Neuf" = 10.6, "Pont Notre-Dame" = 10.3, "Pont Royal" = 9.7, "Pont Saint-Louis" = 9.3, "Pont Saint-Michel" = 8.6, "Pont au Change" = 9.1, "Pont d'Arcole" = 8.6, "Pont d'Austerlitz" = 10.6, "Pont d'Issy" = 8.8, "Pont d'Iéna" = 9.7, "Pont de Bercy" = 9.0, "Pont de Bir Hakeim" = 9.5, "Pont de Charenton" = 9.7, "Pont de Courbevoie" = 12.0, "Pont de Grenelle" = 8.6, "Pont de Neuilly" = 11.7, "Pont de Puteaux" = 9.1, "Pont de Sully" = 8.7, "Pont de Suresnes" = 10.2, "Pont de Tolbiac" = 8.9, "Pont de l'Alma" = 8.4, "Pont de l'Archevêché" = 8.0, "Pont de la Concorde" = 8.8, "Pont de la Tournelle" = 9.6, "Pont des Invalides" = 8.0, "Pont du Carrousel" = 8.1, "Pont du Garigliano" = 14.8, "Pont du Maréchal-Juin" = 8.8, "Pont des Arts" = 8.0, "Passerelle Léopold-Sédar-Senghor" = 8.5, "Passerelle Debilly" = 8.0, "Métro 6" = { deck = 7.0, water = 16.5 }, "Métro 2" = { deck = 7.5, reach = 120.0 }, "Métro 5" = { deck = 7.5, water = 12.0 }, "Métro 1" = { deck = 7.5, water = 10.5 }, "Tram T3a" = { deck = 7.5, water = 14.3 } }
+# Deck heights, Oct 2026 (after the outline decks followed their roads): with decks_level the spans stand at
+# their values over the pool, not 6 m lower over the quay walls' foot (the Pont de Sully 6.2 m mid-river, 11.5 at its
+# quays; the Pont Neuf, Austerlitz, Charles de Gaulle, Saint-Michel, Arcole, Carrousel, Issy the same). The Pont de
+# l'Archevêché 6.6 -> 8.0 (it dipped 1.2 m under its left-bank end). The Pont de Puteaux crests over the Île de
+# Puteaux (its roads meet it there at 15.8-16.0 m, the banks at 8.1-8.6, 120-130 m away): its spans lay level at
+# 9.1 over the water 6 m under the island's roads and climbed 20 % to them; eased (below) they rise at 6.5 % to it.
+# (left: the Pont de Neuilly's island roads meet it at 12.2, 14.2 and 12.2 m within 38 m, pinned: a 2 m bump there)
+decks_ease = { "Pont de Puteaux" = 0.065 }
+# M3 critic: the Pont d'Iéna drew as two 3.2 m bus lanes over open water (its carriageway is highway=service since the
+# 2024 pedestrianisation, its pavements dropped as "along a road bridge"), and every bridge as a thin slab with no
+# piers. Each named deck's OSM man_made=bridge outline is drawn whole as a slab (checks/bridges.md), with piers in
+# the water: span -> [spans (arches), fascia depth m], from data/landmarks_paris.md's bridges table (stone arch
+# bridges 2.5 m fascias, iron and steel ones less; single spans no piers)
+bridge_outlines = true
+# M4 critic: every bridge a thin flat slab on box piers. Each entry now also names its type (engine BRIDGE_TYPES:
+# stone arches cut from the elevation, iron and concrete low segmental arches, girders with a flat soffit),
+# with the arch's rise over its span where it isn't the type's: from data/landmarks_paris.md's bridges table and
+# the reference photos (refs/pont-neuf, pont-alexandre-iii); [spans, crown depth m, type(, rise)] or a table
+[roads.piers]               # span -> [spans, crown depth m, type(, rise)] or {spans, fascia, type, ...} (see above)
+"Pont de Neuilly" = [5, 1.6, "stone", 0.18]
+"Pont d'Iéna" = { spans = 5, fascia = 1.5, type = "stone", arch = "segment", rise = 0.14 }
+"Passerelle Debilly" = [1, 1.0, "iron", 0.1]
+"Pont de l'Alma" = { spans = 1, fascia = 2.0, type = "girder", body = "#8b8a84" }
+"Pont des Invalides" = [3, 1.5, "stone", 0.2]
+"Pont Alexandre III" = { spans = 1, fascia = 1.2, type = "iron", rise = 0.06, body = "#5a605a", pylons = [17.0, 6.0, "#c9bc9d", 5.0, "#b8913a"] }
+"Pont de la Concorde" = { spans = 5, fascia = 1.5, type = "stone", arch = "segment", rise = 0.13 }
+"Passerelle Léopold-Sédar-Senghor" = [1, 1.0, "iron", 0.1]
+"Pont Royal" = [5, 1.6, "stone", 0.36]
+"Pont du Carrousel" = { spans = 3, fascia = 1.4, type = "stone", arch = "segment", rise = 0.12 }
+"Pont des Arts" = { spans = 9, fascia = 0.9, type = "iron", rise = 0.16, pier_t = 0.12, parapet = [1.0, 0.1, "#39403d"] }
+"Pont Neuf" = { spans = [7, 5], fascia = 1.4, type = "stone", rise = 0.42, cutwater = "round", bastions = true }
+"Pont au Change" = [3, 1.5, "stone", 0.2]
+"Pont Notre-Dame" = [3, 1.5, "stone", 0.2]
+"Pont Saint-Michel" = [3, 1.5, "stone", 0.22]
+"Pont d'Arcole" = [1, 1.2, "iron", 0.08]
+"Pont Louis-Philippe" = [3, 1.5, "stone", 0.22]
+"Pont Marie" = [5, 1.5, "stone", 0.36]
+"Pont de la Tournelle" = [3, 1.5, "stone", 0.2]
+"Pont de l'Archevêché" = [3, 1.4, "stone", 0.3]
+"Pont Saint-Louis" = [1, 1.2, "iron", 0.08]
+"Pont de Sully" = [5, 1.2, "iron", 0.12]
+"Pont d'Austerlitz" = [5, 1.2, "iron", 0.12]
+"Pont de Bercy" = { spans = 5, fascia = 1.5, type = "stone", rise = 0.25, upper = "Métro 6", columns = [5.0, 0.9, "#c4b596"] }
+"Pont de Tolbiac" = [5, 1.5, "stone", 0.25]
+"Pont National" = [5, 1.5, "stone", 0.25]
+"Pont Charles de Gaulle" = { spans = 3, fascia = 2.5, type = "girder", body = "#bdb6a8", piers = "#bdb6a8" }
+"Pont Mirabeau" = [3, 1.2, "iron", 0.1]
+"Pont de Bir Hakeim" = { spans = 6, fascia = 1.6, type = "girder", upper = "Métro 6", columns = [7.0, 0.45, "#4b5652"] }
+"Pont de Grenelle" = { spans = 2, fascia = 1.8, type = "girder" }
+"Pont du Garigliano" = { spans = 3, fascia = 2.0, type = "girder", body = "#bdb6a8", piers = "#bdb6a8" }
+# (kerb-to-kerb widths of untagged ways: the europe-west preset's [roads.default_w], Paris's since M5/M6, checked
+# against the facade-to-facade gaps there)
+
+[markings]
+dedupe = 0.6                # M3 critic: doubled lane dashes where OSM's carriageways overlap (Voie Georges-Pompidou, Avenue de New York)
+
+[shores]
+coast_type = "quay"         # (no coast inland: only banks and pools; kept for the record)
+# the Seine's and the canals' banks are masonry quay walls (lower quays 2-3 m over the water; the wall is the
+# lidar terrain's step): granite coping and a stone face, not the default concrete embankment
+bank_type = "pondedge"
+quay_walls = true           # the quays' walls ([terrain] quay_walls): limestone ashlar to the water, a sett apron on top
+quay_face = 2.5             # M3 critic: small triangular spikes every 20-30 m along the walls (the TIN's quay cells, a
+                            # staircase on the 5 m grid, peeking out of the wall face 1.5 m out): the face 2.5 m out
+quay_apron = 5.0            # M3 critic: the 8 m aprons from both sides paved the Square du Vert-Galant's whole tip (5: the TIN's quay cell)
+# M5 critic: the drop from the upper to the lower quay was a faceted TIN slope with grass wedges and saw-tooth edges;
+# real quays are two flat stone terraces and a vertical dressed-stone wall 5-8 m high between them
+step_walls = true
+step_slope = 20.0           # the left bank's embankments by the Pont Neuf are 20-30 degree TIN slopes over 2-3 cells, not one
+step_close = 6.0            # blocks under 12 m apart merged into one wall (the Quai de Conti drew as a row of separate blocks)
+
+[terrain]
+# M7: coloured by height (wooded from 25 m over the datum) the plateaus round Paris (40-180 m) were one dark forest;
+# ESA WorldCover's land cover instead: the forests of Montmorency, Saint-Germain, Meudon and Sénart, the fields of the
+# Plaine de France and Saclay, the towns between
+backdrop_cover = "worldcover"
+backdrop_town_rgb = [112, 110, 104]   # the ground between the towns' buildings from afar (asphalt, paving, gardens), close to the town layer's own mean
+far_reach = 36000.0         # the backdrop: the Seine's valley, Mont Valérien, the Meudon and Saint-Cloud heights, the Plaine de France
+# IGN lidar at 5 m kept sharp: the Seine's quay walls (lower quays 2-3 m over the water, upper quays 5-8 m more)
+# are one grid cell wide, not a 50 m slope (the defaults' 10 m grid, 20 m TIN cells and 15 m smoothing)
+work = 5.0
+tin_cell = 5.0
+smooth_bare = 2.5
+tin_error = 2.0             # as New York's lidar (1.5: 714k ground triangles; 2.0: 566k)
+tin_error_far = 4.0
+tin_error_bank = 0.5        # within 40 m of the water: the lower quays (ports) stay a step, not a slope to the upper quay
+tin_steps = 3.0             # M3 critic: rows of light spikes where the upper quay drops to the lower (Quai Branly, Conti) and
+                            # along La Défense's Boulevard circulaire: every node on such a step kept, a clean one-cell ramp
+# the water's banks are walls: nothing flattened round a levelled body (defaults 25 m flat, 90 m ramp)
+water_flat = 0.0
+water_ramp = 5.0
+flat_spread = 3.0
+water_all_touched = false   # on the 5 m grid the cell by a quay wall is the quay's: the road along it stays up
+# Ground = metres over NGF-IGN69 minus this datum, so the lowest real ground is 0 (05a_terrain clamps what is lower).
+# 23.4 m is the Seine's surface below the Suresnes barrage: the lidar's flat water reads 23.4-24.0 m from Croissy
+# and Bougival to Saint-Ouen (its floor 23.4 m along 15 km of river; Paris's own pool above Suresnes reads 26.8-27.0).
+# NOT the raw lowest cell (16.5 m at 48.8711, 2.1575: gravel pits at Croissy, Sartrouville and Gennevilliers, a
+# few hectares of lidar returns below the water level, not ground anyone walks on)
+datum = 23.4
+# M3 critic: the banks read as sloping TIN embankments. Quay walls: the first land cells along levelled water
+# take their quay's height and the water cells beside them drop 6 m, so the step sits in one TIN cell that
+# 05e_shores covers with a vertical limestone wall at the water's outline and a flat apron ([shores] quay_walls)
+quay_walls = true
+# La Défense's dalle (M3 critic: roads out from under the slab, TIN shards and lidar lumps): Le Parvis (OSM
+# relation 8630709, simplified; the Grande Arche's foot to the CNIT), the Place de la Défense (r8827960) and the
+# Esplanade du Général de Gaulle (r8908456), each held on its own plane; roads under them are covered (05b)
+dalles = [
+    [[2.23673, 48.89155], [2.23467, 48.89219], [2.23447, 48.89242], [2.23474, 48.89289], [2.23526, 48.89332], [2.23563, 48.89351], [2.23707, 48.89294], [2.23789, 48.89336], [2.23801, 48.89325], [2.2375, 48.89264], [2.24035, 48.89174], [2.23967, 48.89081], [2.23762, 48.89147], [2.23714, 48.89147], [2.23696, 48.89118], [2.23673, 48.89155]],
+    [[2.2397, 48.89079], [2.24035, 48.89174], [2.24086, 48.89147], [2.24104, 48.89171], [2.24223, 48.89133], [2.24205, 48.89114], [2.24278, 48.89091], [2.2426, 48.89063], [2.24155, 48.891], [2.24118, 48.89054], [2.24139, 48.89042], [2.24122, 48.8902], [2.24034, 48.89043], [2.23987, 48.89061], [2.2397, 48.89079]],
+    [[2.24473, 48.89001], [2.24586, 48.88985], [2.24573, 48.88964], [2.24812, 48.88916], [2.24793, 48.8887], [2.24618, 48.88898], [2.24446, 48.88932], [2.24277, 48.88989], [2.24267, 48.8901], [2.24303, 48.89059], [2.24282, 48.89085], [2.24448, 48.89053], [2.24483, 48.89021], [2.24473, 48.89001]],
+]
+# M3 critic: halfway down the Square Louise-Michel under the Sacré-Cœur, a 10 m pit in the lidar ground (76.5 and
+# 73.5 m among 83-87 m at 48.8856, 2.3433: a structure dug into the hillside) read as a dark building in a torn
+# hole with tan flaps round it: re-filled from the slope round it
+patches = [
+    [[2.34275, 48.88545], [2.34375, 48.88545], [2.34375, 48.88578], [2.34275, 48.88578], [2.34275, 48.88545]],
+]
+# named summits, for checks/terrain.md: lon, lat, surveyed height (m, NGF-IGN69; left out: not checked). Points
+# and heights from OSM's natural=peak nodes (IGN benchmarks nearby agree within a metre) unless noted
+[terrain.peaks]
+"Butte Montmartre (by the Sacré-Cœur; Paris's high point)" = [2.34172, 48.88692, 130]   # 130.53 m, Cimetière du Calvaire; the Sacré-Cœur's parvis ~129 m
+"Belleville (rue du Télégraphe)" = [2.39940, 48.87442, 128]    # 128.64 m; the Parc de Belleville's belvedere below it is ~108 m
+"Buttes-Chaumont (the park's high ground)" = [2.38490, 48.87950]   # the often cited 103 m isn't sourced; IGN lidar reads 96.8 m here (the Belvédère de la Sibylle's island 89.5 m), so no height to check against
+"Montagne Sainte-Geneviève (Panthéon)" = [2.34723, 48.84468, 61]
+"Mont Valérien" = [2.21350, 48.87280, 162]   # the fort's hill in Suresnes, 3 km south-west of La Défense: ground area, not districts
+# other named points for checks/dem.md (lon, lat, [expected m]); the scene height is read off them
+[terrain.spots]
+"Seine at Pont Neuf (the user's point: the Île de la Cité's tip, Square du Vert-Galant)" = [2.3413, 48.8570]
+"Seine at Pont Neuf (the river's surface, south arm)" = [2.3413, 48.8565]
+"La Défense's dalle" = [2.2400, 48.8920]
+"Place de la Concorde" = [2.3212, 48.8656]
+
+# the classical ensembles (M4): their buildings are dated and kinded like the faubourg around them, but they are
+# cut stone (the Rue de Rivoli's arcades, 1802-55; Place Vendôme, 1699-1720; the Palais-Royal's galleries) and
+# Louis XIII brick and stone (Place des Vosges, 1605-12): a building whose inside point is in the zone
+[facade.zones]
+"Rue de Rivoli (arcades, Concorde to Rohan)" = { style = "limestone", polygon = [[2.33635, 48.86266], [2.33605, 48.86224], [2.32345, 48.86619], [2.32375, 48.86661], [2.33635, 48.86266]] }
+"Place Vendôme" = { style = "limestone", polygon = [[2.3281, 48.8664], [2.3307, 48.8664], [2.3307, 48.8687], [2.3281, 48.8687], [2.3281, 48.8664]] }
+"Palais-Royal" = { style = "limestone", polygon = [[2.3364, 48.8633], [2.3385, 48.8633], [2.3385, 48.8668], [2.3364, 48.8668], [2.3364, 48.8633]] }
+# the Louvre's wings and pavilions (unnamed APUR footprints but the Richelieu wing): the palace kind of the monument
+# style (arched windows between pilasters, slate mansards), not the housing grid (M4 critic)
+"Palais du Louvre (wings)" = { style = "monument", variant = 0.3, polygon = [[2.3300, 48.8614], [2.3322, 48.8636], [2.3390, 48.8616], [2.3412, 48.8604], [2.3400, 48.8590], [2.3372, 48.8592], [2.3300, 48.8604], [2.3300, 48.8614]] }
+"Place des Vosges" = { style = "brickstone", polygon = [[2.3644, 48.8548], [2.3667, 48.8548], [2.3667, 48.8563], [2.3644, 48.8563], [2.3644, 48.8548]] }
+
+[cars]                      # 06d_cars (M6): the tables are the preset's; Paris's own streets without kerbside rows
+deck_ends = true            # a lane meeting a bridge deck takes the deck's height at their node, not the ground's (quay walls read the river bed there)
+# the quays' expressways (the voies sur berge left to traffic), the Champs-Élysées and the Rue de Rivoli (bus and
+# bike lanes along the kerbs), the Périphérique
+no_kerbside = ["Voie Georges-Pompidou", "Voie Georges Pompidou", "Voie Mazas", "Avenue des Champs-Élysées",
+    "Rue de Rivoli", "Boulevard Périphérique"]
+
+[tiles]
+pillars_in_water = true     # the Seine's bridges stand on piers in the river (masonry arches, few single spans)
+
+# landmark structures the building table can't make (stages/structures.py). The Eiffel Tower (M4): a lattice tower
+# in the frame of its four piers, which OSM puts 69.8-69.9 m from their mean along the grid's north/east (facing
+# 44.8: its faces look NE, SE, SW and NW; UTM 31N, whose grid north is 0.5 degrees off true north here). Plan
+# from OSM's parts (m from the centre): piers 35.4-61.8 (a 123.6 m square, 26.4 m legs), 1st deck 35.3 half
+# (57.63 m), 2nd 20.1 (115.73 m), the legs above it 6.8-17.0 (the parts 115.73-276.13 m), 3rd 8.6 (276.13 m);
+# heights from the SETE (landmarks_paris.md); the arches, the legs' inner edges and the tops' proportions from
+# the reference photos (refs/eiffel-tower/01, 05). Colour: Eiffel brown in three shades, darkest at the base
+# (landmark_facades.md: #7a6a58 the sun/shade mean; the renderer's light makes the sunlit side). Night (M8):
+# style floodlit (variant = floodlight strength); the gold, the sparkle and the beacon are to come.
+[[structures]]
+kind = "lattice_tower"
+name = "Tour Eiffel"
+at = [2.2945009, 48.8582612]
+facing = 44.8
+height = 330
+style = "floodlit"
+variant = 0.6
+colours = [[0, "#7a6754"], [120, "#857260"], [300, "#8f7e69"]]
+colour = "#857260"
+segment = 6.0
+legs = [
+    { profile = [[0, 61.8, 35.4], [15, 53.5, 28.5], [30, 45.4, 21.4], [45, 37.4, 14.6], [57.63, 31.0, 10.0], [80, 24.2, 5.8], [100, 19.9, 4.0], [115.73, 17.3, 3.6]], chord = 0.085 },
+    { profile = [[115.73, 17.0, 6.8], [150, 14.6, 6.0], [190, 12.3, 5.4], [230, 10.3, 5.0], [276.13, 8.4, 4.6]], chord = 0.12 },
+]
+faces = [[99, 115.73], [115.73, 276.13]]
+arches = { spring = 14, crown = 38, rib = 4.5, depth = 1.6, inset = 1.0, top = 50.5, period = 2.5 }
+belts = [[50.5, 57.63, 35.3, 2.2, "#6b5b4a"], [111.8, 115.73, 20.1, 1.8, "#6b5b4a"], [273.8, 276.13, 9.0, 1.2, "#665747"]]
+floors = [[57.63, 35.3, 13.0, 1.0], [115.73, 20.1, 7.0, 0.8], [120.5, 16.5, 7.0, 0.6]]
+railings = [[57.63, 63.5, 35.0], [115.73, 118.6, 19.8], [120.5, 122.5, 16.3], [279.11, 282.0, 8.8]]
+frustums = [[281.0, 296.5, 6.6, 4.2]]
+boxes = [
+    [-0.6, 60.8, -25.3, 25.9, 6.4, 13.4, "#7d756b"], [-0.5, 60.8, 24.5, 25.8, 6.4, 13.4, "#7d756b"],
+    [-24.0, 60.8, -0.2, 14.5, 6.4, 26.3, "#7d756b"],          # the 1st deck's pavilions (OSM: Ferrié, Eiffel, Madame)
+    [0, 277.6, 0, 16.6, 3.0, 16.6, "#4f4b45"], [0, 279.4, 0, 17.6, 0.6, 17.6],   # the glazed 3rd deck, the upper deck
+    [0, 297.5, 0, 11.0, 2.0, 11.0], [0, 299.7, 0, 5.0, 2.4, 5.0],                # the campanile's top and lantern
+    [48.6, 0.4, 48.6, 26.4, 0.8, 26.4, "#a89e8c"], [-48.6, 0.4, 48.6, 26.4, 0.8, 26.4, "#a89e8c"],
+    [48.6, 0.4, -48.6, 26.4, 0.8, 26.4, "#a89e8c"], [-48.6, 0.4, -48.6, 26.4, 0.8, 26.4, "#a89e8c"],   # the piers
+]
+tubes = [[[0, 300.9, 0], [0, 318, 0], 1.1, "#8d8274"], [[0, 318, 0], [0, 324, 0], 0.7, "#b9b5ad"],
+    [[0, 324, 0], [0, 330, 0], 0.35, "#d8d6d0"]]
+
+# M10b: the three columns of the great squares, which 04_buildings drops as needles (OSM w227757683, w227762241,
+# w72937686): figures of lofted sections (the shafts, round), prisms (square pedestals, the obelisk's stepped
+# taper) and tubes (the statues), at OSM's centroids; heights from OSM and Wikipedia, the parts' proportions
+# from photos (est.). Bronze dark green-brown, the Génie and the pyramidion gilt.
+# The Colonne de Juillet (Place de la Bastille, 1840): 47 m to the Génie's torch (OSM 46.3); a round white
+# marble base (OSM's 255 m2 outline), a square marble pedestal, the bronze column (3.6-4 m) with its capital,
+# balcony and lantern, the gilt Génie de la Liberté (4 m).
+[[structures]]
+kind = "figure"
+name = "Colonne de Juillet"
+at = [2.369139, 48.853166]
+facing = 0
+style = "floodlit"
+variant = 0.5
+colour = "#4d4a3c"
+top = 47
+sections = [[10.8, 0, 0, 2.6, 2.6], [12, 0, 0, 2.1, 2.1], [37.4, 0, 0, 1.8, 1.8], [37.6, 0, 0, 2.3, 2.3], [39, 0, 0, 2.8, 2.8], [39, 0, 0, 1.3, 1.3], [42.5, 0, 0, 1.3, 1.3], [43.3, 0, 0, 0.35, 0.35]]
+prisms = [[[[8.50, 0.00], [7.85, 3.25], [6.01, 6.01], [3.25, 7.85], [0.00, 8.50], [-3.25, 7.85], [-6.01, 6.01], [-7.85, 3.25], [-8.50, 0.00], [-7.85, -3.25], [-6.01, -6.01], [-3.25, -7.85], [-0.00, -8.50], [3.25, -7.85], [6.01, -6.01], [7.85, -3.25]], 0, 3.0, "#d6d0c2"], [[[-3.3, -3.3], [3.3, -3.3], [3.3, 3.3], [-3.3, 3.3]], 3.0, 10.0, "#cfc8b8"]]
+boxes = [[0, 10.4, 0, 7.4, 0.8, 7.4], [0, 39.4, 0, 5.4, 0.5, 5.4]]
+tubes = [[[0, 43.3, 0], [0, 46.0, 0], 0.45, "#c9a84e"], [[0, 45.6, 0], [0.4, 47.0, 0.2], 0.12, "#c9a84e"],
+    [[-1.0, 45.2, -0.3], [1.0, 45.2, -0.3], 0.22, "#c9a84e"]]
+
+# The Colonne Vendôme (1810, re-erected 1875): 44.3 m (OSM); a square bronze-clad pedestal (OSM's 41 m2: 6.4 m) on
+# a stone step, the column (3.6 m) under its spiral of bronze reliefs, the capital and gallery, the lantern and
+# dome, Napoleon as Caesar (bronze)
+[[structures]]
+kind = "figure"
+name = "Colonne Vendôme"
+at = [2.329438, 48.867473]
+facing = 3
+style = "floodlit"
+variant = 0.5
+colour = "#56523f"
+top = 44.3
+sections = [[7.2, 0, 0, 2.1, 2.1], [8.2, 0, 0, 1.9, 1.9], [36.5, 0, 0, 1.75, 1.75], [36.7, 0, 0, 2.1, 2.1], [38, 0, 0, 2.6, 2.6], [38, 0, 0, 1.1, 1.1], [41.5, 0, 0, 1.1, 1.1], [42.3, 0, 0, 0.4, 0.4]]
+prisms = [[[[-3.6, -3.6], [3.6, -3.6], [3.6, 3.6], [-3.6, 3.6]], 0, 0.8, "#bdb5a5"], [[[-3.1, -3.1], [3.1, -3.1], [3.1, 3.1], [-3.1, 3.1]], 0.8, 6.5]]
+boxes = [[0, 6.85, 0, 6.6, 0.7, 6.6], [0, 38.3, 0, 4.6, 0.5, 4.6]]
+tubes = [[[0, 42.3, 0], [0, 44.3, 0], 0.32]]
+
+# The Obélisque de Louxor (Place de la Concorde, erected 1836): 33.37 m with its pedestal (OSM); a red granite
+# shaft of 22.83 m (2.44 m square at the foot, 1.54 m under the pyramidion), here five stepped prisms, its gilt
+# pyramidion (1998) on a grey granite pedestal of about 10.5 m
+[[structures]]
+kind = "figure"
+name = "Obélisque de Louxor"
+at = [2.321131, 48.865476]
+facing = 25
+style = "floodlit"
+variant = 0.5
+colour = "#c9a84e"
+top = 33.37
+sections = [[31.9, 0, 0, 1.09, 1.09], [33.37, 0, 0, 0.05, 0.05]]
+prisms = [[[[-3.0, -3.0], [3.0, -3.0], [3.0, 3.0], [-3.0, 3.0]], 0, 1.6, "#a29a8e"], [[[-2.0, -2.0], [2.0, -2.0], [2.0, 2.0], [-2.0, 2.0]], 1.6, 10.5, "#968e83"],
+    [[[-1.22, -1.22], [1.22, -1.22], [1.22, 1.22], [-1.22, 1.22]], 10.5, 14.78, "#b19a88"],
+    [[[-1.13, -1.13], [1.13, -1.13], [1.13, 1.13], [-1.13, 1.13]], 14.78, 19.06, "#b19a88"],
+    [[[-1.04, -1.04], [1.04, -1.04], [1.04, 1.04], [-1.04, 1.04]], 19.06, 23.34, "#b19a88"],
+    [[[-0.95, -0.95], [0.95, -0.95], [0.95, 0.95], [-0.95, 0.95]], 23.34, 27.62, "#b19a88"],
+    [[[-0.86, -0.86], [0.86, -0.86], [0.86, 0.86], [-0.86, 0.86]], 27.62, 31.9, "#b19a88"]]
+
+# The Petit Palais' dome over its entrance on the Avenue Winston-Churchill (1900): a stone drum and a grey dome
+# (heights est. from photos: top about 36 m over the 22 m palace); the palace itself is its OSM outline
+[[structures]]
+kind = "figure"
+name = "Petit Palais dome"
+at = [2.31446, 48.86605]
+facing = 270
+style = "floodlit"
+variant = 0.3
+colour = "#8b9096"
+top = 36.5
+sections = [[25, 0, 0, 8.0, 8.0], [27.5, 0, 0, 7.6, 7.6], [30, 0, 0, 6.6, 6.6], [32, 0, 0, 5.0, 5.0], [33.4, 0, 0, 3.0, 3.0], [34, 0, 0, 1.4, 1.4], [34, 0, 0, 0.9, 0.9], [36, 0, 0, 0.9, 0.9], [36.5, 0, 0, 0.2, 0.2]]
+prisms = [[[[8.30, 0.00], [7.67, 3.18], [5.87, 5.87], [3.18, 7.67], [0.00, 8.30], [-3.18, 7.67], [-5.87, 5.87], [-7.67, 3.18], [-8.30, 0.00], [-7.67, -3.18], [-5.87, -5.87], [-3.18, -7.67], [-0.00, -8.30], [3.18, -7.67], [5.87, -5.87], [7.67, -3.18]], 18, 25, "#d6cbb3"]]
+
+# M6 trees: the city's own inventories inside the districts, invented trees elsewhere (the Luxembourg and other
+# state gardens the city doesn't list, the Bois' woods away from the drives, the 4 km margin). Ville de Paris
+# "Les arbres" (ODbL, 220,215 trees: streets, gardens, cemeteries, schools, the Bois' drives; heights are class
+# values, 9 % unknown) for the 20 arrondissements; for La Défense and Neuilly the Hauts-de-Seine département's
+# road trees (genus, height) and its "cadastre vert" (Etalab 2.0; every crown seen from the air, its diameter,
+# no species or height). Groups are the viewer's species (city.json trees.species), eight of them: 3 bits
+[trees]
+# M5 critic: the Concorde "sprinkled with trees", odd trees on the Notre-Dame parvis: no invented trees on the paved and
+# asphalt squares (the inventory's own stay)
+none_on_paved = true
+
+[trees.street.census]
+species_bits = 3
+groups = [
+    ["plane", ["Platanus"]],
+    ["chestnut", ["Aesculus"]],
+    ["lime", ["Tilia"]],
+    ["sophora", ["Styphnolobium", "Sophora", "Robinia", "Gleditsia", "Gymnocladus", "Koelreuteria", "Ailanthus", "Toona", "Pterocarya", "Juglans", "Cladrastis", "Maackia"]],
+    ["maple", ["Acer", "Liquidambar", "Parrotia"]],
+    ["pine", ["Pinus", "Taxus", "Cedrus", "Chamaecyparis", "Cupressus", "Picea", "Abies", "Thuja", "Sequoiadendron", "Sequoia", "Metasequoia", "Taxodium", "Juniperus", "Larix", "Pseudotsuga", "Cryptomeria", "Cupressocyparis", "Calocedrus", "Araucaria", "Ginkgo"]],
+    ["small", ["Prunus", "Pyrus", "Malus", "Cercis", "Magnolia", "Lagerstroemia", "Amelanchier", "Cornus", "Crataegus", "Corylus", "Ligustrum", "Sorbus", "Photinia", "Laburnum", "Albizia", "Ilex", "Arbutus", "Eriobotrya", "Mespilus", "Cotinus", "Syringa", "Hibiscus"]],
+    ["broadleaf", []],      # the rest: hackberry, oak, ash, hornbeam, elm, poplar, beech, birch, tulip tree ...
+]
+# green areas in the districts with this many listed trees a hectare have only those (parks, cemeteries); the
+# cells round each listed tree get no invented one
+cover = { per_ha = 12, cells = 1 }
+[[trees.street.census.sources]]   # Paris: every domanialité inside the 20 arrondissements (the Bois included)
+file = "raw/trees/les-arbres.geojson"
+districts = ["Paris 1er", "Paris 2e", "Paris 3e", "Paris 4e", "Paris 5e", "Paris 6e", "Paris 7e", "Paris 8e", "Paris 9e", "Paris 10e", "Paris 11e", "Paris 12e", "Paris 13e", "Paris 14e", "Paris 15e", "Paris 16e", "Paris 17e", "Paris 18e", "Paris 19e", "Paris 20e"]
+species = "genre"
+height_field = "hauteurenm"
+dbh = "circonferenceencm"   # trunk circumference: a plane of 100 cm about 12 m, 130 cm 14 m, 225 cm 22 m
+height = [3.0, 0.085, 3.0, 32.0]
+jitter = 0.08               # heights are classes (5, 6, 8, 10 ... m)
+[[trees.street.census.sources]]   # Hauts-de-Seine: trees on the departmental roads (genus, height)
+file = "raw/trees/hauts-de-seine/voirie_dept.geojson"
+districts = ["La Défense (Puteaux)", "La Défense (Courbevoie)", "La Défense (Nanterre)", "Neuilly-sur-Seine (Axe historique)"]
+species = "genre"
+height_field = "hauteur"
+dbh = "circonference"
+height = [3.0, 0.085, 3.0, 30.0]
+jitter = 0.05
+[[trees.street.census.sources]]   # ... and every other crown of the cadastre vert: height from its diameter
+file = "raw/trees/hauts-de-seine/cadastre_vert_arbres.csv"
+districts = ["La Défense (Puteaux)", "La Défense (Courbevoie)", "La Défense (Nanterre)", "Neuilly-sur-Seine (Axe historique)"]
+sep = ";"
+latlon = "geo_point_2d"
+dbh = "diametre"            # crown diameter: 6 m about 9 m tall, 10 m about 13 m
+height = [2.5, 1.05, 4.0, 24.0]
+dedupe = 3.0                # the road trees are in it too
+
+# camera presets for the viewer's menu (M3 on): areas and landmarks as in New York's city.toml. Areas:
+# [lon, lat, distance m, elevation degrees(, azimuth looked from(, target's lift over the ground m))]; the
+# afternoon sun (16:15 CEST in October) stands in the south-west, so most views look from the south-south-west
+[blocks]                    # 07b_blocks: 2 km blocks, so the first view waits for less of the dense centre (M9)
+size = 2000
+
+[views]
+[views.areas]
+# the start view is city.json's startView (the Île de la Cité: the overview would wait for the whole city before it shows); the overview first in the menu
+"Paris overview" = [2.3300, 48.8620, 12500, 34, 200]
+"Île de la Cité and the Seine" = [2.3480, 48.8540, 1500, 26, 235]
+"Louvre and Tuileries" = [2.3310, 48.8625, 1500, 28, 200]
+"Place de la Concorde" = [2.32113, 48.86548, 480, 18, 200, 10]   # M10b: from over the Seine (south-south-west): the Luxor obelisk on the square, the Hôtel de la Marine and the Crillon, the Rue Royale to the Madeleine
+"Champs-Élysées from the Arc" = [2.3045, 48.8702, 950, 10, 295, 20]   # from over the Arc (its top at 50 m) down the avenue to the Concorde
+"Latin Quarter" = [2.3450, 48.8480, 1400, 28, 200]
+"Marais" = [2.3600, 48.8590, 1300, 28, 200]
+"Montparnasse" = [2.3220, 48.8425, 1500, 26, 200]
+"Bercy and the BnF" = [2.3780, 48.8345, 1800, 26, 200]
+"Belleville and the Buttes-Chaumont" = [2.3825, 48.8798, 1000, 22, 210]   # M10: the park's cliffs and lake with the Temple de la Sibylle, Belleville's hill behind
+"La Défense (overview)" = [2.2395, 48.8920, 1700, 20, 140]
+"Roofs of the 9e" = [2.3390, 48.8745, 380, 14, 215, 25]   # the "toits de Paris" (refs/area-zinc-roofs): ~115 m up over the zinc mansards east of the Opéra, looking north-east along them, chimney stacks in rows on the party walls
+"Canal Saint-Martin (locks)" = [2.3650, 48.8735, 380, 16, 190, 0]   # M10: up the canal past the Récollets locks and the iron footbridges, from the south
+"Avenue de l'Opéra (street level)" = [2.3325, 48.8688, 350, 3.0, 158, 20]   # on the avenue's axis (bearing 338) from the Palais-Royal end, ~40 m up, the Opéra at the end
+"Boulevard Saint-Germain (street level)" = [2.34225, 48.85162, 250, 6, 290]   # M6: down the plane-lined boulevard (Odéon to Maubert, bearing 110) from ~30 m
+"The Seine from the Pont des Arts" = [2.3420, 48.8568, 380, 1.0, 290, 5]   # near the water, the Vert-Galant's tip and the Pont Neuf ahead
+"Eiffel Tower from the Trocadéro" = [2.294496, 48.858262, 750, 12, 315, 90]   # the tower is a structure from M4; the view is fixed from now
+"Pont Alexandre III" = [2.31354, 48.86365, 190, 7, 262, 6]   # from downstream (west): the one low steel arch and the four pylons
+
+[views.landmarks]
+"Arc de Triomphe" = ["Arc de Triomphe", 115, 260, 6]      # from the Champs-Élysées (ESE) along the axis, the great arch open (M3 critic)
+"Notre-Dame" = ["Cathédrale Notre-Dame de Paris", 250]       # the west front
+"Sacré-Cœur" = ["Basilique du Sacré-Cœur", 190]
+"Panthéon" = "Panthéon"
+"Invalides dome" = ["Dôme des Invalides (église du Dôme)", 190]
+"Opéra Garnier" = ["Opéra Garnier (Palais Garnier)", 160]
+"Centre Pompidou" = ["Centre Pompidou", 250, 330, 18]     # from over the piazza: the west front's escalator tubes
+"Musée d'Orsay" = ["Musée d'Orsay", 330, 480, 18]          # from across the Seine (the Tuileries' quay): the old station's front and clocks
+"Grande Arche" = ["Grande Arche de La Défense", 290]         # from the Esplanade's side, through the arch
+
+# the menu's groups: the city's areas, the three ground-level views, La Défense's towers together, then the
+# landmarks with the Eiffel Tower among them (a first-time visitor finds the must-sees in one place)
+[views.groups]
+"Street and river" = ["Avenue de l'Opéra (street level)", "Boulevard Saint-Germain (street level)", "The Seine from the Pont des Arts", "Roofs of the 9e", "Canal Saint-Martin (locks)"]
+"Landmarks" = ["Eiffel Tower from the Trocadéro", "Pont Alexandre III"]
+
+# M8 night: the Ville de Paris public lighting inventory (ODbL; raw/lamps/README.txt): every open-air lamp at its
+# place, height and colour temperature (06e_lamps); tunnels (SOUTERRAINS), galleries, floodlights, ground
+# lights and RATP doors are left out. Default heights: candélabres 7 m (the most common support), wall consoles
+# 5.5 m (4-6 m brackets on facades), arcade ceilings and wall lamps 3.5 m
+[lamps]
+path = "lamps/eclairage-public.geojson"
+label = "Ville de Paris, Eclairage public (ODbL)"
+skip_categories = ["SOUTERRAINS"]
+kinds = { "Candélabre" = [7.0, 2.5, 16.0], "Console" = [5.5, 3.0, 12.0], "Mat" = [8.0, 3.0, 16.0], "Lanterne" = [4.5, 2.0, 10.0], "Applique" = [3.5, 2.0, 8.0], "Plafond" = [3.5, 2.0, 8.0], "Borne" = [1.0, 0.5, 2.0], "Portique" = [6.0, 3.0, 12.0] }
+fields = { kind = "lib_ouvrag", category = "voie_categorie", height = "support_hauteur", kelvin = "lampe_temperature_couleur", family = "lampe_famille", power = "lampe_puissance", flux = "lampe_flux" }

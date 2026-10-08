@@ -1,0 +1,209 @@
+{
+  "title": "Tokyo 3D",
+  "nativeTitle": "東京",
+  "startView": "Marunouchi and the Imperial Palace",
+  "about": "Central Tokyo: Marunouchi, Otemachi and the Imperial Palace, Hibiya and Kasumigaseki, Ginza, Nihonbashi, Tsukiji and Shiodome, Toranomon and Azabudai, Tokyo Tower, Roppongi and Akasaka, Tsukishima, Kachidoki and Harumi, Rainbow Bridge and Daiba; Kanda, Akihabara, Ueno's south, Asakusabashi and Kuramae, Asakusa and the Tokyo Skytree; Yotsuya, Aoyama, Jingu Gaien and Shinjuku Gyoen, Nishi-Shinjuku and Kabukicho, the Meiji Shrine, Harajuku, Omotesando and Shibuya: 56.5 km² (49 km² of land) in ten special wards, about 100,000 buildings. Around them a ring of plain block masses to about 3 km and the bay rim (Toyosu, Ariake, Shibaura) as masses, on a painted roofscape; beyond, the Kanto plain's towers of 60 m and more as masses to about 30 km, and the plain, the bay and the mountains to Mount Fuji, about 100 km west.\n\nReal, from open data, each thing where it is: the building footprints and heights from MLIT's PLATEAU 3D city model (the FY2025 CityGML: 96 % of the buildings, their surveyed heights, and the roof levels of its LOD2 buildings, a tower cut from its podium); OpenStreetMap's outlines where PLATEAU has none (the Diet and the government quarter, recent towers); 28 towers' and landmarks' heights from published figures (Wikipedia in Japanese and English, the owners' pages); the ground from GSI's 5 m laser-survey elevation (DEM5A) and its 10 m elevation beyond, Copernicus GLO-30 over the sea and past Japan's tiles (Mount Fuji, Tanzawa, Chichibu), drawn with the earth's curvature; roads, railways, bridges and viaducts, the bay, the Sumida, the canals and the palace moats, parks and land use, signals and crossings from OpenStreetMap; the far land's colours from ESA WorldCover 2021; the sun on 15 October, clock time JST (UTC+9).\n\nEstimated, not measured: the 4 % of buildings without a PLATEAU height stand at OSM's height or storeys × 3.5 m, else at a default 10.5 m; a large PLATEAU block surveyed only in outline (LOD1) takes its highest point over the whole footprint; a few towers are capped or set by hand where PLATEAU's height took a mast or a podium; the masses at OSM's heights where mapped, else by how densely the land is built; Tokyo Midtown Nihonbashi and Grand City Tower Tsukishima (both 2026, not yet mapped) are massed approximately from the developers' figures.\n\nModelled after photos, not measured: the landmarks' shapes and colours (Tokyo Tower's lattice and its seven bands, the Skytree's shaft, decks and gain tower, Rainbow Bridge's towers and cables, the NTT Docomo Yoyogi building's clock and spire, the National Diet Building's central tower, Fuji TV's sphere, Tokyo Station's domes, Sensō-ji's five-storey pagoda, main hall and Hōzōmon, Wakō's clock tower, Nikolai-dō's dome, the Eitai, Kachidoki and Kiyosu bridges, TEPCO's mast); some of their spans, rises and colours are estimates. Landmarks without a figure take the generic styles.\n\nInvented to look plausible: the facades (Tokyo's styles drawn by the shader: tiled mid-rises, mansions with balcony rails, narrow 雑居ビル with signboards, glass and granite towers, department stores, wooden houses, temples and ministries; the style picked from PLATEAU's use, the building's size and its street; window grids and colours from palettes, not photographed); the projecting vertical signs in Kabukicho, on Yasukuni-dori, in Shibuya's Center-gai and on Akihabara's Chuo-dori, and the screens; the rooftop clutter (stair boxes, FRP tanks, condensers, billboards, cooling towers, helipad squares); the trees (placed by rule along OSM's roads and in its parks: ginkgo, zelkova, camphor, cherries, black pines; the named avenues after their known planting); the road markings' layout (after Japan's code), the pavements and the scramble's diagonals; the cars, taxis, buses and the traffic, and where they park; which windows are lit at night, the street lights, the floodlights and the towers' lights.\n\nCredits: 3D city model: 出典：国土交通省 PLATEAU (Project PLATEAU, Ministry of Land, Infrastructure, Transport and Tourism; 3D city model FY2025 CityGML), processed and modified (buildings cut by roof level, some heights corrected, some buildings replaced by figures), under the PLATEAU site policy (Public Data License 1.0, compatible with CC BY 4.0); elevation: 出典：国土地理院 (Geospatial Information Authority of Japan) elevation tiles DEM5A and DEM10, processed (mosaicked, resampled, smoothed), under the GSI content terms of use (compatible with CC BY 4.0); © OpenStreetMap contributors (ODbL), via the Overpass API and a BBBike extract; contains modified Copernicus DEM GLO-30 data © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved; © ESA WorldCover project 2021, contains modified Copernicus Sentinel data (2021) processed by the ESA WorldCover consortium (CC BY 4.0). Tower heights are facts from Wikipedia and the owners' pages; reference photos from Wikimedia Commons were only looked at, not redistributed. The derived data (buildings, roads, trees and the rest) is a derivative database of OpenStreetMap and is offered under the Open Database License 1.0 (ODbL): it is the data files this page loads (tiles, blocks, markings, trees, shores, cars and rooftops beside this page), made by this repository's pipeline; the rendered images are Produced Works, attributed as above. Rendered with three.js and its meshoptimizer decoder (both MIT licence).",
+  "switchTitles": {
+    "masses": "The town beyond the districts as plain block masses from OpenStreetMap's buildings: a ring to about 3 km, the bay rim (Toyosu, Ariake, Shibaura) and the Kanto plain's towers of 60 m and more to about 30 km (heights from OSM where mapped, else guessed)",
+    "rooftops": "Stair boxes, FRP water tanks, condensers, billboards, cooling towers and helipad squares on the roofs (invented)"
+  },
+  "storagePrefix": "tokyo3d",
+  "location": {
+    "latitude": 35.6812,
+    "longitude": 139.7671
+  },
+  "sun": {
+    "date": "10-15"
+  },
+  "time": {
+    "start": 15.0,
+    "presets": {
+      "Day": 15.0,
+      "Dusk": null,
+      "Night": 21.0
+    },
+    "utcOffset": 9,
+    "zone": "JST"
+  },
+  "loading": {
+    "earlyCompile": true,
+    "deferLayers": false,
+    "frustumNear": true,
+    "passesLater": true
+  },
+  "animation": {
+    "gate": "frame",
+    "slowMs": 70,
+    "full": true,
+    "reason": true,
+    "overlayWater": true,
+    "webgpuOnly": true
+  },
+  "tiles": {
+    "merge": [
+      "road",
+      "bridge",
+      "markings"
+    ]
+  },
+  "camera": {
+    "azimuth": 200
+  },
+  "haze": {
+    "thinHeight": 250,
+    "thinMin": 0.16
+  },
+  "masses": {
+    "chunk": 3000,
+    "wallTint": [1.3, 1.28, 1.24],
+    "roofTint": [1.8, 1.8, 1.75],
+    "farWindows": 0.3,
+    "palette": [[0.8, 0.79, 0.76, 3], [0.72, 0.71, 0.68, 3], [0.64, 0.62, 0.58, 2], [0.86, 0.85, 0.82, 2], [0.58, 0.54, 0.49, 1], [0.6, 0.5, 0.43, 0.6], [0.55, 0.57, 0.58, 1]],
+    "weathered": 0.85,
+    "windowVary": 0.4,
+    "roofPalette": [[0.6, 0.6, 0.59, 3], [0.47, 0.5, 0.54, 2], [0.36, 0.38, 0.41, 2], [0.66, 0.67, 0.67, 1.5], [0.42, 0.46, 0.43, 0.6], [0.45, 0.39, 0.34, 0.8], [0.27, 0.28, 0.3, 1.2], [0.52, 0.4, 0.34, 0.25]]
+  },
+  "water": {
+    "windFrom": 45,
+    "night": { "glow": 0.05, "sky": 0.1, "gain": 9, "max": 0.6, "streak": 32, "knee": 0.07, "tapKnee": true, "ripple": 0, "blur": 3, "soft": 1, "tilt": 0.3, "peak": 0.3, "fres": 0.06, "base": 0.3, "desat": 0.95, "desatTint": [0.92, 0.96, 1.06], "floor": [0.0022, 0.003, 0.0065], "steep": { "at": [25, 200], "knee": 0.14, "gain": 6, "peak": 0, "fres": 0.06 } },
+    "sea": {"shore": [0.074, 0.088, 0.082], "near": [0.058, 0.077, 0.078], "offshore": [0.05, 0.07, 0.08], "silt": [0.078, 0.088, 0.078], "basin": [0.048, 0.064, 0.064]},
+    "seaVariation": {"silt": 0.0, "streaks": 0.35, "windy": 0.35, "gusts": 0.5},
+    "inland": {"river": [0.034, 0.048, 0.044], "lake": [0.018, 0.032, 0.022]}
+  },
+  "markings": {
+    "centreColour": {"big": "yellow", "small": "white"},
+    "bigCentre": "solid",
+    "dashes": {"street": [10, 5], "arterial": [10, 5], "motorway": [20, 8], "centre": [10, 5]},
+    "lineWidth": [0.15, 0.15],
+    "zebra": {"bar": 0.45, "gap": 0.45, "from": 1.0, "to": 5.0, "atSignals": true, "mid": {"half": 2.0, "period": 0.9, "bar": 0.45, "give": false}, "zigzags": false},
+    "stopLine": [6.0, 6.45],
+    "giveWay": "stop",
+    "edgeLines": true,
+    "nearside": "left",
+    "cycleLane": {"w": 1.5, "line": 0.0, "colour": [0.06, 0.16, 0.36]},
+    "sidewalk": {"paving": [0.37, 0.365, 0.355], "flag": [0.3, 0.3], "red": 0.05, "bike": null, "tactile": true, "flowers": true, "kerb": [0.5, 0.495, 0.48]},
+    "far": 3000
+  },
+  "ground": {
+    "coverBlend": 2000,
+    "sodium": { "arterial": 0.04, "street": 0.03, "motorway": 0.35 },
+    "townLights": { "led": 0.75, "base": 0.008, "gain": 0.9, "white": [0.95, 0.95, 0.9], "farK": 2.4, "far": 0.003,
+      "roads": { "rgb": [100, 100, 102], "tol": 0.025, "k": 0.08, "sodium": 0.25, "white": [1.0, 0.92, 0.8] } },
+    "lampHeads": 2.0,
+    "plazaLamps": { "h": 4.5, "period": 16, "k": 1.6 },
+    "litAreas": [
+      { "at": [-4670.6, 1197.5], "r": 85, "k": 0.4, "colour": [1.0, 0.98, 0.94] },
+      { "at": [1833.7, -3095.2], "r": 120, "k": 0.55 }, { "at": [1863.6, -3316.7], "r": 120, "k": 0.55 },
+      { "at": [1893.5, -3538.2], "r": 120, "k": 0.55 }, { "at": [1923.5, -3759.7], "r": 120, "k": 0.55 },
+      { "at": [-4487.9, -2699.5], "r": 260, "k": 0.5 } ],
+    "yardBase": 0.4,
+    "streetLight": 1.6,
+    "townFarCover": 1.0,
+    "coverWater": [
+      0.11,
+      0.106,
+      0.094
+    ],
+    "coverWaterSky": 0.4,
+    "relief": 1.2,
+    "townPaving": [[0.2, 0.2, 0.198], [0.36, 0.355, 0.345]],
+    "townNoiseGreen": 0.15,
+    "townMapNear": 1.0,
+    "lawn": [[0.05, 0.072, 0.034], [0.085, 0.104, 0.05]],
+    "lawnStyle": {"patches": 0.4, "dry": [0.12, 0.115, 0.06], "worn": 0.3},
+    "urban": {"paving": [0.36, 0.355, 0.345], "concrete": [0.34, 0.335, 0.325], "beige": [0.37, 0.36, 0.34], "darkTop": [0.22, 0.22, 0.215], "scrub": 0, "soil": 0, "weeds": 0.15, "stain": 0.45, "slab": 1.2},
+    "gravel": ["#c9c1b0", "#d7d0c2"],
+    "coverLines": {"asphalt": [0.07, 0.07, 0.074], "ballast": [[0.13, 0.12, 0.11], [0.2, 0.19, 0.175]], "track": [0.05, 0.045, 0.04], "pitch": 4.5, "band": 1.7}
+  },
+  "trees": {
+    "species": {
+      "banyan": {"h": 15, "R": 4.2, "wK": 0.72, "trunkK": 1.0, "bark": "#5e5850", "pal": ["#6a8a3a", "#74923e", "#7e9840", "#6f8a38", "#88a046", "#7a8f3c"], "shape": {"roots": 0, "base": 0.2, "flat": 1.55, "ring": 0.45, "lobes": 9, "fork": 0.2, "inner": 1}, "leaf": {"L": 5, "W": 5, "n": 3800}},
+      "camphor": {"h": 16, "R": 7, "wK": 1.05, "trunkK": 1.1, "bark": "#7a7266", "pal": ["#4b6a2f", "#537234", "#5b7838", "#476430", "#61793b"], "shape": {"base": 0.38, "flat": 0.85, "ring": 0.62, "fork": 0.45, "lobes": 10, "inner": 0}, "leaf": {"L": 6, "W": 2.6}},
+      "acacia": {"h": 14, "R": 6.5, "wK": 1.1, "trunkK": 1.2, "bark": "#5a5248", "pal": ["#3e5c2c", "#46642f", "#3a5629", "#4c6a33"], "shape": {"base": 0.3, "flat": 0.9, "ring": 0.58, "fork": 0.3, "inner": 1}, "leaf": {"L": 6, "W": 3}},
+      "bloom": {"h": 8, "R": 5.5, "wK": 1.25, "trunkK": 1.3, "bark": "#3e3530", "bloom": false, "pal": ["#55652f", "#5e6934", "#4f5f2d", "#68703a", "#6e6a36"], "shape": {"base": 0.22, "flat": 0.6, "ring": 0.66, "fork": 0.55, "lobes": 9, "inner": 0}, "leaf": {"flowers": 0}, "lean": 0.05, "asym": 0.15},
+      "kuromatsu": {"like": "mangrove", "tiles": [14, 15], "h": 8, "R": 4.4, "wK": 1.05, "trunkK": 1.0, "bark": "#4d423a", "pal": ["#283c27", "#2d422b", "#263826", "#324830"], "shape": {"base": 0.45, "flat": 0.5, "ring": 0.72, "lobes": 8, "lobeR": [0.36, 0.48], "fork": 0.55, "inner": 0, "stems": false}, "leaf": {"L": 10, "W": 1.2, "n": 4200}, "lean": 0.2, "asym": 0.3, "bloom": false},
+      "mangrove": {"h": 8, "R": 3.8, "wK": 1.1, "trunkK": 0.9, "bark": "#4b4038", "pal": ["#2b3d27", "#30442a", "#283a25", "#35482d"], "shape": {"base": 0.4, "flat": 0.6, "ring": 0.7, "lobes": 6, "lobeR": [0.42, 0.55], "fork": 0.6, "inner": 0, "stems": false}, "leaf": {"L": 10, "W": 1.2, "n": 4200}, "lean": 0.18, "asym": 0.3},
+      "royal": {"drop": true},
+      "coconut": {"drop": true}
+    },
+    "classes": {
+      "forest": {"mix": {"acacia": 0.5, "camphor": 0.32, "banyan": 0.08, "bloom": 0.04, "mangrove": 0.06}},
+      "park": {"mix": {"camphor": 0.26, "acacia": 0.26, "banyan": 0.14, "bloom": 0.24, "mangrove": 0.1}},
+      "scrub": {"mix": {"mangrove": 0.3, "acacia": 0.7}},
+      "grass": {"mix": {"banyan": 0.3, "camphor": 0.22, "acacia": 0.2, "bloom": 0.22, "mangrove": 0.06}},
+      "residential": {"mix": {"banyan": 0.3, "camphor": 0.22, "acacia": 0.2, "bloom": 0.22, "mangrove": 0.06}},
+      "campus": {"mix": {"banyan": 0.3, "camphor": 0.22, "acacia": 0.2, "bloom": 0.22, "mangrove": 0.06}},
+      "industrial": {"mix": {"banyan": 0.3, "camphor": 0.22, "acacia": 0.2, "bloom": 0.22, "mangrove": 0.06}},
+      "open": {"mix": {"banyan": 0.3, "camphor": 0.22, "acacia": 0.2, "bloom": 0.22, "mangrove": 0.06}},
+      "pine": {"step": 9, "p": 0.8, "h": [6, 10], "wr": [0.95, 1.3], "mix": {"kuromatsu": 1}, "clump": 0.05, "tone": 1, "thin": true},
+      "sakura": {"step": 9, "p": 0.75, "h": [6, 10], "wr": [1.1, 1.5], "mix": {"bloom": 0.85, "camphor": 0.15}, "clump": 0.3, "tone": 1, "thin": true}
+    },
+    "carpetBranch": true,
+    "carpetNormals": true
+  },
+  "shadows": {
+    "groundSteep": 3,
+    "fit": true
+  },
+  "night": { "glowBranch": true, "homes": {"far": [0.15, 0.35], "room": [0.75, 1.2], "curtains": 0.2},
+    "goldTower": [0.66, 0.4, 0.16],
+    "goldLevels": [40, 120, 217],
+    "goldBase": 21.47,
+    "goldLattice": { "at": [-607.4, 1301.2], "veil": 0.25, "lace": 0.5, "fall": 26, "pool": 1.1, "floor": 0.3, "under": 1.0, "underM": 8,
+      "top": [150, 320, 0.8], "solid": 0.85, "inside": 1.15, "outside": 0.6, "gain": 0.75, "pale": [100, 300, [0.8, 0.66, 0.42]] },
+    "highExposure": [400, 6000, 1.6],
+    "schedule": {
+      "office": [[0, 0.14], [6, 0.1], [8, 0.5], [9, 0.85], [18, 0.82], [19, 0.74], [20, 0.66], [21, 0.56], [22, 0.46], [23, 0.34], [24, 0.14]],
+      "home": [[0, 0.22], [1, 0.13], [3, 0.05], [5, 0.07], [6, 0.17], [7, 0.27], [8, 0.17], [17, 0.19], [18, 0.31], [19, 0.41], [20, 0.47], [21, 0.5], [22, 0.47], [23, 0.37], [24, 0.22]],
+      "shops": [[0, 0.3], [1, 0.16], [6, 0.12], [8, 0.4], [10, 0.85], [20, 0.85], [21, 0.66], [22, 0.5], [23, 0.4], [24, 0.3]],
+      "mall": [[0, 0.06], [9, 0.3], [10, 0.85], [20, 0.85], [21, 0.55], [22, 0.3], [23, 0.12], [24, 0.06]]
+    },
+    "skyGlow": [0.034, 0.036, 0.044],
+    "sky": { "zenith": [0.004, 0.008, 0.026], "glowTop": 0.012, "glowFall": 7 },
+    "ambient": { "k": 0.35, "tint": [0.78, 0.88, 1.2], "ground": [0.36, 0.38, 0.42], "fog": 0.8, "fogTint": [0.85, 0.9, 1.15] },
+    "dusk": { "warm": 0.6 },
+    "dimDusk": [0.3, -11],
+    "lampDusk": 0.6,
+    "duskGrade": { "fill": 0.5, "colour": [0.56, 0.6, 0.68], "whole": true, "moon": 0.25, "afterglow": { "k": 0.5, "colour": [0.92, 0.88, 0.84] } },
+    "duskFill": { "k": 0.25, "colour": [0.45, 0.58, 1.0] },
+    "windows": { "zone": 2, "litFloor": 0.94, "darkFloor": 0.03, "even": true, "vary": 0.25, "max": 0.65, "cool": [0.86, 0.93, 1.0], "neutral": [1.0, 0.95, 0.86] },
+    "masses": { "k": 1.3, "white": 0.95, "lamp": [1.0, 0.94, 0.86], "patch": 0.5, "dusk": true, "far": 3 },
+    "flood": { "bridges": 0.7, "spires": 0.6, "tint": [0.95, 1.0, 1.05] },
+    "carSpots": true,
+    "busLights": 0.5,
+    "roofLamps": 0.3,
+    "glows": [
+      {"at": [5369.7, -4332.4], "r": 42, "y": [2, 306], "colour": [0.32, 0.6, 1.0], "k": 0.95, "lattice": [11, 0.09, 0.2], "fade": 0.85},
+      {"at": [5369.7, -4332.4], "r": 42, "y": [368, 436], "colour": [0.32, 0.6, 1.0], "k": 0.95, "lattice": [8, 0.1, 0.2]},
+      {"at": [5369.7, -4332.4], "r": 42, "y": [457, 497], "colour": [0.32, 0.6, 1.0], "k": 0.95, "lattice": [6, 0.1, 0.2]},
+      {"at": [5369.7, -4332.4], "r": 42, "y": [497, 636], "colour": [0.7, 0.85, 1.0], "k": 0.5, "fade": 0.7},
+      {"at": [5369.7, -4332.4], "r": 36, "y": [341, 353], "colour": [1.0, 0.94, 0.84], "k": 0.9, "grid": [2.4, 0.3, 0.5], "dark": true},
+      {"at": [5369.7, -4332.4], "r": 36, "y": [306, 341], "colour": [0.6, 0.8, 1.0], "k": 0.8, "lattice": [5, 0.12, 0.35]},
+      {"at": [5369.7, -4332.4], "r": 36, "y": [353, 368], "colour": [0.6, 0.8, 1.0], "k": 0.6},
+      {"at": [5369.7, -4332.4], "r": 24, "y": [446, 452], "colour": [1.0, 0.94, 0.84], "k": 0.9, "grid": [2.0, 0.3, 0.5], "dark": true},
+      {"at": [5369.7, -4332.4], "r": 24, "y": [436, 446], "colour": [0.6, 0.8, 1.0], "k": 0.8, "lattice": [4, 0.12, 0.35]},
+      {"at": [5369.7, -4332.4], "r": 24, "y": [452, 457], "colour": [0.6, 0.8, 1.0], "k": 0.6},
+      {"at": [-607.4, 1301.2], "r": 22, "y": [142.5, 146.1], "colour": [1.0, 0.86, 0.66], "k": 1.0, "grid": [2.2, 0.15, 0.4], "dark": true},
+      {"at": [-607.4, 1301.2], "r": 22, "y": [147.3, 150.9], "colour": [1.0, 0.86, 0.66], "k": 1.0, "grid": [2.2, 0.15, 0.4], "dark": true},
+      {"at": [-5399.8, -2179.1], "r": 70, "y": [48, 280], "colour": [0.86, 0.92, 1.0], "k": 0.45, "bands": [4.0, 0.55], "grid": [3.2, 0.25, 0.4]},
+      {"at": [-4594.5, 1259.5], "r": 60, "y": [13.5, 40], "colour": [0.95, 0.97, 1.0], "k": 0.7, "grid": [3.0, 0.2, 0.5]},
+      {"at": [1878.6, -3427.4], "r": 420, "y": [2.8, 7.2], "colour": [1.0, 0.9, 0.75], "k": 0.6, "grid": [4.0, 0.12, 0.6]},
+      {"at": [-4487.9, -2699.5], "r": 220, "y": [31.2, 35.5], "colour": [1.0, 0.9, 0.75], "k": 0.75, "grid": [4.0, 0.12, 0.6]},
+      {"at": [-607.4, 1301.2], "r": 9, "y": [262.5, 267.5], "colour": [0.85, 0.92, 1.0], "k": 1.0, "grid": [1.6, 0.25, 0.3], "dark": true},
+      {"at": [1282.5, -1178.3], "r": 175, "plane": [0.952, 0.306, 28], "y": [3, 40], "colour": [1.0, 0.74, 0.45], "k": 1.0, "flood": true}
+    ]
+  },
+  "movingResolution": 1.25,
+  "facade": {
+    "preset": "jp-tokyo",
+    "roofs": {"tones": [[[0.36, 0.36, 0.34], 3], [[0.28, 0.28, 0.27], 3], [[0.2, 0.2, 0.2], 2], [[0.14, 0.145, 0.15], 1], [[0.3, 0.27, 0.22], 1]]},
+    "nightSigns": { "screens": 1.0, "boards": 1.0 },
+    "glass": { "skyDim": 0.85, "skyDesat": 0.55, "reflectance": 1.3, "silverFrom": 0.1, "silverTo": 0.28 },
+    "billboards": {
+      "brands": ["サクラ電機", "KAZE", "ミドリ屋", "TOKI", "AOI", "ひかり", "ツバサ", "YUME", "ネオン堂", "SORA", "MIRAI", "コハク", "FUJIMI", "ほたる", "RENA", "ハルカ"],
+      "shows": ["夜のひかり", "STAR TOKYO", "青い街", "SHIBUYA LIVE", "月と雨", "はじまりの歌", "NEON DREAMS", "ラストシーン"],
+      "taglines": ["新発売", "今だけ", "東京から", "毎日をもっと", "いま話題", "NEW SEASON", "さあ、行こう", "限定発売"],
+      "headlines": ["本日の天気 晴れ 22°C", "TOKYO NIGHT LIVE", "新作公開中", "秋のセール開催中", "ニュース速報", "まもなく開演"]
+    }
+  }
+}

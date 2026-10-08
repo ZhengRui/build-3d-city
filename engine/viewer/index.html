@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D city</title>
+<style>
+  :root { --panel: rgba(16, 20, 26, 0.78); --line: rgba(255, 255, 255, 0.08); --text: #e6ebf0; --muted: #8f9ba8;
+          --chip: rgba(255, 255, 255, 0.06); --chip-hover: rgba(255, 255, 255, 0.12); --accent: #6cb8ff; }
+  html, body { margin: 0; height: 100%; background: #0d1117; color: var(--text);
+               font: 12px/1.35 system-ui, -apple-system, "Segoe UI", "Noto Sans SC", sans-serif; }
+  canvas { display: block; }
+  button { font: inherit; color: inherit; }
+  [hidden] { display: none !important; }
+  #about { white-space: pre-line; }   /* (a city's About text may have paragraphs: "\n\n") */
+  .panel { position: fixed; background: var(--panel); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+           border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25); }
+
+  #menu { top: 12px; left: 12px; width: min(252px, calc(100vw - 24px)); max-height: calc(100vh - 24px);
+          display: flex; flex-direction: column; overflow: hidden; }
+  #menu header { display: flex; align-items: center; gap: 8px; padding: 9px 10px 9px 12px; }
+  #menu .title { flex: 1; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+  #menu .title span { color: var(--muted); font-weight: 500; }
+  #collapse { width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; cursor: pointer;
+              display: grid; place-items: center; color: var(--muted); }
+  #collapse:hover { background: var(--chip-hover); color: var(--text); }
+  #collapse svg { transition: transform 0.2s; }
+  #menu.collapsed #collapse svg { transform: rotate(-90deg); }
+  #menu.collapsed #menu-body { display: none; }
+  #menu-body { overflow-y: auto; overflow-x: hidden; padding: 0 12px 10px; border-top: 1px solid var(--line); }
+
+  details { border-bottom: 1px solid var(--line); padding: 7px 0; }
+  details:last-child { border-bottom: 0; }
+  summary { cursor: pointer; list-style: none; color: var(--muted); font-size: 11px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: ""; width: 5px; height: 5px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
+                    transform: rotate(-45deg); transition: transform 0.15s; margin-right: 1px; }
+  details[open] > summary::before { transform: rotate(45deg); }
+  details > :not(summary) { margin-top: 7px; }
+
+  .group { color: var(--muted); font-size: 11px; margin: 6px 0 4px; }
+  .group:first-child { margin-top: 0; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .chip, .switch, .seg button { border: 1px solid transparent; background: var(--chip); border-radius: 6px;
+                                padding: 3px 7px; cursor: pointer; white-space: nowrap; }
+  .chip:hover, .switch:hover, .seg button:hover { background: var(--chip-hover); }
+  .chip.active { border-color: var(--accent); color: #fff; }
+  .switches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  .switch { display: flex; align-items: center; gap: 5px; color: var(--muted); padding: 3px 6px; overflow: hidden; }
+  .switch::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #56606b; flex: none; }
+  .switch[aria-pressed="true"] { color: var(--text); }
+  .switch[aria-pressed="true"]::before { background: var(--accent); box-shadow: 0 0 6px var(--accent); }
+  .row { display: grid; grid-template-columns: 70px 1fr 38px; align-items: center; gap: 6px; margin-top: 6px; }
+  .row label { color: var(--muted); }
+  .row output { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); }
+  input[type=range] { width: 100%; margin: 0; accent-color: var(--accent); height: 14px; }
+  .seg { display: flex; gap: 3px; }
+  .seg button { flex: 1; padding: 2px 0; }
+  .seg button[aria-pressed="true"] { border-color: var(--accent); color: #fff; }
+  .help { color: var(--muted); margin: 6px 0 0; }
+  .help b { color: var(--text); font-weight: 500; }
+
+  #stats { top: 12px; right: 12px; padding: 6px 10px; font-size: 11px; color: var(--muted);
+           font-variant-numeric: tabular-nums; text-align: right; }
+  #loading { top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 240px; text-align: center; padding: 12px 14px; }
+  #bar { height: 4px; background: #2a333d; border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  #bar div { height: 100%; width: 0; background: var(--accent); transition: width 0.2s; }
+  /* once the view is up, the rest of the city loads under a small bar at the bottom */
+  #loading.streaming { top: auto; bottom: 12px; transform: translateX(-50%); min-width: 0; width: 170px;
+                       padding: 6px 10px; font-size: 11px; color: var(--muted); pointer-events: none; }
+  #loading.streaming #bar { height: 3px; margin-top: 5px; }
+  /* the view held on screen while a new light's shaders are prepared (main.js freezeView), with a note */
+  #freeze { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  /* a city's always-visible credit line (city.json "attribution", main.js): small, bottom right, clear of the stats line
+     (top right), the menu button (top left) and the streaming bar, which rises above it */
+  #attribution { bottom: 8px; right: 8px; max-width: min(620px, calc(100vw - 16px)); box-sizing: border-box;
+                 padding: 3px 8px; font-size: 10px; line-height: 1.4; color: var(--muted); text-align: right;
+                 border-radius: 6px; background: rgba(16, 20, 26, 0.55); backdrop-filter: none; -webkit-backdrop-filter: none;
+                 box-shadow: none; }
+  #attribution a { color: #b9c4cf; text-decoration: underline; text-decoration-color: rgba(185, 196, 207, 0.4); }
+  #attribution a:hover { color: #fff; }
+  body.has-attribution #loading.streaming { bottom: 44px; }
+  body.has-attribution #note { bottom: 76px; }
+  @media (max-width: 600px) { body.has-attribution #menu { max-height: calc(100vh - 24px - 56px); } }
+  /* phones: the collapsed menu bar shrinks to its title (at 252 px it ran under the stats line on a 390 px screen),
+     and on a touch screen the chips, switches and segments get finger-sized (about 34 px tall, was 24) */
+  @media (max-width: 600px) { #menu.collapsed { width: auto; min-width: 120px; } }
+  @media (pointer: coarse) { .chip, .switch, .seg button { padding: 8px 10px; } .chips { gap: 6px; } .seg button { padding: 8px 0; } }
+  /* the GPU lost (main.js onDeviceLost): a message and a reload instead of a frozen picture */
+  #lost { top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 12px 14px; text-align: center; max-width: 300px; }
+  #lost button { margin-top: 8px; border: 1px solid var(--accent); background: var(--chip); color: var(--text); border-radius: 6px;
+                 padding: 4px 12px; cursor: pointer; font: inherit; }
+  #lost button:hover { background: var(--chip-hover); }
+  #note { bottom: 44px; left: 50%; transform: translateX(-50%); padding: 6px 10px; font-size: 11px; color: var(--muted);
+          pointer-events: none; }
+</style>
+<!-- three.js 0.186.1 (MIT): from the copy next to the engine (engine/vendor/three@0.186.1/, the npm package's files:
+     its README; the default since 2026-10-04: faster than the CDN and independent of it), or from the pinned CDN
+     (jsDelivr) where the city's city.json says "three": "cdn"; ?three=cdn|local for one load. An import map must be in the page before any module loads,
+     so this script writes it, and the modulepreloads, once city.json is in (fetched at once; main.js's loadCity
+     takes the same response over): one round trip before the modules start, against 3-18 s for the CDN's
+     modules over a slow link (London M9). Then three.js and every module it imports are fetched at once (left to
+     the import chain, three.core.js and the add-ons' own imports came a round trip or two later), and the
+     engine's own modules beside them, with one query string for main.js and its imports (a version where the page
+     is published, a fresh one while working: see ENGINE_VERSION) -->
+<script>
+(() => {
+  const CDN = 'https://cdn.jsdelivr.net/npm/three@0.186.1/', LOCAL = './engine/vendor/three@0.186.1/';
+  const ADDONS = ['loaders/GLTFLoader', 'utils/BufferGeometryUtils', 'utils/SkeletonUtils', 'controls/MapControls',
+    'controls/OrbitControls', 'libs/meshopt_decoder.module', 'objects/SkyMesh', 'tsl/display/SSAONode',
+    'tsl/display/depthAwareBlur', 'tsl/display/BloomNode'];
+  // (main.js's own imports, the same list as there)
+  const ENGINE = ['facade', 'ground', 'water', 'trees', 'cars', 'rooftops', 'ui', 'shores', 'terrain', 'night', 'city',
+    'lattice', 'lamps', 'masses', 'styles', 'facade/core', 'facade/roofs', 'facade/patterns'];
+  // The engine modules' query string: a fixed version where the page is published (returning visitors keep the
+  // modules in their cache: a fresh Date.now() on every load fetched all 16 again each time; London M9 round 2), the
+  // engine's ENGINE_VERSION with the city's city.json "version" (bump either to make browsers fetch the code
+  // again); a fresh one on localhost or with ?dev=1, so that a plain reload runs the current code while working
+  const ENGINE_VERSION = '2026.10.02';
+  const params = new URLSearchParams(location.search);
+  // (dev: a loopback or private address, a port of its own, file:, or ?dev)
+  const dev = /^(localhost|127\.|\[::1\]$|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|$)/.test(location.hostname) || location.port !== '' || params.has('dev');
+  const city = window.__cityJson = fetch('city.json', { cache: 'no-cache' });
+  // the data folders' index files at once too, revalidated on every load: a plain fetch or a preload let the
+  // browser keep an old copy by its own heuristics after a rebuild (the menu kept its old places until a hard
+  // reload); main.js takes these responses over. A ?tiles= or ?blocks= elsewhere skips its own.
+  window.__earlyJson = Object.fromEntries(['tiles/tiles.json', 'blocks/blocks.json', 'markings/markings.json']
+    .filter((u) => !params.has(u.split('/')[0]))
+    .map((u) => [u, fetch(u, { cache: 'no-cache' })]));
+  const asked = params.get('three');
+  // If the modules can't be loaded (jsDelivr blocked or down, a "local" city whose vendor folder is missing or
+  // partial), the page loads once more from the other source (?three=..., marked ?threefallback=1 so it happens
+  // once); the CDN gets THREE_WAIT_S before that (its modules took 2.6-18 s at 80 Mbit/s). When both fail, or main.js
+  // fails after its modules were in (the 'modules' mark), the loading box says so instead of staying up.
+  const THREE_WAIT_S = 25;
+  const fallback = params.has('threefallback');
+  const fail = (what, err) => {
+    console.error(what, err);
+    const t = document.getElementById('loadtext'), box = document.getElementById('loading');
+    if (!t) return;
+    box.classList.remove('streaming');
+    t.textContent = what;
+    const d = document.createElement('div');
+    d.className = 'help';
+    d.textContent = String(err?.message ?? err ?? '').slice(0, 300);
+    t.append(d);
+  };
+  city.then((r) => r.clone().json()).then((c) => c, () => ({})).then((c) => {
+    const which = asked ?? c.three ?? 'local';
+    const base = which === 'local' ? LOCAL : CDN, build = (f) => `${base}build/${f}.js`;
+    const v = dev ? Date.now() : `${ENGINE_VERSION}${c.version ? '-' + c.version : ''}`;
+    const map = document.createElement('script');
+    map.type = 'importmap';
+    map.textContent = JSON.stringify({ imports: { three: build('three.webgpu'), 'three/webgpu': build('three.webgpu'),
+      'three/tsl': build('three.tsl'), 'three/addons/': `${base}examples/jsm/` } });
+    document.head.append(map);
+    for (const href of [build('three.webgpu'), build('three.core'), build('three.tsl'), ...ADDONS.map((a) => `${base}examples/jsm/${a}.js`),
+      `engine/main.js?v=${v}`, ...ENGINE.map((m) => `engine/${m}.js?v=${v}`)]) {
+      const link = document.createElement('link');
+      link.rel = 'modulepreload';
+      link.href = href;
+      document.head.append(link);
+    }
+    const modulesIn = () => performance.getEntriesByName('modules').length > 0;
+    let switched = false;
+    const other = () => {
+      if (fallback || switched) return false;
+      switched = true;
+      const u = new URL(location.href);
+      u.searchParams.set('three', which === 'local' ? 'cdn' : 'local');
+      u.searchParams.set('threefallback', '1');
+      location.replace(u.href);
+      return true;
+    };
+    if (which !== 'local') setTimeout(() => { if (!modulesIn()) other(); }, THREE_WAIT_S * 1000);
+    // (main.js fills in the page: not before the body is there)
+    const start = () => import(`./engine/main.js?v=${v}`).catch((err) => {
+      if (modulesIn()) fail('The viewer stopped with an error.', err);
+      else if (!other()) fail('The viewer\'s modules (three.js) could not be loaded, neither from the CDN nor from this site.', err);
+    });
+    if (document.readyState === 'loading') addEventListener('DOMContentLoaded', start, { once: true }); else start();
+  });
+})();
+</script>
+<!-- the city's own first files (the index files: fetched by the script above, revalidated), fetched while the modules come (main.js asks for them only once they are in:
+     2.5-4 s later over a slow link to the CDN); the data folders' defaults, a ?tiles= or ?blocks= elsewhere
+     just loads these for nothing -->
+<link rel="preload" as="fetch" crossorigin="anonymous" href="tiles/ground.glb">
+<link rel="preload" as="fetch" crossorigin="anonymous" href="tiles/terrain.glb">
+</head>
+<body>
+<canvas id="freeze" hidden></canvas>
+<div id="menu" class="panel">
+  <header>
+    <div class="title" id="title"></div>
+    <button id="collapse" aria-label="Show or hide the menu" aria-expanded="true">
+      <svg width="12" height="12" viewBox="0 0 12 12"><path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+  <div id="menu-body">
+    <details id="sec-places" open>
+      <summary>Places</summary>
+      <div id="places"></div>
+    </details>
+    <details id="sec-display" open>
+      <summary>Display</summary>
+      <div class="switches">
+        <button class="switch" id="t-trees">Trees</button>
+        <button class="switch" id="t-rooftops" title="Parapets, stair boxes, water tanks, cooling and air-conditioning plant, sheds and panels on the roofs (invented)">Rooftops</button>
+        <button class="switch" id="t-shadows">Shadows</button>
+        <button class="switch" id="t-ao" title="Ambient occlusion: soft shading in corners and alleys, drawn once the view settles">Occlusion</button>
+        <button class="switch" id="t-markings" title="Lane markings, crossings and sidewalks">Markings</button>
+        <button class="switch" id="t-mirror" title="The city mirrored in the water (one extra render pass)">Mirror</button>
+        <button class="switch" id="t-waves" title="Moving water: waves drift with the wind, rivers flow (redraws the view while water is in sight: up to 24 times a second, less on a slow GPU, stopping a while after the last touch)">Waves</button>
+        <button class="switch" id="t-traffic" title="Cars: traffic moving along the lanes (redraws the view while cars are near: up to 24 times a second, less on a slow GPU, stopping a while after the last touch), parked cars">Traffic</button>
+        <button class="switch" id="t-lamps" hidden title="The street lamps (from the city's lighting inventory where it has one, else placed along the roads): a pool of light on the street and a glowing head per lamp, drawn only after dark (off: those streets go dark)">Lamps</button>
+        <button class="switch" id="t-masses" hidden title="The towns beyond the districts, raised as plain block masses from OpenStreetMap's buildings (heights from their storeys where mapped, else guessed)">Towns</button>
+        <button class="switch" id="t-glow" title="After dark: lit windows, signs, lamps and headlights glow a little (a bloom pass, only while the lights are on)">Glow</button>
+        <button class="switch" id="t-stats" title="Frame rate and triangle count">Stats</button>
+      </div>
+      <div class="row"><label for="s-time">Time</label><input type="range" id="s-time" min="0" max="24" step="0.05" value="15.25"><output id="s-time-out"></output></div>
+      <div class="row"><span></span><div class="seg" id="tod" title="Jump to an afternoon, the blue hour after sunset, or the city at night"></div><span></span></div>
+      <div class="row"><label for="s-haze">Haze</label><input type="range" id="s-haze" min="0" max="3" step="0.05" value="1"><output id="s-haze-out"></output></div>
+      <div class="row"><label for="s-reflect">Reflections</label><input type="range" id="s-reflect" min="0" max="2" step="0.05" value="0.5"><output id="s-reflect-out"></output></div>
+      <div class="row"><label>Resolution</label><div class="seg" id="res"></div><span></span></div>
+    </details>
+    <details id="sec-controls">
+      <summary>Controls</summary>
+      <div class="switches"><button class="switch" id="t-trackpad" title="Two-finger scroll rotates and tilts instead of zooming">Trackpad</button></div>
+      <p class="help"><b>Drag</b> pans · <b>⇧/⌘-drag</b> or <b>right-drag</b> rotates.<br><span id="help-wheel"></span></p>
+    </details>
+    <details id="sec-about">
+      <summary>About</summary>
+      <p class="help" id="about"></p>
+    </details>
+  </div>
+</div>
+<div id="stats" class="panel">–</div>
+<div id="note" class="panel" hidden></div>
+<div id="lost" class="panel" role="alert" hidden><div>The graphics card stopped responding.</div><button type="button">Reload</button></div>
+<div id="attribution" class="panel" hidden></div>
+<div id="loading" class="panel"><div id="loadtext">Loading…</div><div id="bar"><div></div></div></div>
+<!-- The engine's page, the same for every city: a city's web/index.html links here, web/engine to this
+     folder, and main.js (imported by the script in the head) fills in the title and About text from the city's
+     city.json -->
+</body>
+</html>

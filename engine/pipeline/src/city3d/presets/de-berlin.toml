@@ -1,0 +1,191 @@
+# Region preset "de-berlin": Berlin (M4, 2 Oct 2026), built on "europe-west" (base below) as uk-london is: every
+# table of europe-west's (building kinds, roads, markings, trees, cars, shores, rooftop colours) holds here unless
+# this file sets it; [facade.styles] and [facade.osm_style] are Berlin's own (replace: none of Paris's Haussmann,
+# faubourg, HBM and post-war styles, none of London's brick terraces). Building kinds stay europe-west's (04_buildings
+# is unchanged: Berlin's M2 kinds); Berlin's code (presets/de_berlin/) reads the facade style from the kind, the
+# ALKIS function, the LoD2 roof type and eaves, the Umweltatlas storeys, the Umweltatlas block structure type
+# (Realnutzung 2024: "Geschlossene Blockbebauung, Hinterhof (1870er - 1918)", "Großsiedlung und Punkthochhäuser"...)
+# and hand-drawn character areas ([facade.berlin] in city.toml).
+#
+# Research: demos/berlin/data/region_research.md §4 (roofs: the Berliner Dach, red clay tile, slate, zinc, flat
+# bitumen and gravel, chimney stacks) and §5 (facades: types, floor heights, palettes sampled on Commons photos).
+#
+# BERLIN'S FACADE STYLES (new names; the viewer's facade.js draws each, see its "Berlin" section):
+#   altbau     Gründerzeit/Kaiserzeit Vorderhaus (1870-1918): plaster in cream, ochre, sand, pale grey and pastel,
+#              stucco window surrounds and hoods, a string course at every floor, a deep cornice at the eave
+#              (~19-22 m), tall double-casement windows in white frames, a rusticated or shop ground floor, ~3.9 m
+#              storeys; the Berliner Dach over it (06_tiles "berliner" roof: a 60-degree front slope, red tile or
+#              slate, dormers, a flat top); a share stripped of its stucco in the 1950s-60s (plain plaster)
+#   althof     the Altbau's courtyard wings, Quergebäude and Hinterhäuser: plain grey and buff plaster, smaller
+#              windows, no stucco, ~3.2 m storeys
+#   nachkrieg  post-war infill and rows (1950-1990; Lückenschluss, Zeilenbau): smooth plaster (white, cream, grey,
+#              pale yellow), window bands, strip balconies, low (2.9 m) storeys, flat roofs
+#   platte     DDR Plattenbau (WBS 70, P2, QP, the 1960s-80s high-rises): precast panel grid (joints at every
+#              floor and every two bays), loggia columns with coloured balcony fronts on most, light grey, white,
+#              beige panels with post-1990 pastel re-cladding, 2.8 m storeys, flat roofs
+#   kma        Karl-Marx-Allee's Zuckerbäckerstil (1952-60, Strausberger Platz to Frankfurter Tor): Meissen-type
+#              ceramic tile cladding in cream and beige (a fine tile grid), pilasters, an arcade/shop ground floor,
+#              an ornamented frieze and cornice
+#   hansa      the Hansaviertel's Interbau 1957 modernism: pale concrete slabs and points, glazed balcony fronts
+#              with coloured panels (yellow, orange, blue), floor bands, flat roofs
+#   neubau     1990s+ Stadtreparatur and Kritische Rekonstruktion (Friedrichstadt, Mitte, Europacity): stone or
+#              render in vertical window strips between piers, stone joints, a flat roof
+#   beton      post-war modern offices and civic buildings, the government quarter's concrete and glass: light
+#              concrete spandrel bands between window ribbons
+#   glass      office curtain walls (Potsdamer Platz, City West, Alexanderplatz, Europacity): silver, grey,
+#              green-grey and blue-grey, a dark one now and then; not light blue (London's lesson)
+#   sandstein  civic stone: Prussian classicism and Kaiserzeit sandstone (ministries, museums, courts, the
+#              Museum Island's and Unter den Linden's non-landmark buildings): rusticated base, tall windows, cornice
+#   klinker    red and yellow brick: Rotes Rathaus-style civic brick, Gemeindeschulen, Kreuzberg's and Moabit's
+#              industrial brick lofts (Gewerbehöfe), with brick courses close up
+#   kirche     churches: brick Gothic revival and stone, tall lancet windows, steep slate roofs
+# Kept: factory (halls and depots), shed, plain (plant rooms), spire; the landmark styles builders use in
+# landmark_facades.csv: stone, fins, bands, piers, lattice, panel, monument, floodlit, concretepanel, brickstone,
+# limestone, house, civic (europe-west's palettes).
+
+base = "europe-west"
+replace = ["facade.styles", "facade.osm_style"]
+
+[facade.styles.altbau]      # region_research.md §5.2: cream #e2dcd0 #e3d4bd, pale pink #e1cfc2, ochre #c2a878 #d6c392
+floor = 3.9                 # #b9a77b, sand #cdbb94, warm light grey #cfc9bd, sooty grey #a09b92 #b3aea3, pastel repaints
+palette = ["#e2dcd0", "#e3d4bd", "#d9cdb5", "#d6c392", "#c2a878", "#cdbb94", "#cfc9bd", "#b3aea3", "#a09b92",
+    "#e1cfc2", "#c9ccb0", "#d9b8aa", "#c4c2b8", "#c9a85c", "#ddd3bf", "#bfb5a2"]
+                            # (M4 first shots: the pastel blue-grey #b7c4c9 read light blue in the street: a warm grey)
+[facade.styles.althof]      # courtyard buildings: plain plaster, greyer and darker (unrenovated #a09b92 #8b867c)
+floor = 3.2
+palette = ["#b8b1a3", "#a09b92", "#c4bcaa", "#8b867c", "#cfc6b4", "#b3aea3", "#d6cbb5", "#9c968a"]
+[facade.styles.nachkrieg]   # §5.1 nachkrieg: #d8d1bf #b8b3a6 #d9c98f #a89a86, white and grey render
+floor = 2.95
+palette = ["#d8d1bf", "#b8b3a6", "#d9c98f", "#a89a86", "#e0dcd2", "#cbc6ba", "#c9b99a", "#d6cbb2", "#bcc0bd"]
+[facade.styles.platte]      # §5.2: white #dcdad4, light grey #c4c3bd, beige #cfc3a8, concrete #a8a9a6; post-1990
+floor = 2.8                 # pastels yellow #d9c77a, salmon #d8aa95, light blue #9fb6c8, green #a8c0a0, teal #6f8a9a
+palette = ["#dcdad4", "#c4c3bd", "#cfc3a8", "#a8a9a6", "#d6d3cb", "#bdbcb5", "#d2c79a", "#cfb3a5", "#aebbc4",
+    "#b4c0a8", "#cfc8b8", "#b5b7b3"]           # (M4 first shots: the sampled pastels read candy-coloured from the air: muted)
+[facade.styles.kma]         # Strausberger Platz tile #d6c8b2 #d2bda8, light ochre #c8b595, Block C-Nord white #e4e4e0
+floor = 3.3
+palette = ["#d6c8b2", "#d2bda8", "#c8b595", "#ddd2bf", "#cfc8bd", "#e4e0d6"]
+[facade.styles.hansa]       # Niemeyer/Schwippert concrete #d6d1c4 (white #e6e1d6), grey brick stair towers
+floor = 2.9
+palette = ["#d6d1c4", "#e2ddd2", "#cdc9be", "#c8c4bb", "#dad6cc", "#b9b4aa"]
+[facade.styles.neubau]      # Friedrichstadt stone #c8bda9 #d9d2c0, render #e3ded4, clinker #7a4a3a, grey stone
+floor = 3.5
+palette = ["#d9d2c0", "#c8bda9", "#e3ded4", "#bfb6a4", "#d1c7b2", "#7a4a3a", "#a9a39a", "#cbc3b4", "#8e5a46"]
+[facade.styles.beton]       # exposed and painted concrete, travertine and aluminium (1960s-90s offices, ministries)
+floor = 3.4
+palette = ["#c6c2b8", "#b5b2ab", "#d2cec4", "#a9a8a2", "#bdb6a8", "#cfcbc0", "#9d9d98"]
+[facade.styles.glass]       # Hbf office #848d83; silver #afb8c0; grey and green-grey (London M4: muted, never light blue;
+floor = 3.9                 # the pale ones read as coated silver). M4 fix round: Potsdamer Platz read saturated navy
+palette = ["#a9b2b8", "#9ba3a8", "#8f999c", "#848d83", "#8c959a", "#9aa0a2", "#7f898c", "#b0b5b6", "#a3aaae",
+    "#88928f", "#959b9e", "#737d80"]  # (the dark #2e3744 and blue-green #5d7d8c dropped): silver-grey, low saturation
+[facade.styles.sandstein]   # Kaiserzeit sandstone #c8bda9, weathered #a59d8d, Schinkel's light render #d9d0bc
+floor = 4.6
+palette = ["#c8bda9", "#a59d8d", "#d9d0bc", "#bdb29c", "#cfc4ab", "#b3a993", "#d4cab4"]
+[facade.styles.klinker]     # Rotes Rathaus #b8603f (shade #8f4a36), red clinker #8a4a38, yellow clinker #b89a60,
+floor = 4.0                 # school brick red/yellow, Kollhoff #7a4a3a
+palette = ["#8f4f3c", "#7f4536", "#7a4a3a", "#a8885a", "#8a6a50", "#6e4a3e", "#94604a", "#9a7a5a"]
+                            # (M4 first shots: the low October sun made #a35a3e orange: darker, browner, as London's brick)
+[facade.styles.kirche]      # churches: red brick Gothic revival (Zwölf-Apostel, St. Matthäus), sandstone, soot
+floor = 7.0
+palette = ["#8f4a36", "#9c5a44", "#a59d8d", "#7a746b", "#b8a88a"]
+[facade.styles.factory]     # depots, workshops, big low halls: grey cladding and brick
+floor = 4.6
+palette = ["#9a958c", "#7f7a72", "#a8a39a", "#8a5a46", "#6f6a64", "#b4ada2"]
+[facade.styles.shed]        # garages, kiosks, courtyard sheds and Remisen
+floor = 3.0
+palette = ["#a9a397", "#9a958c", "#bdb6a8", "#8b867c", "#94624a"]
+[facade.styles.plain]       # rooftop plant rooms and bulkheads: no windows
+floor = 0.0
+palette = ["#9a968e"]
+[facade.styles.spire]       # masts and spires: steel
+floor = 0.0
+palette = ["#b8bcc0"]
+# landmark styles (landmark_facades.csv sets their tint)
+[facade.styles.stone]
+floor = 3.8
+palette = ["#cbc5a6", "#e0ded8", "#b8ae9c"]
+[facade.styles.fins]
+floor = 4.1
+palette = ["#6d8290"]
+[facade.styles.bands]
+floor = 4.0
+palette = ["#5e7084"]
+[facade.styles.piers]
+floor = 4.1
+palette = ["#3a3d4c"]
+[facade.styles.lattice]
+floor = 5.0
+palette = ["#6a8090"]
+[facade.styles.panel]
+floor = 5.0
+palette = ["#a9adb1"]
+[facade.styles.monument]
+floor = 8.0
+palette = ["#d8ccb2"]
+[facade.styles.floodlit]
+floor = 0.0
+palette = ["#9c978d"]
+[facade.styles.concretepanel]
+floor = 2.9
+palette = ["#c1c4c8", "#b9b0a8", "#a9acb3"]
+[facade.styles.brickstone]
+floor = 3.6
+palette = ["#a5674e", "#9c7a64"]
+[facade.styles.limestone]
+floor = 4.5
+palette = ["#d6ccb6", "#cfc4ab"]
+[facade.styles.house]
+floor = 2.9
+palette = ["#d9d3c3", "#e0dccf"]
+[facade.styles.civic]
+floor = 4.2
+palette = ["#c9bfae", "#b8a88f"]
+
+[facade.osm_style]          # style = OSM building tags that set it on the kinds without a style rule of their own
+factory = ["industrial", "manufacture", "hangar", "garages", "parking", "service", "depot", "warehouse"]
+shed = ["kiosk", "shed", "hut", "toilets", "garage"]
+
+# Berlin's style rules (presets/de_berlin/__init__.py) read these; a city sets the paths and the areas
+[facade.berlin]
+structure = ""              # the Umweltatlas Realnutzung block layer (typ_klar), under the data folder's raw/
+front_m = 12.0              # an Altbau piece whose inside point lies within this of a street's kerb line (the centre line
+                            # less half its width and the pavement) is a Vorderhaus (12 m deep), else a courtyard piece
+old_storey = 3.35           # m per storey (eave over the Umweltatlas storeys) from which a piece counts as pre-war
+new_storey = 3.15           # ... under which (and a flat roof) as post-war
+stripped = 0.22             # share of Altbau fronts stripped of their stucco (Entstuckung of the 1950s-60s): facade.js
+glass_core = 0.55           # offices in the glass areas (City West, Potsdamer Platz, Alexanderplatz, Europacity) 25 m up
+shop_road_m = 12.0          # shopfronts: a front piece (as front_m) on a main road
+shop_roads = ["primary", "secondary", "tertiary", "trunk"]
+tile_old = 0.85             # share of the Altbau's (and courtyard wings', KMA's) pitched and Berliner roofs in red tile
+                            # (M4 fix round: 0.6 made Kreuzberg's roofs read slate grey from the air; §4.4: the steep
+                            # faces "mostly tile-covered")
+
+[tiles]
+roof_eave = true            # roof rises from the LoD2's eaves (eave_h): the Berliner Dach, gables and hips at their height
+
+[rooftops]
+# Berlin's stacks: red brick and plastered (cream) stacks with a zinc or concrete cap, no terracotta pots
+# (region_research.md §4.2-4.3: chimney brick #8a5a45, stucco #b8a888, cowl zinc #8c9296)
+stack_cols = [["chimney_brick", 5], ["chimney_stucco", 3], ["chimney_dark", 2], ["chimney_yellow", 1]]
+pot_cols = [["cowl", 5], ["cap_dark", 3], ["cap_concrete", 2]]     # (with stack_cap: the cover slab's colours)
+stack_cap = true            # a cover slab on each stack, no pots; stacks at most stack_cap_len m long (M4 fix round)
+stack_cap_len = 1.6
+[rooftops.parapet_t]
+altbau = 0.3
+althof = 0.25
+nachkrieg = 0.25
+platte = 0.3
+kma = 0.4
+hansa = 0.25
+neubau = 0.3
+beton = 0.3
+glass = 0.3
+sandstein = 0.35
+klinker = 0.35
+[rooftops.named]
+chimney_brick = "#8a5a45"
+chimney_stucco = "#b8a888"
+chimney_dark = "#6d5a4c"
+chimney_yellow = "#a88d62"
+cowl = "#8c9296"
+cap_dark = "#5a5c5e"
+cap_concrete = "#9a9890"

@@ -1,0 +1,22 @@
+{
+  "notes": "Hong Kong's styles (hk-hongkong, M4) on china-south: public housing blocks (estate: pastel paint with colour accents, small paired windows, AC boxes), private tiled towers (apartment: bay windows, AC boxes), tong lau and walk-ups (tonglau: balconies at every floor, soot, shops and signboards), composite buildings (composite: the same over shops, smaller windows, more AC boxes), flatted factories (industrial: ribbon windows, concrete spandrels, roller shutters), colonial civic buildings (colonial: stone, cornice, a verandah arcade). Their wall detail is in the 'bays' slot (drawn where the bays are resolved) from the pattern library: estateAccents, bayWindows, shophouseBalconies, ribbonSpandrels, verandahArcade; the shops' signboards are the core shopfront's boards with letters. china-south's glass, commercial (malls and podiums), civic, factory, village (Sai Kung's village houses) and the landmark skins are kept as they are.",
+  "base": "china-south",
+  "facade": {
+    "windowF0": 0.06,
+    "shopfront": {
+      "boards": {"band": [0.84, 0.97], "by": "shop", "colours": [[0.18, [0.55, 0.05, 0.04]], [0.32, [0.05, 0.16, 0.45]], [0.44, [0.04, 0.34, 0.15]], [0.56, [0.06, 0.06, 0.065]], [0.7, [0.8, 0.62, 0.06]], [0.84, [0.82, 0.82, 0.78]], [1, [0.62, 0.24, 0.04]]]},
+      "letters": true,
+      "riser": {"to": [0.03, 0.04], "colour": [0.2, 0.2, 0.21]}
+    }
+  },
+  "styles": {
+    "estate": {"livedInWindows": true, "bay": 2.5, "window": [0.27, 0.36, 0.78], "ac": 0.42, "frames": {"dark": 0.08, "light": [0.72, 0.72, 0.7]}, "night": "home", "zone": 1, "parapet": "block", "fade": "bays", "estateAccents": true},
+    "apartment": {"livedInWindows": true, "bay": 3.0, "window": [0.18, 0.3, 0.84], "ac": 0.3, "frames": {"dark": 0.35, "light": [0.7, 0.7, 0.68]}, "night": "home", "zone": 2, "parapet": "block", "fade": "bays", "bayWindows": true},
+    "tonglau": {"livedInWindows": true, "bay": 3.2, "window": [0.13, 0.32, 0.86], "shops": "all", "ac": 0.4, "frames": {"dark": 0.3, "light": [0.68, 0.68, 0.66]}, "night": "village", "zone": 1, "parapet": "village", "fade": "bays", "shopfront": true, "shophouseBalconies": true},
+    "composite": {"livedInWindows": true, "bay": 2.6, "window": [0.2, 0.34, 0.8], "shops": "all", "ac": 0.48, "frames": {"dark": 0.3, "light": [0.68, 0.68, 0.66]}, "night": "home", "zone": 1, "parapet": "block", "fade": "bays", "shopfront": true, "shophouseBalconies": true},
+    "industrial": {"bay": 4.0, "window": [0.025, 0.36, 0.8], "shops": 0.25, "ac": 0.1, "frames": {"dark": 0.7, "light": [0.62, 0.62, 0.6]}, "night": "factory", "zone": 4, "parapet": "factory", "fade": "bays", "shopfront": true, "ribbonSpandrels": true},
+    "tiled": {"bay": 4.0, "night": "none", "zone": 4, "roof": {"flat": true, "wall": true}, "parapet": "block", "fade": "bays", "tiledWall": true},
+    "portholes": {"cell": 3.4, "pattern": "portholes"},
+    "colonial": {"bay": 3.8, "window": [0.3, 0.16, 0.78], "frames": {"dark": 0.2, "light": [0.75, 0.74, 0.7]}, "zone": 4, "roof": {"flat": true}, "parapet": "block", "fade": "bays", "verandahArcade": true}
+  }
+}

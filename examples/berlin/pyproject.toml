@@ -1,0 +1,12 @@
+[project]
+name = "berlin"
+version = "0.1.0"
+description = "Berlin core (Mitte, Tiergarten, Moabit, Hansaviertel, Friedrichshain, Kreuzberg, Alt-Treptow, east Charlottenburg): city.toml for the build-3d-city engine"
+requires-python = ">=3.12"
+dependencies = ["city3d"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+city3d = { path = "../../.agents/skills/build-3d-city/engine/pipeline", editable = true }

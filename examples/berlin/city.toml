@@ -1,0 +1,829 @@
+# Berlin: the historic core and its neighbours (Ortsteile Mitte, Tiergarten, Moabit, Hansaviertel, Friedrichshain,
+# Kreuzberg, Alt-Treptow) and the City West round the Zoo, the Kurfürstendamm and the Gedächtniskirche. Every
+# city-specific setting of the build-3d-city pipeline; the engine (.agents/skills/build-3d-city/engine/pipeline, its
+# README lists every key with its default) and the region preset "europe-west" hold the rest. Run a stage with
+# `uv run city3d <stage>` from this folder, everything with `uv run city3d all`.
+
+name = "berlin"
+title = "Berlin"
+# Script-written settings, kept out of this file so that a script run does not rewrite (and commit) it again:
+# the [[structures]] figures of scripts/*_structures.py, in generated/ (laid under this file in list order, then
+# this file's own [[structures]]; see the engine README, `include`)
+include = ["generated/structures-m4t.toml", "generated/structures-m4h.toml", "generated/structures-m10f.toml"]
+# Berlin's own preset (M4), on europe-west's tables (uk-london's base/replace mechanism): Berlin's facade styles
+# (Altbau plaster and stucco with the Berliner Dach, courtyard wings, post-war infill, Plattenbau, Karl-Marx-Allee's
+# tiles, the Hansaviertel, Neubau stone, post-war concrete, glass, sandstone, brick, churches), its roof shapes from
+# the LoD2's roof types and eaves, its chimney stacks; europe-west's building kinds (M2), roads, trees and cars until
+# M5-M6 replace them (data/region_research.md; see README "Region preset")
+preset = "de-berlin"
+# UTM 33N (central meridian 15 E): Berlin's own grid. Every official Berlin dataset (LoD2, DGM1, the Umweltatlas,
+# the tree and lamp inventories) is ETRS89 / UTM 33N, EPSG:25833: the same projection on the ETRS89 datum, which
+# PROJ relates to WGS 84 by a null transformation (no grid shift), so EPSG:25833 coordinates come through unchanged
+# (the true ETRS89-WGS 84 offset is ~0.8 m in 2026: below every source's error, and all official sources share it).
+# The sources are read in 25833 (the citygml adapter's crs, the DGM1's GeoTIFF tags) and warped as they load.
+# Berlin is 1.6 degrees west of the zone's centre: scale 0.99997, grid north 1.3 degrees east of true north
+utm_epsg = 32633
+coast = false               # inland: the Spree and the canals are OSM water polygons; the Baltic is 150 km away
+drive = "right"
+# metres per storey for OSM building:levels and the Umweltatlas storey counts (geschosse, 88 % of the buildings):
+# the Gründerzeit Altbau, 41 % of the buildings, has 3.5-4 m storeys (a 5-storey block 21-22 m to the eaves,
+# region_research.md §5.1); Plattenbau 2.8 m, offices 3.6-4.0 m. checks/sources.md §4 measures hoehe / geschosse
+level_h = 3.5
+user_agent = "3D-Fun berlin reconstruction (hobby project)"
+# Local Overpass first: Docker container city3d-overpass-berlin, built from BBBike's Berlin extract of 26 Sept 2026
+# (raw/osm/Berlin.osm.pbf, box lon 12.76-13.98, lat 52.23-52.82); if it is down: `docker start city3d-overpass-berlin`
+overpass = ["http://127.0.0.1:8793/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter"]
+
+[osm]
+# by each district polygon's box, not Overpass area(): the local server's area dispatcher is not running (it answers
+# "open64: 2 No such file or directory /db/db//osm3s_areas"); it is not ours to restart, and the public mirrors are
+# slow from here
+area = false
+
+# The user's boundary (30 Sept 2026, "Core", option A of Phase 0; the Phase 0 boundary note,
+# demos/data/phase0/berlin.md): seven Ortsteile (admin_level 10) by relation, and the City West as Phase 0's box
+# lon 13.3055-13.3450, lat 52.4960-52.5300 cut by the Ortsteile Charlottenburg and Wilmersdorf (the box reaches
+# 1.01 km² into Wilmersdorf south of the Kurfürstendamm, to Lietzenburger Straße and the Ludwigkirchplatz: Phase 0's
+# 53.3 km² and the downloaded tiles include it). West edge just west of Adenauerplatz: Schloss Charlottenburg is out
+[districts]
+Mitte = 16566
+Tiergarten = 55750
+Moabit = 28339
+Hansaviertel = 16567
+Friedrichshain = 55763
+Kreuzberg = 55765
+"Alt-Treptow" = 55762
+# Breitscheidplatz and the Gedächtniskirche, the Zoo and Zoo station, the Kurfürstendamm to Adenauerplatz,
+# Kantstraße, Savignyplatz, the TU and Ernst-Reuter-Platz, north to the Spree
+"Charlottenburg (City West)" = { relation = 110126, clip = [[13.3055, 52.4960], [13.3055, 52.5300], [13.3450, 52.5300], [13.3450, 52.4960], [13.3055, 52.4960]] }
+# the Kurfürstendamm's south side between Lietzenburger Straße and lat 52.496 (Phase 0's box)
+"Wilmersdorf (north)" = { relation = 55740, clip = [[13.3055, 52.4960], [13.3055, 52.5300], [13.3450, 52.5300], [13.3450, 52.4960], [13.3055, 52.4960]] }
+
+[sun]                       # 10 October, leaves still green (the viewer works its sun out from city.json's sun.date)
+latitude = 52.5
+declination = -6.8
+
+[sources]
+# The official LoD2 first (M1, checks/sources.md): the cadastre's footprints (ALKIS), one solid per building or
+# building part, roofs and heights from the 2021 laser scan; 2.5-3 x as many buildings as OSM. OSM fills what it
+# lacks (buildings since the cadastre's footprints) and gives names and building:parts; the Umweltatlas layer is
+# the same footprints in 2D (joined by gml_id) and fills nothing: it lends storeys, names and the function's text
+footprints = ["lod2", "osm", "umwelt"]
+# the hand-checked landmark list, the LoD2's measured heights (highest roof point over the building's ground), the
+# Umweltatlas's (the same laser heights, where a footprint has no LoD2 solid), then OSM's tags. Why: checks/sources.md
+heights = ["landmark", "lod2", "umwelt", "osm_height", "osm_levels", "default"]
+dem = "geotiff"             # Berlin DGM1 (1 m bare earth, laser scan 2021), m above NHN
+backdrop = "geotiff"        # Copernicus GLO-30 (a surface model: +4 m on the DGM1 by median) beyond
+
+[sources.lod2]              # Berlin LoD2 CityGML 1.0 (dl-de/zero-2.0), raw/lod2/README.txt
+adapter = "citygml"         # sources/citygml.py: parsed tile by tile, footprints = the GroundSurfaces
+# 123 1-km tiles: every tile meeting the boundary buffered by 1 km (79 meet the boundary)
+path = "lod2/LoD2_*.zip"
+crs = "EPSG:25833"          # srsName urn:adv:crs:ETRS89_UTM33*DE_DHHN2016_NH: ETRS89 / UTM 33N + NHN (DHHN2016)
+label = "LoD2"
+role = "primary"
+# m: highest roof point minus the solid's (flat) ground z, from the 2021 laser scan (DatenquelleDachhoehe 5000)
+height = "measuredHeight"
+keep = ["gml_id", "parent_id", "part", "function", "roofType", "name", "ground_z", "roof_top_z", "eave_z",
+    "roof_area", "n_roof", "n_wall", "fp_from", "tile", "Grundrissaktualitaet", "DatenquelleDachhoehe"]
+rename = { ground_z = "ground_elevation" }    # the solid's ground (m NHN), for 03_compare's check against the DGM1
+
+[sources.umwelt]            # Umweltatlas Berlin, Gebäudehöhen (dl-de/zero-2.0), raw/buildings_heights/README.txt
+adapter = "file"
+path = "buildings_heights/gebaeudehoehen_bbox.geojson"
+crs = "EPSG:25833"
+label = "Umweltatlas"
+role = "fill"
+height = "hoehe"            # m above ground: the LoD2's laser roof height (one per footprint, 0.1 m steps)
+keep = ["gml_id", "gisid", "name", "funktion", "funktion_txt", "role_txt", "dachart", "dachart_txt", "geschosse",
+    "grundrissaktualitaet"]
+lend = ["geschosse", "funktion_txt", "dachart_txt"]
+
+[sources.geotiff]           # Berlin DGM1 (dl-de/zero-2.0) and Copernicus GLO-30 (raw/dgm1, raw/backdrop READMEs)
+# 81 2 x 2 km tiles over the boundary + 4 km; their GeoTIFF tags carry the ESRI PCS name "ETRS89 / UTM zone 33N"
+# but no EPSG GeoKey: GDAL resolves it to EPSG:25833 (checked with rasterio), so nothing needs setting
+ground = ["dgm1/dgm1_33_*_2_be_2025.tif"]
+backdrop = ["backdrop/Copernicus_DSM_COG_10_N52_00_E012_00_DEM.tif", "backdrop/Copernicus_DSM_COG_10_N52_00_E013_00_DEM.tif"]
+bare = true
+note = "Berlin DGM1: 1 m bare earth from the 2021 laser scan (ATKIS DGM1, Senatsverwaltung für Stadtentwicklung, Bauen und Wohnen; dl-de/zero-2.0), metres above NHN (DHHN2016), 2 x 2 km GeoTIFF tiles in EPSG:25833 over the boundary + 4 km. Beyond it Copernicus GLO-30 (1 arc-second, EGM2008): a surface model, ~4 m over the DGM1 by median (buildings and forest)."
+
+[buildings]
+# M2 (checks/buildings.md, quality.md). The LoD2's solids are the table: one per Building or BuildingPart, all
+# standing on the ground (their parts tile the building's footprint: no stacking needed), each at its laser
+# measuredHeight. OSM's building:parts only for the few buildings the LoD2 gets wrong (parts_in)
+parts = true
+parts_in = [
+    # (M4 builder H: the Fernsehturm's OSM parts w556435241 and the Siegessäule's w718035022 are no longer used: both
+    # are [[structures]] figures, scripts/m4h_structures.py, and their outlines are excluded below)
+    "w1214009386",          # Upbeat (Moabit, 2025; the LoD2 lacks it): its parts 21, 44.5 and 82 m, not its 2,905 m²
+                            # outline at 82 (fix round)
+    "w22989918",            # Atrium Tower: 7-30 levels (the LoD2's generalised roof, roofType 9999: 55 m for 106)
+]
+# OSM buildings built over the LoD2 (it is clipped round them): towers since its 2021 scan, and the landmarks above
+# whose LoD2 solids are wrong
+keep = { osm = ["w22989918", "w1364133390", "w1335157930", "w1214009386"] }
+# EDGE East Side Tower (2023, 142 m), The Berlinian (topped out January 2026, 146 m), Upbeat (Moabit, 2025, 82 m):
+# OSM's outlines, at the list's heights
+# no split of LoD2 solids along OSM buildings (the preset's, for BD TOPO's joined towers and podiums): the LoD2 has
+# its own parts and a laser height per solid; split replaced 37 of them by OSM's outlines at the Umweltatlas's height
+split = { min_n = 1000000 }      # (off: a city.toml table merges into the preset's, so {} would keep it)
+# the Fernsehturm's two LoD2 solids (its shaft to 253 m, and a 763 m² prism to 229 m round the sphere): its OSM parts
+# and its mast's four thin OSM parts (1-7 m², 264-374 m: under min_piece the lower three went and left the top
+# floating), drawn instead as one 26 m² mast from its 256-264 m part raised to 368 m (osm_fix)
+# (and, M3 fix round, the Jakob-Kaiser-Haus's 6,352 m² basement between its houses, 4.3 m from the sunken courts' floor:
+# a dark roof slab at the street's level; the ground over it re-filled as [terrain] patches)
+exclude = { gml_id = ["DEBE3DhqsGtrFsGv", "DEBE3DTptoJUMc8e", "DEBE3DsO9RhopAvB",
+    # M4 (builder T): the Sony Center's tent as 50 LoD2 canopy solids 8-24 m thick at 34-68 m (a [[structures]] figure
+    # instead, scripts/m4t_structures.py), the HKW's shell roof as a 1,482 m² box at 14-24 m (likewise), and a
+    # construction-era 740 m² canopy slab at 37-42 m by the Berlinian (the Galeria's corner, 2021 scan)
+    "DEBE3DiiU6EaJSRb", "DEBE01YYK0001z2r",
+    "DEBE3DRowA5hQCj1", "DEBE3DR0HEmXToaS", "DEBE3DEFymWchfNx", "DEBE3DcZdidMFUlR", "DEBE3DSdr81jYxyl", "DEBE3DAlHqqxD8E0",
+    "DEBE3DaTKGffCwdi", "DEBE3DhuKxV0Hd9v", "DEBE3DNFim45RMKJ", "DEBE3DpzMloy0UAh", "DEBE3DfHDiOSHVza", "DEBE3DCx7buH79Fg",
+    "DEBE3DpyzOi4c3Rw", "DEBE3DkgtSxjD0Xl", "DEBE3DMNkGpb9aZG", "DEBE3DUsZwyarl9P", "DEBE3DkrkEogyarF", "DEBE3DusZPsbcS8s",
+    "DEBE00YYTi0000C2", "DEBE3DayioPtWSTA", "DEBE3DBjkQ81hT0f", "DEBE3DEwgsloOu25", "DEBE3DDE5ITWxCmq", "DEBE3DRnvNgy0ibG",
+    "DEBE3DpY7u7K223j", "DEBE3DIJ24c60eLz", "DEBE3DZq0HqXRym3", "DEBE3DjOhV5nRPzT", "DEBE3DzEnaohAVzF", "DEBE3DfSHgBAAftm",
+    "DEBE3DQgSoFkvG7L", "DEBE3DBNHOVzVsb2", "DEBE3DaEZh3985Oe", "DEBE3DgzKJxIffBV", "DEBE3DMxiYueLH8X", "DEBE3DQtFJhQ5npV",
+    "DEBE3DfckGB5NcuV", "DEBE00YYTi0000Bx", "DEBE3DacDvbIgZPx", "DEBE3DvrzDgV1Lrc", "DEBE00YYTi0000Bw", "DEBE3DQoad7uC6lp",
+    "DEBE3DTI9elDVJHU", "DEBE3DL4qRx8oGCn", "DEBE3Ds8v5EOhsyE", "DEBE3DSCIXvqIY3Z", "DEBE3DOPCx4EuxYK", "DEBE3DYmMYXaomfk",
+    "DEBE3DGXJHEPpGSY", "DEBE3DIy7uww4nv5",
+    # M4 builder H: the Brandenburg Gate's attic (a raised roof: the gate is a figure), the hall roofs hanging over
+    # Alexanderplatz's (18.7-27.1 m over a 6.7 m body) and the Zoo's (20.8-25 m over 8.7) viaducts: vaults in [[structures]]
+    "DEBE01YYK0001xqy", "DEBE01YYK0001z5U", "DEBE3DEWbuSeLh2K", "DEBE3DLPnzPapVrB",
+    # M10 fix round (builder R): the Neue Nationalgalerie's hall and its roof plate's four overhang canopies (a beige
+    # hollow box at 4.6-10.4 m): a figure instead (scripts/m10f_structures.py)
+    "DEBE3DLm1PkVj2Jm", "DEBE3DEBkBdyKstJ", "DEBE3DLKmQ9RPq9S", "DEBE3DI7scFRyFLk", "DEBE3DLI05H49nju"], osm = ["w304987174", "w304987173", "w304987172", "w304987176",
+    "w131446868", "w131446864", "w131446870", "w131446862",
+    "w120866116",           # the Weltkugelbrunnen (a fountain, 280 m² at 10.5 m)
+    "w373626464", "w373626454", "w373626455", "w373626460", "w373626461",   # the Oberbaumbrücke's tower in the Spree (18 m; the bridge is M4's)
+    "w303035499",
+    # M4 builder H: figures in [[structures]] (scripts/m4h_structures.py) instead of OSM's stacks
+    "w556435241", "w718035022"] }         # the Watergate club's floating terrace by the Oberbaumbrücke (102 m², all in the Spree: M3c's critic took the box for the bridge's tower standing in the river)
+    # (and the Siegessäule's four upper 0.36 m plinth steps: floored at 3.5 m they stacked into one plinth four times)
+osm_fix = { w96880477 = 368.0 }
+# the Rotes Rathaus: the LoD2's tower solid (196 m², 83.7 m: its laser caught the spire's foot) at its 74 m parapet; the
+# top to 94 m is M4's. (Its OSM parts no longer build it: the tower part lay beside the LoD2's tower, a 30 m² sliver
+# from 30 to 74 m, and the building at 30 m)
+# M4 (builder T): the HKW's auditorium under its shell roof (the [[structures]] figure) at 11 m, not the Umweltatlas's
+# 21.6 (the shell's top, recheck's placeholder fix)
+fix_h.gml_id.DEBE3DcKC9RSinNW = 11.0
+# M4 builder H: towers whose laser caught a dome's or spire's foot, cut to the eave the [[structures]] figure
+# stands on: the Gendarmenmarkt's domed towers, St. Hedwig's rotunda, the Bode-Museum's dome drum, Hackescher Markt's
+# hall body; the Marienkirche (to 44 m: its 48 m helm, WP), Nikolaikirche, Zionskirche and Heilandskirche towers
+fix_h.gml_id.DEBE3DgmfpurHZfT = 74.0
+fix_h.gml_id.DEBE3DkEireAqk2H = 50.0
+fix_h.gml_id.DEBE3DZe5I3ioLoM = 51.2
+fix_h.gml_id.DEBE01YYK00000AQ = 19.5
+fix_h.gml_id.DEBE3DfDgUjMn2VJ = 28.3
+fix_h.gml_id.DEBE01YYK00004lV = 6.9
+fix_h.gml_id.DEBE3Dm03ICrhanR = 44.0
+fix_h.gml_id.DEBE3DJ5QoacFhgE = 38.1
+fix_h.gml_id.DEBE3Dj5UEZckkkC = 44.8
+fix_h.gml_id.DEBE3DyvAFdwloz7 = 45.3
+# Fix round (critic 1): the LoD2's roofType 9999 solids (generalised: one flat top per complex) and its placeholder
+# heights. 1,449 pieces at 5 m or less where the Umweltatlas (the same footprints, its own 2022 heights) is over twice
+# as high (1,339 of them roofType 9999 at ~3-3.5 m: the Abgeordnetenhaus 3.5 m for 27, the Littenstraße courts 25.8,
+# the Moabit court 24.9) take the Umweltatlas's; 9999 solids over 8 m off it too (the BND 13.1 for 33.3, the Park
+# Center 23.6 for 34.3, the Dom's body 43.4 for 33.7), a lower one only where it is closer to geschosse x 3.4 m
+recheck = { of = "lod2", source = "umwelt", low = 5.0, ratio = 2.0, field = "rooftype", values = ["9999"], diff = 8.0, storeys = "geschosse", storey_h = 3.4 }
+# every LoD2 solid stands on its own ground (ground_z) to its own top: never on a canopy's or a twin solid's roof (the
+# stacking lifted the Hauptbahnhof's piece to 53.9-105.5 m, the Paul-Löbe-Haus's parts to 51-55)
+own_ground = true
+# a tower's own parts the Umweltatlas measures at the tower's height are no copies (Heidestraße's 69 m, the
+# Kudamm-Karree's 91-93, Zoofenster's)
+copied_keep = ["umwelt"]
+copied_storeys = "geschosse"    # (where the Umweltatlas has none: the Kudamm-Karree's 48 m² piece at 92.9 m, 22 storeys)
+# M4 (builder T): the generalised solids recheck gave one Umweltatlas height over low wings (the BND's 41,809 m² at 33.3
+# m over features from 5.4 m, the Park Center's mall, the Haupttelegrafenamt): split by the Umweltatlas's footprints
+# clipped to them, each at its own height
+gen_split = { of = "lod2", source = "umwelt", field = "rooftype", values = ["9999"], min_area = 1500.0, min_range = 6.0, min_piece = 20.0, skip = [
+    "DEBE01YYK0002MCN", "DEBE01YYK000000D"] }    # (the Reichstag and the Berliner Dom: builder H's figures stand on
+# their bodies; split, the Dom's 85 m landmark height went onto a 38 m² piece and its dome stood at 84-130 m)
+# sloped canopies drawn from eave to ridge as boxes 4-24 m thick over nothing (the Sony Center's tent, the HKW's shell,
+# the Zoo's aviaries: 105 pieces of 150 m² or more over 3 m thick): a 0.6 m slab at the top over open ground; a hall
+# roof over a lower body (station halls 12 m over their concourse, the Hauptbahnhof's Bügel) reaches down to it
+canopy_fit = { thick_max = 3.0, thick = 0.6, cover = 0.3, gap = 1.0, slab_max_area = 3000.0, max_down = 18.0 }   # (the Hauptbahnhof's vaults stay;
+# the Treptow Twin Towers' roof between them 41 m over the podium stays up)
+# no OSM height over the LoD2's laser: the preset's osm_height reconcile raised only the Nikolaikirche's and the
+# Zionskirche's naves to their spires (84 and 67 m for 33 and 28)
+reconcile = { sources = [] }
+# OSM's fill on the water (Kulturschiff Paula, pontoons, a 154 m² piece in the Spree): boats at 3.5 m, not 10.5
+afloat = { areas = ["natural=water"], share = 0.5, h = 3.5, tag = "ship" }
+volume_dedupe = true        # the LoD2 has 665 pairs of solids overlapping by over 10 % (canopies over buildings)
+dedupe_keep_taller = true   # 1,021 LoD2 solids lie 90 % inside another; where taller (two in three: a tower or a raised
+                            # canopy over its building) they stay, volume_dedupe cutting them out of the lower one
+# the preset's list and allotment huts, garden sheds and cabins: the LoD2 (the cadastre) has every real building
+# but the Kleingärten's Lauben; OSM adds them where the LoD2 has nothing (M1: 315 allotment huts and 112 roofs)
+osm_skip = ["roof", "carport", "ship", "boat", "houseboat", "shelter", "bridge", "construction", "container",
+    "static_caravan", "subway_entrance", "entrance", "grandstand", "demolished", "abandoned", "ruins", "tent",
+    "hut", "shed", "allotment_house", "cabin", "garden_house", "gazebo",
+    # stations and viaducts OSM has where the LoD2 has nothing: over track or street (the Ostbahnhof's 18,600 m² platform
+    # hall at 10.5 m, Ostkreuz's 6,190 m², Kottbusser Tor's elevated U1 station on the square, the S-Bahn's viaducts at
+    # 3.5 m): decks and halls for M3/M4, not blocks from the ground
+    "train_station", "viaduct"]
+# What of the LoD2 is a building (first match wins; decision table in checks/buildings.md). ALKIS functions:
+# 31001_* buildings; 51009_1610 Überdachung (canopy), _1611 Carport, _1750 Gedenkstätte/Denkmal (the Holocaust
+# memorial's 2,711 stelae, the Soviet memorial's terrace, the listed Stadtbahn viaduct's arches at 7-9 m), 51001
+# towers, 51002 chimneys and cranes, 51006_1430 stands, _1440 stadiums (the pitches at 0-2 m)
+rules = [
+    { label = "memorials and statues under 50 m² (the stelae)", field = "function", values = ["51009_1750"], area_below = 50, action = "exact" },
+    { label = "flat structures under 2.5 m (terraces, pitches, crane rails)", field = "function", prefix = ["51", "53"], h_below = 2.5, action = "drop" },
+    { label = "canopies under 20 m² (balcony roofs, porches)", field = "function", values = ["51009_1610", "51009_1611"], area_below = 20, action = "drop" },
+    { label = "canopies and hall roofs (as their roof)", field = "function", values = ["51009_1610", "51009_1611"], action = "roof", thick = 0.6 },
+    { label = "walled memorial grounds under 5 m (the Sophienkirchhof's 5,500 m² at 3 m)", field = "function", values = ["51009_1750"], area_from = 200, h_below = 5.0, action = "drop" },
+    { label = "structures (viaducts, stands, towers, chimneys, cranes)", field = "function", prefix = ["51", "53"], action = "exact" },
+    { label = "buildings under 2 m (underground garages' and basements' roofs)", field = "function", prefix = ["31001"], h_below = 2.0, action = "drop" },
+    { label = "building parts (bays, stair towers, wings)", field = "part", values = ["true"], area_from = 1.0, action = "keep" },
+    # the Umweltatlas (fill) has the same footprints, the LoD2's canopies and structures among them: none of those
+    # fills a gap the rules above leave
+    { source = "umwelt", label = "Umweltatlas structures and canopies", field = "funktion", prefix = ["51", "53"], action = "drop" },
+    { source = "umwelt", label = "Umweltatlas footprints under 2 m", h_below = 2.0, action = "drop" },
+    # M4 builder H: the Fernsehturm, the Siegessäule (figures in [[structures]]) and Ostkreuz's Ringbahn hall (a 6,324 m²
+    # block to 24 m: a vault in [[structures]]), which the Umweltatlas fills once their OSM outlines are left out
+    { source = "umwelt", label = "Umweltatlas pieces under M4 figures", field = "gml_id", values = ["DEBE01YYK0000B8a", "DEBE01YYK0002POy", "DEBE00YY2ps00009"], action = "drop" },
+]
+
+[buildings.landmarks]
+match = "best"
+radius = 40.0
+cap = true
+cap_keeps_lift = true       # (a capped part lifted over the ground keeps its base: the Fernsehturm's mast)
+raise_parts = 5.0           # a tower drawn by OSM parts more than 5 m under its listed height: its parts scaled up
+
+[buildings.kinds.field_kind]    # the ALKIS function (the LoD2's, every solid) -> the preset's kinds
+field = "function"
+[buildings.kinds.field_kind.map]
+"31001_3041" = "civic"      # Kirche
+"31001_3040" = "civic"      # Gebäude für religiöse Zwecke
+"31001_3043" = "civic"      # Kapelle
+"31001_3011" = "civic"      # Parlament
+"31001_3012" = "civic"      # Rathaus
+"31001_3015" = "civic"      # Gericht
+"31001_3020" = "civic"      # Bildung und Forschung
+"31001_3021" = "civic"      # Allgemein bildende Schule
+"31001_3022" = "civic"      # Berufsbildende Schule
+"31001_3023" = "civic"      # Hochschulgebäude
+"31001_3030" = "civic"      # kulturelle Zwecke
+"31001_3032" = "civic"      # Theater, Oper
+"31001_3034" = "civic"      # Museum
+"31001_3036" = "civic"      # Veranstaltungsgebäude
+"31001_3037" = "civic"      # Bibliothek
+"31001_3050" = "civic"      # Gesundheitswesen
+"31001_3051" = "civic"      # Krankenhaus
+"31001_3090" = "civic"      # Empfangsgebäude
+"31001_3091" = "civic"      # Bahnhofsgebäude
+"31001_2100" = "factory"    # Gewerbe und Industrie
+"31001_2111" = "factory"    # Fabrik
+"31001_2120" = "factory"    # Werkstatt
+"31001_2140" = "factory"    # Vorratshaltung
+"31001_2142" = "factory"    # Speichergebäude
+"31001_2143" = "factory"    # Lagerhalle
+"31001_2200" = "factory"    # sonstiges Gewerbe und Industrie
+"31001_2460" = "factory"    # Gebäude zum Parken
+"31001_2461" = "factory"    # Parkhaus
+"31001_2462" = "factory"    # Parkdeck
+"31001_2500" = "factory"    # Versorgung
+"31001_2520" = "factory"    # Elektrizitätsversorgung
+"31001_2522" = "factory"    # Umspannwerk
+"31001_2523" = "factory"    # Umformer
+"31001_2463" = "shed"       # Garage
+"31001_2055" = "shed"       # Kiosk
+"31001_2612" = "shed"       # Toilette
+"51009_1610" = "shed"       # Überdachung (drawn as a raised roof)
+"51009_1611" = "shed"       # Carport
+"51009_1750" = "civic"      # Gedenkstätte, Denkmal (stelae, the Stadtbahn viaduct)
+"51001_1001" = "civic"      # Wasserturm
+"51001_1002" = "civic"
+"51001_1004" = "civic"      # Kontrollturm
+"51001_1008" = "civic"      # Funkturm
+"51001_9998" = "civic"
+"51002_1290" = "factory"    # Schornstein
+"51002_1332" = "factory"    # Portalkran
+"51002_1333" = "factory"    # Laufkran
+"51006_1430" = "civic"      # Zuschauertribüne
+"51006_1440" = "civic"      # Stadion
+
+[quality]                   # 04b_quality's height checks: the Umweltatlas (h_umwelt) and the storeys it lends
+second = "umwelt"
+storeys = "geschosse"
+storey_min = 2.5
+
+[ground]
+town = true                 # the Bezirke beyond the boundary: a painted roofscape, not bare paving
+# M3 (London's settings): the Bezirke's buildings over the 4 km ground margin raised as block masses (06e_masses).
+# Their footprints are the Umweltatlas's (town_buildings.gpkg, 287,191 with heights, copied from
+# town_buildings_umwelt.gpkg in 06e_masses' schema), which cover the ground area and no more: no reach into the
+# backdrop (a larger reach would make 06e_masses fetch OSM's instead); the WorldCover map carries the town on
+masses = true
+masses_reach = 0.0
+masses_houses_far = true
+# (M7 fix round) the Umweltatlas's towers and masts are no blocks: the Funkturm stood as a fat windowed mass (its lattice
+# is city.json's masts)
+masses_skip = { funktion = ["Mast", "Sende-, Funkturm, Fernmeldeturm"] }
+# the Spree is held by the Mühlendamm lock (upper pool ~32.3 m, lower ~31.5 m), the Landwehrkanal by its Ober- and
+# Unterschleuse, the Spreekanal and the harbours by theirs: OSM's lock gates and weirs split the water, each pool
+# levelled on its own
+pools = true
+# the parks' paths (the Tiergarten's, Treptower Park's, the Volkspark Friedrichshain's), pedestrian areas cut out
+# whole, stone and asphalt squares as their own layers (Alexanderplatz, Pariser Platz, the Potsdamer Platz's)
+paths = { footway = 2.6, path = 2.0, cycleway = 2.6, bridleway = 3.0, steps = 2.5, pedestrian = 4.0 }
+paved = true
+green_min_width = 3.5
+path_relations = true
+green_off_water = true
+path_layers = true
+# the Zoologischer Garten (tourism=zoo, not a park in OSM): lawn ground and wooded like a park (M3 fix round)
+[ground.green]
+tourism = ["zoo"]
+
+[roads]
+lane_w = 3.25               # German urban lanes 3.0-3.5 m (RASt 06)
+footbridges = true          # the Monbijou footbridges, the Marie-Elisabeth-Lüders-Steg, the Landwehrkanal's Stege
+decks_ref = "water"         # the named decks count from the water under them
+decks_level = true          # ... from its level (the ground beside the quay walls lies 6 m under it; engine option)
+# the Stadtbahn (S-Bahn and regional trains through Mitte) runs on brick arches the LoD2 keeps as a structure at
+# 7-9 m (51009_1750, checks/buildings.md): at the default 7.5 m the tracks would run through the arches' tops
+rail_layer_h = 9.5
+# The Spree's bridges: the deck's height over the water (the upper pool 32.3 m, the lower 31.5). Berlin's Spree
+# bridges give 4.0-4.5 m headroom (the Bundeswasserstraße's clearance through the city), the deck 1-1.5 m deep; the
+# quays stand 2-3 m over the water, so the decks rise a little to their spans. The U1 crosses the Oberbaumbrücke on
+# its upper deck (its ways carry no bridge:name: the key "U1" matches their name): 8 m over the street on its
+# Kreuzberg steel viaduct, and over the river 8 m over the highest ground within 80 m along it (the banks), ~4 m
+# over the road deck. The Stadtbahn ("Berliner Stadtbahn", every elevated way of it, whatever its layer: OSM's
+# layers 2-3 where it crosses roads and the Spree had put it 25 m up at Jannowitzbrücke) 7.0 m over the highest
+# ground within 80 m along it, level over the Spree from its banks: at 9.5 m its tracks ran a median 2.8 m over the
+# LoD2's arches (checks/clearance.md)
+decks = { "Oberbaumbrücke" = 6.5, "U1" = { deck = 8.0, reach = 80.0, level_on = "Oberbaumbrücke" }, "Berliner Stadtbahn" = { deck = 7.0, reach = 80.0 }, "Weidendammer Brücke" = 5.5, "Monbijoubrücke" = 5.0, "Moltkebrücke" = 6.0, "Marschallbrücke" = 5.5, "Jannowitzbrücke" = 6.0, "Schillingbrücke" = 6.0, "Elsenbrücke" = 6.5, "Kronprinzenbrücke" = 6.0, "Lutherbrücke" = 5.5, "Lessingbrücke" = 5.5, "Michaelbrücke" = 6.0, "Mühlendammbrücke" = 5.5, "Rathausbrücke" = 5.0, "Liebknechtbrücke" = 5.5, "Friedrichsbrücke" = 5.0, "Schloßbrücke" = 5.0, "Gustav-Heinemann-Brücke" = 5.5, "Hugo-Preuß-Brücke" = 6.0, "Ebertsbrücke" = 5.0, "Eiserne Brücke" = 5.0, "Moabiter-Brücke" = 5.5, "Gotzkowskybrücke" = 5.5, "Hansabrücke" = 5.5, "Schlesische Brücke" = 5.0, "Humboldthafenbrücke" = 7.0, "Admiralbrücke" = 3.2 }
+# (M3 fix round) the Stadtbahn's Humboldthafenbrücke (2006, concrete arches over the harbour; OSM's relation): drawn
+# whole under its tracks (rail_outlines), on piers in the water, not two beams on stick piers
+# each named deck's OSM man_made=bridge outline drawn whole with piers in the river, typed from photos (refs/):
+# the Oberbaumbrücke's brick arches (its towers are buildings), the Moltkebrücke's, the Lutherbrücke's, the
+# Schloßbrücke's and the Friedrichsbrücke's sandstone arches, the Weidendammer Brücke's and the Marschallbrücke's
+# iron arches, the post-war concrete and steel girders (Jannowitz, Schilling, Elsen, Michael, Mühlendamm)
+bridge_outlines = true
+# M3 fix round: the Stadtbahn's unnamed station tracks through the Hauptbahnhof (OSM layer 3: 21-26 m, over the named
+# viaduct's 11 m) take the span they join; the tracks laid on the LoD2's viaduct arches (51009_1750) at the arches'
+# tops, every 10 m, interpolated over the steel spans between them (up to 80 m), no stick piers inside the arches
+rail_join = true
+rail_on = { field = "function", values = ["51009_1750"], near = 2.0, gap = 80.0, step = 10.0 }
+outline_parts = true
+rail_outlines = true
+# the Kronprinzenbrücke, the Mühlendammbrücke, the Rathausbrücke carry their streets' names, no bridge:name: their ways
+# take the outline's name (engine [roads] outline_names)
+outline_names = true
+[roads.piers]
+# the U1 on its brick arcade along the bridge's north side (the outline's U1 band), level with the road deck's piers
+"Oberbaumbrücke" = { spans = 7, fascia = 1.4, type = "stone", rise = 0.25, body = "#9a4e3a", piers = "#8f4835", upper = "U1", arcade = { bay = 4.6, pier = 1.3, wall = 0.9, rise = 0.35, colour = "#9a4e3a" } }
+"Weidendammer Brücke" = { spans = 1, fascia = 1.0, type = "iron", rise = 0.1, body = "#3f4a46" }
+"Monbijoubrücke" = { spans = 2, fascia = 1.0, type = "stone", rise = 0.25 }
+"Moltkebrücke" = { spans = 3, fascia = 1.4, type = "stone", rise = 0.22, body = "#b3a283", piers = "#ab9a7c" }
+"Marschallbrücke" = { spans = 3, fascia = 1.2, type = "iron", rise = 0.1, body = "#4b5652" }
+"Jannowitzbrücke" = { spans = 3, fascia = 1.6, type = "girder", body = "#7c817e" }
+"Schillingbrücke" = { spans = 3, fascia = 1.4, type = "concrete", rise = 0.08 }
+"Elsenbrücke" = { spans = 3, fascia = 1.6, type = "concrete", rise = 0.06 }
+"Kronprinzenbrücke" = { spans = 3, fascia = 1.2, type = "girder", body = "#d4d6d2", piers = "#d4d6d2" }
+"Lutherbrücke" = { spans = 3, fascia = 1.4, type = "stone", rise = 0.22 }
+"Lessingbrücke" = { spans = 3, fascia = 1.2, type = "stone", rise = 0.2 }
+"Michaelbrücke" = { spans = 3, fascia = 1.4, type = "concrete", rise = 0.08 }
+"Mühlendammbrücke" = { spans = 3, fascia = 1.6, type = "concrete", rise = 0.06 }
+"Friedrichsbrücke" = { spans = 3, fascia = 1.2, type = "stone", rise = 0.22 }
+# (M5 fix round) the Landwehrkanal's Admiralbrücke (1882): iron beams on granite abutments, its cast-iron railings
+"Admiralbrücke" = { spans = 1, fascia = 0.8, type = "girder", body = "#5d625e", piers = "#a49c8c" }
+"Schloßbrücke" = { spans = 3, fascia = 1.2, type = "stone", rise = 0.22 }
+"Liebknechtbrücke" = { spans = 1, fascia = 1.4, type = "girder" }
+"Gustav-Heinemann-Brücke" = { spans = 1, fascia = 1.0, type = "girder", body = "#d4d6d2" }
+"Hugo-Preuß-Brücke" = { spans = 3, fascia = 1.4, type = "girder", body = "#b9bcb8" }
+"Moabiter-Brücke" = { spans = 3, fascia = 1.2, type = "stone", rise = 0.2 }
+"Hansabrücke" = { spans = 3, fascia = 1.2, type = "concrete", rise = 0.1 }
+"Humboldthafenbrücke" = { spans = 4, fascia = 1.4, type = "concrete", rise = 0.14, body = "#b9b4aa", piers = "#b9b4aa" }
+
+[markings]
+# M5: German markings (RMS, StVO; data/region_research.md §1.1, §1.6). Lane, centre and edge lines, their dash table
+# and widths are the viewer's (web/city.json markings: white, 3 m strokes every 9 m, 0.12 m). Here what OSM decides:
+# - junction arms: OSM's 3,070 traffic-signal nodes make a signalled junction (a stop line and the pedestrian Furt's
+#   two broken lines); elsewhere a give-way line on the lesser road (city.json draws it as Haifischzähne), none on the
+#   greater or between equal side streets (right before left in the Tempo 30 zones)
+junctions = "signals"
+# - zebras only where OSM maps one (Berlin crosses on lights: ~250 zebras against 3,584 signalled crossings): plain
+#   0.5 m bars, no zig-zags, no beacons; signal crossings between junctions with their Furt lines and stop lines
+#   (zigzag 1 m: just the room for the stop lines either side, city.json zebra.zigzags false)
+zebras = true
+beacons = false
+zigzag = 1.0
+signal_crossings = true
+# - bus lanes (OSM busway / lanes:bus / bus:lanes; 74 ways tagged) with a 0.25 m solid line, a third red-surfaced;
+#   cycle lanes (Radfahrstreifen, OSM cycleway=lane) along the kerbs, solid, red-surfaced (city.json cycleLane)
+bus_lanes = true
+bus_red = 0.3
+cycle_lanes = true
+# - Kopfsteinpflaster: 18 % of the residential ways and 46 % of the living streets are surface=sett (granite setts)
+setts = ["sett", "cobblestone", "unhewn_cobblestone"]
+# - the Berliner Gehweg (AV Geh- und Radwege 2023): a mosaic-sett strip each side of the slab walkway (granite slabs
+#   in the Altbau streets, 35 cm concrete plates elsewhere) on most side streets, fewer on the main roads (style 1:
+#   city.json markings.sidewalk.style2); the rest plain slabs
+# (M5 fix round: more on the Altbau main streets: Oranienstrasse's was plain slabs)
+sidewalk_style = { primary = 0.5, secondary = 0.8, tertiary = 0.8, residential = 0.85, unclassified = 0.6, living_street = 0.5 }
+# - tram tracks (OSM railway=tram, 96 km in the area: Torstraße, Invalidenstraße, Alexanderplatz, Warschauer Straße,
+#   the Hauptbahnhof): grooved rails in the asphalt, a fifth in granite setts (Pflastergleis), grass or ballast beds
+#   off the road
+trams = { setts = 0.2, road_w = 2.4, off_w = 3.4 }
+# - Unter den Linden's Mittelpromenade (M5 fix round): the space between the two carriageways one water-bound gravel
+#   walk with granite edging (sidewalk style 2, city.json markings.sidewalk.promenade), not two slab sidewalks
+promenades = ["Unter den Linden"]
+sidewalk_style_names = ["Oranienstraße", "Adalbertstraße", "Kastanienallee", "Bergmannstraße"]   # the Gehweg end to end
+[markings.sidewalk_w]       # Berlin pavements (AV guide values; region research 1.3: Altbau streets 4-5.5 m with the
+                            # Unterstreifen's trees; class I 5 m), not europe-west's Paris widths
+trunk = 4.0
+primary = 5.0
+secondary = 4.5
+tertiary = 4.5
+residential = 4.5
+unclassified = 3.5
+living_street = 3.0
+
+# M6: the Baumkataster (Land Berlin, Baumbestand Berlin, dl-de/zero-2.0; raw/trees/README.txt) stands for the street
+# and park trees in the districts: scripts/m6_trees.py writes trees_street.csv (107,650 round the boundary) and
+# trees_park.csv (124,542) in the data folder. Rail land and stations take none (London's rule: no landuse=railway
+# trees between the Stadtbahn's tracks); heights in half metres (park oaks and beeches reach 25-35 m); crowns
+# capped short of the facades (Berlin's Altbau streets are 22-30 m wide between facades, the limes' crowns 8-12 m)
+# and at the census's own crown diameter; the census's park trees stand on the ground (lift_flag: only trees on
+# the drawn street surface take city.json's streetLift); none under the U1 viaduct's or the bridges' decks
+[trees]
+none_extra = ["landuse=railway", "railway=platform", "public_transport=station"]
+height_q = 2
+clip_walls = { gap = 0.6, min = 2.5 }
+lift_flag = true
+census_off_decks = true
+[trees.green]
+"tourism=zoo" = "forest"    # the Zoo's grounds are densely wooded; its enclosures (landuse=grass, smaller) stay open
+[trees.street]
+# invented street trees only outside the districts (the census inside): limes first (region_research.md §3.6:
+# 72 trees per km of street, the nearest neighbour 8.9 m, 1.8-2.3 m in from the kerb)
+step = 8.9
+row_offset = 2.0
+planted = { major = 0.6, minor = 0.55 }
+height = { broadleaf = { major = [10, 19], minor = [7, 15] }, palm = [11, 16], flowering = [7, 10] }
+[trees.street.census]
+lon = "lon"
+lat = "lat"
+species = "genus"
+height_field = "height"
+crown_field = "crown"
+height = [12.0, 0.0, 3.0, 38.0]  # (no trunk size used: 1-5 % of heights unknown take their group's median)
+jitter = 0.06                    # heights are whole metres
+species_bits = 3
+# the viewer's eight Berlin species (city.json trees.species), by genus; a genus takes the first group naming it.
+# Street trees in the districts (region_research.md §3.2): lime 41.9 %, maple 16.3, plane 8.6, oak 4.6, horse
+# chestnut 3.5; park trees: maple 29 %, lime 12, oak 12, hornbeam 5, beech 5, robinia 4.5, poplar 3.9
+groups = [
+    ["lime", ["Tilia"]],                                        # Linde: tall, dense, heart-shaped leaves, yellowing
+    ["maple", ["Acer", "Liquidambar"]],                         # Ahorn (Spitz-, Berg-), yellow to orange in October
+    ["plane", ["Platanus"]],                                    # Platane: London's plane model (opt-in keys)
+    ["oak", ["Quercus"]],                                       # Eiche: the Tiergarten's 24 %
+    ["chestnut", ["Aesculus"]],                                 # Rosskastanie, leaf-miner brown by October
+    ["robinia", ["Robinia", "Gleditsia", "Styphnolobium", "Sophora", "Ailanthus", "Gymnocladus"]],   # pinnate, light
+    ["birch", ["Betula"]],                                      # Birke: white bark, small yellowing leaves
+    ["broadleaf", []],      # the rest: hornbeam, beech, poplar, hazel, elm, ash, willow, hawthorn, pear, the few conifers ...
+]
+# green areas holding >= 10 listed trees a hectare (the parks: Treptower Park 61, Volkspark Friedrichshain 132,
+# Hasenheide 91) have only those; the woods (OSM natural=wood: 103 ha of the Tiergarten's 180, where the census
+# holds ~70 a hectare, a dense wood ~150) keep the invented forest between them; no invented tree in the 3 x 3
+# cells round a listed one
+# (M6 fix round: the woods keep their invented trees wherever no listed tree stands within 15 m, keep_woods: the
+# Baumkataster lists the south-east Tiergarten's woods only in part, which stood as a bare lawn)
+cover = { per_ha = 10, cells = 1, classes = ["park", "orchard", "scrub", "grass"], keep_woods = 15 }
+# (trees_extra.csv: scripts/m6_trees.py --rows, Unter den Linden's four lime rows where the census leaves them out)
+sources = [{ file = "trees_street.csv", street = true }, { file = "trees_park.csv", dedupe = 1.0 },
+           { file = "trees_extra.csv", street = true, dedupe = 1.0 }]
+
+# M6: Berlin's traffic (data/region_research.md §2): the Verkehrsmengenkarte 2023's heavy share (2.5 %), the fleet
+# (KBA, LABO): cars ~70 % of the motor vehicles (SUVs 13 %), vans 12 %, taxis 4 % (6,552 licensed, hellelfenbein
+# RAL 1015 by law), BVG buses 4 % on the corridors, motorbikes 2 %. Right-hand traffic (city.toml drive); OSM draws
+# the dual carriageways (Karl-Marx-Allee, Unter den Linden, Leipziger Straße, Straße des 17. Juni) as two one-way
+# ways: each keeps to its share of the gap (twin_limits). Buses only on OSM's bus routes (route=bus relations):
+# BVG yellow (RAL 1023), solo and articulated MAN Lion's City, the ADL Enviro500 double-deckers on the 100, 200,
+# 300 and the M-/X-lines that use them. Yellow Flexity trams on OSM's tram tracks (Mitte, Friedrichshain, Moabit;
+# Kreuzberg has none): 30.8 m trains of four modules, one every ~700 m on each track (a tram every 5-10 minutes
+# at ~20 km/h)
+[cars]
+deck_ends = true            # a lane meeting a bridge deck takes the deck's height at their node, not the ground's (quay walls read the river bed there)
+types = [
+    ["sedan", 4.25, 1.79, 1.46, "hatch"],        # Golf, Polo, Octavia, A-Class, 1-Series, Corsa, Model 3
+    ["suv", 4.45, 1.84, 1.65, "crossover"],      # Tiguan, T-Roc, Q3, Model Y, Kuga
+    ["taxi", 4.93, 1.85, 1.47, "taxi"],          # E-Class T-Modell, Octavia, Prius+: hellelfenbein, the yellow TAXI sign
+    ["van", 5.0, 1.95, 1.95],                    # Transporter, Sprinter, Crafter
+    ["bus", 12.0, 2.55, 3.1],                    # MAN Lion's City 12, eCitaro: BVG yellow, pale roof
+    ["truck", 8.0, 2.5, 3.3],                    # rigid delivery trucks, BSR refuse trucks
+    ["lorry", 12.0, 2.55, 3.8],
+    ["moto", 1.95, 0.72, 1.2],
+    ["bus_art", 18.1, 2.55, 3.1, "bus_art"],     # MAN Lion's City 18 G: the articulated workhorse of the M-lines
+    ["bus_dd", 13.0, 2.55, 4.1, "bus_london"],   # ADL Enviro500 (199 double-deckers): the 100, 200, 300, M-/X-lines
+    ["tram", 8.4, 2.4, 3.4, "tram_cab"],         # Flexity Berlin, 2.40 m wide: the front cab module
+    ["tram_mid", 6.6, 2.4, 3.4, "tram_mid"],
+    ["tram_tail", 8.4, 2.4, 3.4, "tram_tail"],   # the rear cab, facing back
+]
+twin_limits = true
+kerb_occupancy = 0.62       # Altbau streets parked bumper to bumper (Parkraumbewirtschaftung zones), broken by driveways and bays
+# (M6 fix round: one file per kerb with 15-25 % of the slots empty, and OSM's lane and street-side parking strips
+# (Planckstrasse's, Am Weidendamm's) parked as one file along the strip, not filled as car parks)
+kerb_occupancy_max = 0.82
+street_side_lots = "row"
+stop_clear = 2.5           # queues behind the stop line and the Furt of every signalled arm
+park_pitch = [5.5, 6.0]
+# sedan, suv, taxi, van, bus, truck, lorry, moto (bus_art, bus_dd and the trams: none parked)
+parked_mix = [60, 15, 1, 12, 0, 0.5, 0, 2]
+restricted_mix = [10, 4, 30, 14, 14, 0, 0, 6]
+[cars.kerbside]             # region_research.md §2.5, calibrated on OSM's parking tags
+primary = 0.08
+secondary = 0.18
+tertiary = 0.35
+residential = 0.6
+unclassified = 0.4
+living_street = 0.3
+road = 0.35
+service = 0.12
+[cars.class]                # speed m/s, mean gap m, queue factor, mix [sedan, suv, taxi, van, bus, truck, lorry, moto]
+motorway = [20, 36, 0.8, [50, 16, 2, 14, 0, 7, 6, 1.5]]
+trunk = [13, 34, 0.5, [55, 14, 3, 13, 2, 4, 1, 2]]
+primary = [11, 32, 0.5, [55, 13, 4, 12, 6, 2.5, 0.3, 2]]     # (buses only where routes run: [cars.bus_routes])
+secondary = [10, 34, 0.5, [57, 13, 4, 12, 4, 2.5, 0, 2]]
+tertiary = [8, 42, 0.45, [58, 13, 3, 13, 3, 2.5, 0, 2]]
+residential = [7, 60, 0.4, [60, 14, 2, 14, 0, 2, 0, 2]]
+unclassified = [7, 70, 0.4, [60, 14, 2, 14, 0, 2, 0, 2]]
+living_street = [4, 120, 0.5, [60, 14, 1, 16, 0, 0, 0, 2]]
+road = [7, 70, 0.4, [60, 14, 2, 14, 0, 2, 0, 2]]
+service = [5, 140, 0.5, [58, 13, 2, 22, 0, 1, 0, 2]]
+[cars.bus_routes]
+min = 3.0                   # a mix weight: residential streets on a route get buses too
+split = { bus = 0.45, bus_art = 0.55 }
+dd = "bus_dd"
+networks = ["Verkehrsverbund Berlin-Brandenburg"]   # BVG and the VBB, not the Flixbus coaches
+skip = ["N"]                # the night lines (N1-N97): no buses at 4 pm on streets only they take
+dd_refs = ["100", "200", "300", "M19", "M29", "M41", "M46", "M48", "M85", "X9", "X34", "X10", "TXL"]
+dd_share = 0.5
+[cars.trams]
+modules = ["tram_tail", "tram_mid", "tram_mid", "tram"]
+gap = 0.25
+speed = 6.5
+spacing = 700.0
+# colours (region_research.md §2.4: KBA new cars 2025 grey/silver 32 %, black 27, white 19, blue 10, red 5,
+# green 3; the stock older, more silver and blue)
+[cars.palettes]
+# (M6 fix round: the critic read the traffic too blue: grey ~20 % and silver ~10 %, black ~25 % as a neutral #1a1c1e
+# (not a blue-black), white ~20 %, blue ~9 % and darker, few saturated colours)
+sedan = [["#b3b5b7", "", 10], ["#5f6163", "", 12], ["#8b8d8f", "", 8], ["#1a1c1e", "", 25], ["#efefed", "", 20],
+    ["#2d3e5c", "", 7], ["#1f2733", "", 2], ["#8e2228", "", 5], ["#34443a", "", 3], ["#c4b9a2", "", 3],
+    ["#6d4f3a", "", 1], ["#444648", "", 4]]
+suv = [["#b3b5b7", "", 10], ["#5f6163", "", 14], ["#8b8d8f", "", 8], ["#1a1c1e", "", 26], ["#efefed", "", 19],
+    ["#2d3e5c", "", 8], ["#8e2228", "", 4], ["#34443a", "", 4], ["#c4b9a2", "", 3], ["#444648", "", 4]]
+taxi = [["#e4dccb", "#e4dccb", 95], ["#16171a", "#16171a", 3], ["#b5b9bd", "#b5b9bd", 2]]    # hellelfenbein (sampled #e7e3d8)
+van = [["#f0f0ee", "", 58], ["#b3b5b7", "", 10], ["#5f6163", "", 7], ["#1a1c1e", "", 7], ["#2d3e5c", "", 4],
+    ["#ffcc00", "#ffcc00", 4], ["#e8641c", "", 2], ["#a32028", "", 3], ["#c9bb9f", "", 3], ["#e7e9ec", "", 2]]   # DHL/Post yellow, BSR orange
+bus = [["#f0d722", "#e4e4e0", 100]]          # BVG Verkehrsgelb (RAL 1023, sampled #f0cd04), the pale roof
+bus_art = [["#f0d722", "#e4e4e0", 100]]
+bus_dd = [["#f0d722", "#3b3d40", 100]]       # (the double-decker's second colour is its skirt)
+tram = [["#f0d722", "#e8e8e4", 100]]         # Flexity: yellow, the white roof, black window band, dark skirt
+tram_mid = [["#f0d722", "#e8e8e4", 100]]
+tram_tail = [["#f0d722", "#e8e8e4", 100]]
+truck = [["#f0f0ee", "#f0f0ee", 55], ["#e8641c", "#e8641c", 10], ["#f0f0ee", "#b3282a", 8], ["#1b3f7a", "#f0f0ee", 8],
+    ["#8d9196", "#f0f0ee", 11], ["#16171a", "#f0f0ee", 8]]                                   # (BSR orange)
+
+[shores]
+# the Spree's banks through Mitte and the government quarter are stone quay walls (Museum Island, the Kupfergraben,
+# the Schiffbauerdamm, the Reichstagufer), the Landwehrkanal's sandstone-faced walls under its path: masonry faces
+# at the water with a coping (London's and Paris's settings)
+bank_type = "pondedge"
+quay_walls = true
+quay_face = 2.5
+quay_apron = 5.0
+
+[facade.berlin]             # presets/de_berlin: the style rules' block layer and the character areas
+structure = "landuse/reale_nutzung_2024_bbox.geojson"   # Umweltatlas Realnutzung 2024 (typ_klar: block structure type)
+# character areas (later ones win): their character for the kinds each takes (presets/de_berlin/__init__.py rule 6)
+[facade.berlin.areas]
+"Fischerinsel" = { character = "platte", polygon = [[13.4040, 52.5125], [13.4118, 52.5125], [13.4118, 52.5082], [13.4040, 52.5082], [13.4040, 52.5125]] }
+"Leipziger Straße" = { character = "platte", polygon = [[13.3905, 52.5114], [13.4060, 52.5114], [13.4060, 52.5086], [13.3905, 52.5086], [13.3905, 52.5114]] }
+"Mollstraße and Karl-Marx-Allee II" = { character = "platte", polygon = [[13.4130, 52.5285], [13.4330, 52.5285], [13.4330, 52.5196], [13.4265, 52.5180], [13.4130, 52.5205], [13.4130, 52.5285]] }
+"Friedrichstadt" = { character = "neubau", polygon = [[13.3800, 52.5200], [13.4000, 52.5200], [13.4000, 52.5050], [13.3800, 52.5050], [13.3800, 52.5200]] }
+"Museum Island and Unter den Linden" = { character = "sandstein", polygon = [[13.3880, 52.5228], [13.4030, 52.5228], [13.4030, 52.5160], [13.3880, 52.5160], [13.3880, 52.5228]] }
+"Government quarter" = { character = "beton", polygon = [[13.3660, 52.5232], [13.3800, 52.5232], [13.3800, 52.5172], [13.3660, 52.5172], [13.3660, 52.5232]] }
+"Potsdamer Platz" = { character = "glass", polygon = [[13.3700, 52.5118], [13.3810, 52.5118], [13.3810, 52.5050], [13.3700, 52.5050], [13.3700, 52.5118]] }
+"Breitscheidplatz and the Zoo" = { character = "glass", polygon = [[13.3260, 52.5085], [13.3420, 52.5085], [13.3420, 52.5025], [13.3260, 52.5025], [13.3260, 52.5085]] }
+"Alexanderplatz" = { character = "glass", polygon = [[13.4085, 52.5245], [13.4175, 52.5245], [13.4175, 52.5198], [13.4085, 52.5198], [13.4085, 52.5245]] }
+"Europacity and the Hauptbahnhof" = { character = "glass", polygon = [[13.3620, 52.5330], [13.3760, 52.5330], [13.3760, 52.5245], [13.3620, 52.5245], [13.3620, 52.5330]] }
+"Mediaspree" = { character = "glass", polygon = [[13.4360, 52.5085], [13.4480, 52.5085], [13.4480, 52.5030], [13.4360, 52.5030], [13.4360, 52.5085]] }
+# the Stalinallee's first section, Strausberger Platz to Frankfurter Tor (1952-60): a band ~110 m each side
+"Karl-Marx-Allee (Strausberger Platz to Frankfurter Tor)" = { character = "kma", polygon = [[13.4262, 52.5195], [13.4560, 52.5170], [13.4560, 52.5146], [13.4262, 52.5170], [13.4262, 52.5195]] }
+"Hansaviertel" = { character = "hansa", district = "Hansaviertel" }
+
+# M10 fix round (builder R): [facade.zones] (buildings whose inside point lies in the polygon take the style and tint):
+# the stelae plain weathered concrete (not the civic grid with windows); the Kanzleramt's 3011 pieces white concrete
+# panels (the critic: its chip landed on beige Altbau blocks, the de-berlin rules' sandstone and Altbau for the
+# 3.9-4.4 m storeys)
+[facade.zones]
+"Stelenfeld" = { style = "plain", tint = "#7d7f80", variant = 0.5, polygon = [[13.377554, 52.513176], [13.376096, 52.51323], [13.376072, 52.513261], [13.37774, 52.514473], [13.377846, 52.514509], [13.378093, 52.514527], [13.379223, 52.514598], [13.37952, 52.514595], [13.379974, 52.513702], [13.379921, 52.513629], [13.377704, 52.513193], [13.377554, 52.513176]] }
+"Bundeskanzleramt" = { style = "concretepanel", tint = "#d6d3cc", polygon = [[13.370672, 52.519673], [13.365632, 52.519675], [13.365584, 52.519702], [13.367994, 52.520643], [13.370674, 52.520644], [13.370672, 52.519673]] }
+
+[tiles]
+pillars_in_water = true     # the Spree bridges stand on piers in the river
+# footprints over 20 % in the Spree (the water bodies over 1 km²) and on no deck: clipped to the bank where a fifth
+# lies on land, else plain pontoons of at most 4.5 m (the landing stages, the Badeschiff)
+river = { min_km2 = 1.0, share = 0.2, land = 0.2, pontoon_h = 4.5, keep = ["tower"] }
+# M10 fix round (critic 1, high): the Holocaust Memorial's 2,600 stelae (2.4 m² each, kept "exact" by the first
+# [buildings] rule) fell to 06_tiles' 4 m² footprint cull: pieces a rule keeps at their exact height are drawn
+small_exact = true
+
+[blocks]                    # 07b_blocks: 2 km blocks (Paris M9, London)
+size = 2000
+
+[terrain]
+far_reach = 36000.0         # the backdrop: the Barnim plateau's edge, the Grunewald and Teufelsberg, the Müggelberge
+peak_radius = 50.0          # the summit table at the summits themselves
+# Copernicus GLO-30 beyond the DGM1 is a surface model, 4.8 m over the DGM1 by median (checks/dem.md): let down by
+# that much so the backdrop meets the ground area's edge without a step
+back_shift = -4.8
+backdrop_cover = "worldcover"   # the backdrop coloured from ESA WorldCover (06e_masses), not by height (Paris M7)
+backdrop_town_rgb = [118, 113, 106]
+# OSM's roads painted into the 20 m land cover map round the masses (London's M3 fix round): the town's street grid
+cover_roads = { motorway = 24.0, trunk = 18.0, primary = 14.0, secondary = 12.0, tertiary = 10.0, residential = 8.0, unclassified = 8.0, living_street = 6.0 }
+# (M7 fix round) a 10 m line map over the inner cover map: the town layer's asphalt, the rail beds as ballast with track
+# lines (the Ringbahn and the A100 south of the Tempelhofer Feld read as a mottled grey-brown smear)
+cover_lines = { cell = 10.0, rail = 4.0, yard = 0.6 }
+# the DGM1 kept sharp (Paris's and London's settings): the Spree's quay walls stand 2-3 m over the water, one 5 m
+# cell wide, the Landwehrkanal's 1.5-2.5 m
+work = 5.0
+tin_cell = 5.0
+smooth_bare = 2.5
+tin_error = 2.0
+tin_error_far = 4.0
+tin_error_bank = 0.5
+tin_steps = 3.0
+water_flat = 0.0
+water_ramp = 5.0
+flat_spread = 3.0
+water_all_touched = false
+quay_walls = true
+# pits in the DGM1 (checks/sources.md §7: 182 under 30 m NHN in the ground area; no real dry ground in central
+# Berlin is under ~31 m): the Tiergarten tunnel's ramp south of Potsdamer Platz (15.3 m), a 6.0 m hole at Westend,
+# building pits and basements. Every dry pit with a cell under 29 m NHN re-filled from its outline as far as it
+# lies 2 m under the ground's closing over 150 m (London's [terrain] pits); the rail and A100 cuttings (33-38 m
+# NHN at their floor) seed none and stay
+# (M3 fix round) pits holding 50 m or more of a motorway or railway at ground level are cuttings and troughs, left as
+# the DGM1 has them (the A100's trough at Sonnenallee had been filled 11 m up, a pit at 52.527, 13.279 24 m)
+pits = { below = 29.0, grow = 2.0, window = 150.0, keep_ways = ["motorway", "motorway_link", "rail", "light_rail", "subway"], keep_len = 50.0 }
+# the Jakob-Kaiser-Haus's sunken courts east of the Reichstag (the DGM1 at 30 m NHN, 4.7 m under Dorotheenstraße: the
+# critic's "sunken rectangular pit with walls"), over its basement's outline: re-filled from the street round it
+# ... and a 1.8 ha hump of the DGM1 inside the Hauptbahnhof (to 9.8 m in the scene over Europaplatz's 4.5: the station's
+# floor kept as ground), which lifted the Stadtbahn 5 m through the hall (its decks count from the highest ground
+# within 80 m): re-filled from the streets round it, so the tracks run level through the station at ~11 m
+patches = [[[13.377567, 52.518328], [13.377545, 52.518451], [13.378136, 52.518491], [13.378195, 52.518167], [13.378529, 52.51819], [13.378469, 52.518514], [13.37882, 52.518538], [13.378879, 52.518214], [13.379266, 52.518241], [13.379212, 52.518806], [13.379472, 52.518844], [13.379508, 52.518644], [13.379846, 52.518668], [13.379815, 52.518837], [13.380175, 52.518861], [13.380276, 52.518178], [13.380371, 52.518131], [13.377444, 52.517949], [13.377443, 52.518116], [13.377705, 52.518133], [13.377669, 52.518335], [13.377567, 52.518328]], [[13.3682, 52.5241], [13.3707, 52.5241], [13.3707, 52.5259], [13.3682, 52.5259], [13.3682, 52.5241]]]
+# (M7) the DGM1's 81 tiles leave the ground area's four corners bare (8 % of the work grid), which the nearest-cell
+# fill drew as stretched-column streaks (checks/terrain.png): filled from GLO-30 instead, opened 150 m (its roofs and
+# woods), offset to the DGM1 along the edge and easing into the two's median difference over 600 m
+gap_fill = { open = 150.0, smooth = 60.0, edge = 150.0, blend = 600.0 }
+# (M7) the Ringbahn's and the A100's cuttings past the roads' 1 km margin (no tracks or carriageways drawn in them) read
+# as smeared soft bands across the overview's foreground (M3 critic 2): filled to grade from their outlines
+cuttings = { beyond = 1000.0, near = 30.0, grow = 2.0, window = 150.0 }
+# (M7) the Umweltatlas footprints painted into the 20 m cover map in the town colour: no back-yard tree green under the masses
+cover_buildings = true
+# the named summits beyond the DGM1 pinned in the backdrop at their surveyed heights (its 200 m cells averaged
+# Teufelsberg to 78 m in the scene for 90, the Arkenberge to 64 for 92)
+back_peaks = true
+# Ground = metres over NHN minus this datum. NOT the default "auto" (the lowest cell): the DGM1 holds cut-and-cover
+# tunnels and pits (15.3 m in the Tiergarten tunnel's ramp south of Potsdamer Platz, 6.0 m at Westend; 182 pits
+# under 30 m in the ground area, checks/sources.md §7). The DGM1's water surfaces: the Spree's upper pool 32.3 m
+# (above the Mühlendamm lock: the Dom, the Oberbaumbrücke, the Landwehrkanal 32.0), the lower pool 31.5 m at the
+# Reichstag, falling to ~30.7 m downstream (checks/dem.md, sources.md §7). M3 settles the datum (the viewer's water
+# mirror assumes water near 0; Paris put the Seine at 0)
+datum = 30.0
+# named summits for checks/dem.md and checks/terrain.md: lon, lat, height (m NHN) of OSM's natural=peak nodes
+[terrain.peaks]
+"Kreuzberg (Viktoriapark)" = [13.38152, 52.48774, 66]
+"Großer Bunkerberg (Mont Klamott)" = [13.43215, 52.52637, 78]
+"Kleiner Bunkerberg" = [13.43638, 52.52796, 68]
+"Humboldthöhe (Humboldthain)" = [13.38478, 52.54733, 84.5]
+"Insulaner" = [13.35155, 52.45742, 78]
+"Teufelsberg" = [13.24295, 52.49772, 120]
+"Großer Müggelberg" = [13.64265, 52.41677, 114.8]
+"Arkenberge" = [13.40480, 52.63817, 121.9]
+"Großer Ahrensfelder Berg" = [13.58179, 52.55631, 114]
+[terrain.spots]
+"Spree beside the Berliner Dom, lower pool (the water)" = [13.40350, 52.51800]
+"Spree at the Reichstag, lower pool (the water)" = [13.37540, 52.51990]
+"Spree at the Oberbaumbrücke (the water)" = [13.44620, 52.50140]
+"Landwehrkanal at Hallesches Tor (the water)" = [13.39110, 52.49764]
+"Alexanderplatz" = [13.41300, 52.52190]
+"Pariser Platz (Brandenburg Gate)" = [13.37900, 52.51630]
+"Potsdamer Platz" = [13.37620, 52.50960]
+"Tiergarten tunnel ramp south of Potsdamer Platz (DGM pit)" = [13.36900, 52.50370]
+"Breitscheidplatz" = [13.33500, 52.50470]
+"Prenzlauer Berg (Senefelderplatz)" = [13.41230, 52.53250]
+"Prenzlauer Berg (Kollwitzplatz)" = [13.41740, 52.53600]
+
+# camera presets for the viewer's menu (06_tiles, M3 on): [lon, lat, distance m, elevation deg, azimuth deg (from
+# the target to the camera), lift m (the target over the ground)]. A first set; M3 and M4 frame them in the viewer
+[views]
+group_order = true          # M10: each menu group in its [views.groups] order
+[views.areas]
+"Berlin overview" = [13.3900, 52.5130, 13000, 30, 200]
+# (M10 fix round: "Mitte and Museum Island" overlapped "Museum Island": over the Friedrichstadt and Unter den Linden instead)
+"Mitte" = [13.3890, 52.5160, 1500, 24, 200]
+"Alexanderplatz" = [13.4130, 52.5220, 1200, 24, 220]
+"Government quarter" = [13.3700, 52.5180, 1800, 24, 160]
+"Potsdamer Platz" = [13.3760, 52.5095, 1100, 22, 160]
+"Kreuzberg" = [13.4100, 52.4960, 1800, 26, 200]
+"Friedrichshain" = [13.4400, 52.5050, 1600, 22, 210]
+# (M10 fix round: "Zoo and Kurfürstendamm" overlapped "Kurfürstendamm": the Zoo, its station and Breitscheidplatz from the south-east)
+"City West and the Zoo" = [13.3380, 52.5075, 1400, 24, 150]
+# M10 areas (the camera south-south-west unless named, so the afternoon sun lights what is seen; 28-32 degrees down
+# over the quarters, closer and steeper than the districts' views above)
+"Museum Island" = [13.3962, 52.5203, 650, 30, 190, 10]     # (M10 fix round: from the south, the Fernsehturm out of frame, not cut)
+"Treptower Park" = [13.4705, 52.4868, 650, 26, 200, 5]              # the Soviet War Memorial (mound, soldier, banners: M10 fix round figures), the park, the Spree
+# street and river
+"The Spree (Weidendammer Brücke)" = [13.3910, 52.5221, 180, 4, 280, 2]
+"Unter den Linden (street level)" = [13.390502, 52.517114, 80, 4, 264, 3]   # (M5 fix round: on the Mittelpromenade's middle, between its two lime rows)
+"Oranienstraße (street level)" = [13.418477, 52.501571, 45, 0.5, 295, 2]   # on the north footway by the kerb, 6.5 m off the centre line, looking ESE
+# M4 fix round (builder F): an Altbau street at eye level, Bergmannstraße from the north footway towards Marheinekeplatz
+# M5: ground views (markings, trams, parks, water)
+# (M5 fix round: the Friedrichstraße junction draws no crossings (its arms short between the two AWA carriageways)
+# and lies in the street canyon's shade: the signalled junction at Wilhelmstraße and Voßstraße, from Wilhelmstraße to the south-south-east)
+"Landwehrkanal (Admiralbrücke)" = [13.413838, 52.495164, 100, 9, 83, 2]
+# skyline and landmarks
+# M10: the opening view: from over the Friedrichstadt east-north-east down Unter den Linden past Bebelplatz to the
+# Lustgarten, the Dom, the Humboldt Forum and the Fernsehturm, the afternoon sun behind the camera
+"Unter den Linden to the Fernsehturm" = [13.4020, 52.5195, 1300, 10, 250, 50]
+"Fernsehturm" = [13.4094, 52.5208, 900, 14, 230, 180]
+"Brandenburg Gate" = [13.3777, 52.5163, 300, 10, 90, 12]
+"Reichstag" = [13.3761, 52.5186, 450, 16, 120, 20]
+# (M3 fix round) from the south-west over the Spree and the Rathausstraße, the front with its tower, the Fernsehturm whole beside it
+"Gedächtniskirche" = [13.3350, 52.5048, 380, 12, 245, 25]
+"Siegessäule" = [13.3501, 52.5145, 500, 12, 250, 40]
+"Hauptbahnhof" = [13.3695, 52.5250, 650, 18, 180, 15]
+"Oberbaumbrücke" = [13.4456, 52.5017, 450, 10, 300, 10]
+# M4 (builder T): the modern landmarks' own views
+"Karl-Marx-Allee" = [13.4420, 52.5166, 900, 12, 275, 20]
+# M4 builder H: more landmark views
+"Gendarmenmarkt" = [13.3926, 52.5137, 420, 16, 175, 25]
+"East Side Gallery" = [13.4415, 52.5050, 260, 12, 205, 2]
+# M10 landmarks (the target lifted to about a third of the building; azimuth: where the camera stands)
+# (M10: no Tempodrom view: its tent roof is not modelled, a brick hall under a hipped roof)
+# M10 fix round: the stelae drawn ([tiles] small_exact), the Schloss and the Wall memorial
+"Holocaust Memorial" = [13.37800, 52.51390, 260, 30, 205, 1]                # the Stelenfeld from the south-south-west, the Tiergarten behind
+"Berlin Wall Memorial" = [13.39060, 52.53500, 240, 20, 140, 2]             # the Wall's preserved segments by the Ackerstraße (m10f figures) and the former death strip, from the south-east
+# M8: dusk and night (the 7th value: the hour the view sets)
+# M7: hills and far views. A hill view's camera stands over the summit (the eye 20-40 m up, over its trees), looking
+# 4.4-4.5 degrees down along a bearing: the target lies the distance ahead, lifted so the eye is there (the summits:
+# the Kreuzberg 66 m NHN, Mont Klamott 78, the Teufelsberg 120 and the Großer Müggelberg 115 pinned in the backdrop)
+"The city from the Kreuzberg" = [13.38396, 52.49383, 700, 4.5, 195.0, -0.2]     # north over Kreuzberg to Mitte and the Fernsehturm
+# from the Drachenberg (98.6 m NHN in the DGM1, the Teufelsberg's rubble neighbour 700 m north-east): the Teufelsberg's
+# summit lies 240 m west of the ground area, on the backdrop's bare 200 m cone, which filled half the view
+# (no view from the Müggelberge: 10 km beyond the ground area they stand on the backdrop's bare 200 m TIN, the
+# Müggelsee a flat grey sheet and the city a thin line 20 km off in the haze: the backdrop doesn't hold that close)
+"Over Berlin to the horizon" = [13.4300, 52.5400, 15000, 10, 210]               # north-north-east to the Barnim's edge
+# (M7 fix round) the hills as landforms, low and oblique: the Kreuzberg from over Großbeerenstraße ~35 m up, 300 m short of the falls (its north slope,
+# the waterfall down it, Schinkel's monument on the summit), the Drachenberg and the Teufelsberg from the south-east over the Grunewald, ~110 m up (from the east the Messe's halls filled the foreground)
+[views.groups]
+"Street and river" = ["Unter den Linden (street level)", "Oranienstraße (street level)", "The Spree (Weidendammer Brücke)", "Landwehrkanal (Admiralbrücke)"]
+"Skyline and landmarks" = ["Unter den Linden to the Fernsehturm", "Fernsehturm", "Brandenburg Gate", "Reichstag", "Holocaust Memorial", "Gendarmenmarkt", "Gedächtniskirche", "Siegessäule", "Hauptbahnhof", "Karl-Marx-Allee", "East Side Gallery", "Oberbaumbrücke", "Berlin Wall Memorial"]
+"Hills and far views" = ["The city from the Kreuzberg", "Over Berlin to the horizon"]
+# the menu: Areas (every [views.areas] view not named here), then these groups in this order (M10; Prenzlauer Berg
+# and the Tempelhofer Feld lie outside the districts: no view). M10 renamed nine long chips: "Government quarter and
+# Tiergarten", "Friedrichshain and the East Side Gallery", "Crossing Anton-Wilhelm-Amo-Straße and Wilhelmstraße",
+# "Rosenthaler Platz tram (street level)", "Kaiser-Wilhelm-Gedächtniskirche", "The Drachenberg and Teufelsberg from the south-east",
+# "Hackescher Markt and the Scheunenviertel", "Kottbusser Tor (Kreuzberg 36)", "The Spree from the Weidendammer Brücke"
+
+# >>> m8 lamps (builder M8)
+# 06e_lamps: Berlin's official street lighting inventory (gdi.berlin.de WFS beleuchtung, dl-de/zero-2.0; raw/lamps/
+# README.txt): 113,828 points in the box, EPSG:25833, no height, colour or flux per lamp, so those come by fixture type.
+# Gas (6 % in the area: Kreuzberg, Tiergarten, Hansaviertel; region_research.md lights) a dim green-gold mantle;
+# electric: LED <= 3,000 K is the standard for new lamps (25-35 % converted [believed]), the rest older white
+# fluorescent and, on a share of the main roads' bracket lamps, high-pressure sodium.
+[lamps]
+path = "lamps/beleuchtung_bbox.geojson"
+label = "Land Berlin, Öffentliche Beleuchtung (gdi.berlin.de, dl-de/zero-2.0)"
+crs = "EPSG:25833"
+kind_match = "contains"
+skip_status = ["Ausser Betrieb", "zeitw. Demontiert", "Sanierung (außer"]
+clip = 1500                 # the box reaches 6-10 km past the area: lamps there cost ~24 ms by night at the overview
+fields = { kind = "leuchtentyp", status = "status", street = "strasse" }
+[lamps.kinds]
+"Gas-Aufsatz" = { h = 4.2, gas = true, flux = 1100 }          # the Modell-/Schinkelleuchte on a 4 m cast post, 4-6 mantles
+"Gas-Hänge" = { h = 5.5, gas = true, flux = 1900 }            # the Reihenleuchte hanging from a bracket, 6-9 mantles
+"Gas-Reihen" = { h = 5.5, gas = true, flux = 1900 }            # Reihenleuchte (outside the area)
+"Gas-Sonder" = { h = 4.8, gas = true, flux = 1500 }           # candelabra, Bündelpfeiler
+"Vierfachausleger" = { h = 11, kelvin = 3500, flux = 9000, heads = 4, sodium = 0.35 }
+"Dreifachausleger" = { h = 11, kelvin = 3500, flux = 9000, heads = 3, sodium = 0.35 }
+"Doppelausleger" = { h = 10, kelvin = 3500, flux = 9000, heads = 2, sodium = 0.35 }
+"Zwillingsausleger" = { h = 9, kelvin = 3500, flux = 8000, heads = 2, sodium = 0.35 }
+"Auslegerleuchte" = { h = 9, kelvin = 3500, flux = 8000, sodium = 0.3 }
+"Überspannung" = { h = 9, kelvin = 3000, flux = 9000 }         # hung on a wire over the carriageway
+"Ansatzleuchte" = { h = 7, kelvin = 3000, flux = 4500 }       # side-entry heads on Peitschen- and Kandelabermasten
+"Aufsatzleuchte" = { h = 5, kelvin = 3000, flux = 2600 }      # post-top lanterns of the side streets and squares
+"Wandausleger" = { h = 5.5, kelvin = 3000, flux = 2500 }
+"Sonderform" = { h = 6, kelvin = 3000, flux = 3500 }
+"Rohrständer" = { h = 6, kelvin = 3000, flux = 3000 }
+"Elektrische Beleuchtung" = { h = 6, kelvin = 3000, flux = 3000 }
+# (dropped: Schaltkasten (switch boxes), Anstrahlung (floodlights: the landmarks' glows do that), Leuchtband (tunnels))
+# <<< m8 lamps
+

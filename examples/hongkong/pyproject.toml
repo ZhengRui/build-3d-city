@@ -1,0 +1,12 @@
+[project]
+name = "hongkong"
+version = "0.1.0"
+description = "Hong Kong option E (Victoria Harbour's both shores to the Lion Rock ridge, Tseung Kwan O, Clear Water Bay, Sai Kung): city.toml for the build-3d-city engine"
+requires-python = ">=3.12"
+dependencies = ["city3d"]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+city3d = { path = "../../.agents/skills/build-3d-city/engine/pipeline", editable = true }

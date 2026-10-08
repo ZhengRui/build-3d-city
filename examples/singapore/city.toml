@@ -1,0 +1,590 @@
+# Singapore: the centre and the Greater Southern Waterfront (option D, the user's choice of 6 Oct 2026; the boundary
+# note the Phase 0 boundary note): Marina Bay all round, the CBD, the Civic District, the Singapore
+# River, Chinatown, Bugis, Kampong Glam and Little India, Kallang Basin and the Sports Hub, Orchard Road, River Valley,
+# Tiong Bahru, the City Terminals port, HarbourFront, Keppel Bay, Mount Faber and Sentosa. Every city-specific setting
+# of the build-3d-city pipeline; the engine (.agents/skills/build-3d-city/engine/pipeline, its README lists every key
+# with its default) and the region preset "china-south" hold the rest. Run a stage with `uv run city3d <stage>` from
+# this folder, everything with `uv run city3d all`.
+
+# M4 landmark figures written by scripts/m4l_structures.py (engine README, "Generated settings")
+include = ["generated/structures-m4l.toml"]
+
+name = "singapore"
+title = "Singapore"
+# Singapore's own (M4): "sg-singapore", built on china-south (Shenzhen's: the nearest tower city, a subtropical coast with
+# mangroves and palms), whose tables it keeps but for the facade styles: HDB blocks with void decks, corridors and accent
+# paint, shophouses with five-foot ways and tile roofs, granite and colonial civic, condos, Sentosa villas ([facade.singapore])
+preset = "sg-singapore"
+# UTM 48N (central meridian 105 E; Singapore at 103.85 E: scale 0.99982). The official data is SVY21 (EPSG:3414,
+# a transverse Mercator on WGS 84): read in its own CRS by every adapter and warped as it loads
+utm_epsg = 32648
+coast = true                # the Singapore Strait, Keppel Harbour and the Marina Bay reservoir behind its barrage
+drive = "left"              # left-hand traffic: lanes, parking, medians and stop lines mirrored
+# metres per storey for OSM building:levels (M2): where OSM has both a height and levels, the median height per storey
+# is 3.4 (13-20 storeys, n 43), 3.8 (21-30, n 42) and 3.9 (31+, n 51); under 13 storeys the tags are mostly an
+# import's round heights (10 m on 2 and 3 storeys: 5.0 and 3.33 a storey), and Singapore's shophouses are ~4 m a
+# storey. 3.5: condos (3.2-3.4 + roof) and offices (4.0-4.2) between. HDB blocks have their own rule ([sources.hdb])
+level_h = 3.5
+user_agent = "city3d (you@example.com)"
+# The local Overpass first (Singapore's, port 8785; started by the user, from the Geofabrik Malaysia-Singapore-Brunei
+# extract), then the public mirrors Berlin lists. Connection refused falls through to the mirrors; 01_osm is run with
+# --overpass-cache ../data/singapore/raw/overpass so every answer is kept and replayed
+overpass = ["http://127.0.0.1:8785/api/interpreter", "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+    "https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter"]
+
+[osm]
+# by each district polygon's box, not Overpass area(): a fresh local Overpass may have no area data (Berlin's), and
+# the answer is the same set of buildings
+area = false
+# M2 fix round 2 (engine opt-ins of 6 Oct): underground=yes, location=underground|indoor and level < 0 outlines go
+# (HarbourFront MRT's box: underground=yes on layer=1; an indoor workshop)
+underground_drop = true
+# M3 fix round: "decks" (engine opt-in): raised decks such as the MBS SkyPark (193-207 m over the three
+# 198 m towers) and Canninghill Piers' skybridge (80.5-84 m) are kept in the air without the dedupe dropping the towers
+# under them. (Plain min_height had dropped MBS's towers and floated towers over podium rings.) Tanjong Rhu's Sky Deck
+# stays out by id
+min_height = "decks"
+
+# The user's boundary (6 Oct 2026, option D): URA Master Plan 2019 subzones (raw/MP2019_subzone_nosea.geojson,
+# Singapore Open Data Licence), 54 of them in 14 planning areas. URA's units are not OSM relations by URA's names
+# (OSM's level 6/7 copies, r19910xxx, differ in places), so every district is the country relation (Singapore,
+# r536780, which reaches into the territorial sea and so holds every subzone) clipped to the union of the chosen
+# subzones of one planning area: the clips ARE the subzone lines (simplified as a coverage by 5 m, shared edges kept),
+# read from data/boundary_districts.geojson by each district's name (its properties.name), which scripts/m1_boundary.py
+# writes (coordinates to 6 decimals). Maritime Square only east of 103.8085 E; Southern Islands only its Sentosa
+# subzone (four beach islets under 5 ha left out: 3.0 ha, no buildings); Kallang's Crawford is apart from Tanjong
+# Rhu, so a district of its own. 32.55 km² in all, of which 2.72 km² inland water (Marina Bay and Reservoir, Kallang
+# Basin, the river, Keppel channel): 29.82 km² land.
+# Underground: OSM's location=underground / layer<0 outlines (MRT stations, the Marina Bay Link Mall, the CityLink
+# and Esplanade Xchange malls) are dropped in M2 (common.load_osm does it by default; check them in checks/buildings.md)
+[districts]
+# City Terminals, Everton Park, Maritime Square, Singapore General Hospital, Telok Blangah Rise, Tiong Bahru; 7.55 km², 332 vertices
+"Bukit Merah (Tiong Bahru to the City Terminals)" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Anson, Bayfront Subzone, Bugis, Cecil, Central Subzone, City Hall, Clifford Pier, Marina Centre, Maxwell, Nicoll, Phillip, Raffles Place, Tanjong Pagar; 5.08 km², 188 vertices
+"Downtown Core" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Tanjong Rhu; 2.44 km², 71 vertices
+"Kallang (Tanjong Rhu)" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Crawford; 0.24 km², 29 vertices
+"Kallang (Crawford)" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Marina East; 1.84 km², 75 vertices
+"Marina East" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Marina South; 1.63 km², 55 vertices
+"Marina South" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Bras Basah, Dhoby Ghaut, Fort Canning; 0.83 km², 83 vertices
+"Museum" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Istana Negara; 0.54 km², 66 vertices
+"Newton (Istana Negara)" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Boulevard, Somerset, Tanglin; 0.96 km², 150 vertices
+"Orchard" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# China Square, Chinatown, Pearl's Hill, People's Park; 1.37 km², 106 vertices
+"Outram" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Institution Hill, Leonie Hill, One Tree Hill, Oxley, Paterson; 1.48 km², 127 vertices
+"River Valley" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Bencoolen, Farrer Park, Kampong Glam, Little India, Mackenzie, Mount Emily, Rochor Canal, Selegie, Sungei Road, Victoria; 1.59 km², 126 vertices
+"Rochor" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Boat Quay, Clarke Quay, Robertson Quay; 0.96 km², 118 vertices
+"Singapore River" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Sentosa; 4.92 km², 542 vertices
+"Sentosa" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+# Straits View; 1.13 km², 38 vertices
+"Straits View" = { relation = 536780, clip = "data/boundary_districts.geojson" }
+
+[sun]                       # the viewer's sun: late March, the dry north-east monsoon's end, the noon sun near the zenith
+latitude = 1.29
+declination = 1.0
+
+[sources]
+# M2: OSM is the footprint source (complete and current in the centre); HDB's blocks fill where OSM has none (6
+# small blocks, and the HDB complexes whose OSM outline is the whole podium: [buildings] exclude) and give every
+# footprint they cover their storeys, before OSM's tags (OSM's HDB heights are mappers' 3.0-3.4 m x storeys, and a
+# complex's outline carries its towers' height: Waterloo Centre 55 m on 7,900 m²). "est": OSM buildings with no
+# height and no levels take the median of their tagged neighbours of a similar footprint (scripts/m2_heights.py,
+# checks/m2_estimates.md), before the default of 3 storeys. URA's MP2019 layer is not a footprint layer (4 % of OSM
+# matched; checks/m1_sources.md): unused
+footprints = ["osm", "hdb", "est"]
+# est before osm_levels: it carries the shophouse rule (1-4 levels: 4.5 m + 4 m a storey); else only untagged ones
+heights = ["landmark", "hdb", "osm_height", "est", "osm_levels", "default"]
+dem = "copernicus"          # GLO-30: the only open DEM (no open LiDAR; OneMap3D is a viewer only). A surface model
+[sources.copernicus]
+# the ground area (3 km) and the backdrop (15 km) reach 103.6-104.05 E, 1.1-1.45 N
+tiles = ["N01_00_E103_00", "N01_00_E104_00"]
+
+[sources.hdb]               # HDB Existing Building (footprints) + HDB Property Information (storeys), data.gov.sg
+adapter = "file"
+# HDB's block footprints in the scene's box with max_floor_lvl joined by block number and street (scripts/m1_sources.py:
+# hdb_storeys.gpkg; raw/hdb_building, raw/hdb_property; Singapore Open Data Licence), towers cut out of the podiums
+# they overlap and podiums carrying their towers' storeys set to 3 (scripts/m2_heights.py: hdb_m2.gpkg)
+path = "../hdb_m2.gpkg"
+label = "HDB"
+role = "fill"
+# roof height from storeys (M2): HDB's floor to floor is 2.8 m, the void deck ~0.8 m more and the roof slab, parapet
+# and the lift motor rooms and tanks on it ~3 m: 2.8 x storeys + 4 (12 storeys 37.6 m, OSM's mappers 36-41; 30
+# storeys 88 m). OSM's HDB heights are no measurement (3.0, 3.33 and 3.4 m x storeys exactly on 23 of 44); the one
+# measured block, Pinnacle@Duxton, 50 storeys 156 m, has taller floors and its sky bridges (the landmark list sets
+# it). One- and two-storey blocks (markets, hawker centres, bin centres): 4 m a storey
+height = "where(max_floor_lvl > 2, max_floor_lvl * 2.8 + 4.0, where(max_floor_lvl > 0, max_floor_lvl * 4.0, 0))"
+keep = ["blk_no", "st_cod", "postal_cod", "max_floor_lvl", "year_completed", "residential", "commercial",
+    "multistorey_carpark", "podium_fix"]
+lend = ["max_floor_lvl", "year_completed", "residential", "commercial", "multistorey_carpark"]
+
+[sources.est]               # height estimates for OSM's untagged buildings (scripts/m2_heights.py: osm_est.gpkg)
+adapter = "file"
+# copies of the OSM outlines with no height or levels, field est = the median height of their tagged neighbours of a
+# similar footprint (checks/m2_estimates.md); plus the OSM outlines with layer=-1 that stand on the ground (Ocean
+# Financial Centre, two hotels): their copy is what keeps them ([buildings] surface_layers)
+path = "../osm_est.gpkg"
+label = "estimate"
+role = "fill"
+height = "est"
+keep = ["est_src"]
+
+[sources.ura]               # URA Master Plan 2019 Building layer (footprints only: BLDG_TYPE, no heights), data.gov.sg
+adapter = "file"
+path = "ura_building/ura_mp2019_building.geojson"
+label = "URA MP2019"
+role = "fill"
+keep = ["bldg_type"]
+
+[buildings]
+parts = true                # the CBD towers' building:part outlines (UOB Plaza, Republic Plaza, MBS's towers)
+# canopies (123 "roof": petrol stations, Bugis Street's, covered walkways), building sites (29: IR2, NS Square,
+# Skywater Residences, W Singapore Marina View; topped-out ones checked in M2: none confirmed), bridges
+osm_skip = ["roof", "yes;roof", "carport", "shelter", "bridge", "construction", "ship"]
+# OSM's layer=-1 outlines that stand on the ground: location=surface ones (MBFC's podium) and the untagged ones a fill
+# source's polygon covers ([sources.est]: Ocean Financial Centre, Old SSVF HQ, Parkroyal Collection Marina Bay); the
+# rest (Dhoby Ghaut MRT station 23,500 m², Bencoolen station, an underpass) go
+surface_layers = true
+# untagged train_station / transportation outlines of 150 m² or more are station boxes under the street (the MRT is
+# underground here): dropped, never estimated (replaces m2_heights.py's station list; entrances keep set_h 4.5 m)
+station_untagged = "drop"
+# M3 fix round: "gaps" (engine opt-in) lifts only parts with a gap under them: Pinnacle@Duxton's two
+# skybridges (72-75, 147-150 m) and the National Stadium's roof rings over its 20 m bowl (m2_heights.py STADIUM_BOWL);
+# parts_fill_shafts closes the slots under 5 m wide between a tower's parts (Asia Square Tower 2 solid)
+lift_parts = "gaps"
+parts_fill_shafts = 5.0
+# OSM polygons over this are estate outlines unless tagged or named as one building (Shenzhen's 5,000 m²): here the
+# untagged ones of 5,000-20,000 m² are buildings (the City Terminals' sheds at 20 m, Sentosa's 15,400 m² hall, River
+# Valley's condo blocks), 27 of them were lost at 5,000 m²
+osm_max_area = 20000
+# a building inside an outline dropped as an estate (holding 2 or more) stays (Ascott Raffles Place's tower, Robinson
+# Suites, Grand Park City Hall's wings): no duplicate of an outline that goes itself
+container_inner = true
+# pieces overlapping on the map and in height are one volume drawn twice: the lesser is clipped by the better (OSM's
+# over a fill's, then the taller): Shaw House over Shaw Centre, Mandarin Oriental over its base (critic M2 round 1)
+volume_dedupe = true
+# the Sultan Mosque's outline holds its four minarets (7 m² each, under min_piece): kept, not an estate outline
+keep = { osm = ["w155990076"] }
+# left out by OSM id, set_h and osm_fix: generated by `uv run python scripts/m2_heights.py --toml` (the reasons are in
+# the script: HAND_EXCLUDE, the podiums, STATION_*, PART_STRUCTURES, TOWER_PARTS, OSM_FIX; checks/m2_estimates.md):
+# - by hand: the MBS SkyPark (a 207 m block from the ground: 01_osm keeps no min_height on buildings; M4 structure),
+#   the HDB complexes whose one OSM outline is the podium (HDB draws podium and towers), identical twin outlines, a
+#   sliver, One Raffles Place Tower 2 drawn twice
+# - 52 podium outlines round towers OSM maps inside them as buildings of their own (MBFC, One Raffles Quay, Asia
+#   Square, Singapore Land Tower, Marina Square, Hilton Orchard's tower drawn as a part), which 04_buildings would drop
+#   as the podium's smaller duplicates: drawn as their ring round the towers ([sources.est] est_src "podium")
+# - railway stations: the MRT is underground here; untagged train_station / transportation outlines of 150 m² or more
+#   are station boxes under the street (Dhoby Ghaut, HarbourFront, Orchard Boulevard...): out; the rest are entrances,
+#   set_h 4.5 m. And location=indoor outlines
+# - the Singapore Flyer's 29 rim building:parts (40 m² prisms to 165 m: a [[structures]] wheel in M4)
+# osm_fix: Mandarin Gallery 20 m (a 4-storey mall), the Flyer's terminal 12 m. Engine wishes in the README
+# >>> generated by scripts/m2_heights.py --toml (edit the script, not these lines)
+exclude = { osm = ["r14107427", "r19541775", "r2304417", "r4131188", "r4547546", "r6730990", "w1035284763",
+    "w1077992845", "w1135080884", "w1165450368", "w116800998", "w125836966", "w125836967", "w1341168847",
+    "w1341168848", "w1341168849", "w1341168850", "w1341168851", "w1341168852", "w1341168856", "w1341168857",
+    "w1341168859", "w1341168860", "w1341168861", "w1341168862", "w1341168863", "w1341168864", "w1341168865",
+    "w1341168866", "w1341168867", "w1343518026", "w1346343773", "w1358622936", "w1358622937", "w1358622938",
+    "w1358622939", "w1377221328", "w1377221329", "w1377221330", "w1395942980", "w147102974", "w1490961017",
+    "w1551487380", "w1551487382", "w1551487384", "w1551487385", "w1551487386", "w171142595", "w171142597",
+    "w171975661", "w171999293", "w171999304", "w171999336", "w172025313", "w172025316", "w172263111", "w172268002",
+    "w172288947", "w172288948", "w172288950", "w172288952", "w172288953", "w172288955", "w172288956", "w172288958",
+    "w172288975", "w172373826", "w172518496", "w172518499", "w172596785", "w172814599", "w182827369", "w303311927",
+    "w334127038", "w334127041", "w372072215", "w393090486", "w406900506", "w407705505", "w41890074", "w432515092",
+    "w43755568", "w441384916", "w44414531", "w446734892", "w448084975", "w45098518", "w46538130", "w46594825",
+    "w47134068", "w47298646", "w47345006", "w47345013", "w47345021", "w47345027", "w48045891", "w48045893",
+    "w48178719", "w492119925", "w492119928", "w492119930", "w492119932", "w492119933", "w492119935", "w492119937",
+    "w492119939", "w492119940", "w492119942", "w492119944", "w492119946", "w492119948", "w492119949", "w492119951",
+    "w492119953", "w492119954", "w492119956", "w492119958", "w492119959", "w492119961", "w492119963", "w492119964",
+    "w492119966", "w492119968", "w492119969", "w492119971", "w492119973", "w492119974", "w509003525", "w510901696",
+    "w525062338", "w530727673", "w530727676", "w530727677", "w530727678", "w530727679", "w530727680", "w530727681",
+    "w530727682", "w530727683", "w530727684", "w530727685", "w530727686", "w530727687", "w530727688", "w530727693",
+    "w530727702", "w530727712", "w530727720", "w530727725", "w530727726", "w530727727", "w538685713", "w539767174",
+    "w539767937", "w560240322", "w572839866", "w572839867", "w572839868", "w572839869", "w572839870", "w572839871",
+    "w572839872", "w572839873", "w572839874", "w572839875", "w572839876", "w572839877", "w572839878", "w572839879",
+    "w572839880", "w572839881", "w591619300", "w591619301", "w591619302", "w681693634", "w681693635", "w681693636",
+    "w681693637", "w681695775", "w681695776", "w681695777", "w681695778", "w681695779", "w681695780", "w681695782",
+    "w681695783", "w681695784", "w681695785", "w681695786", "w681695787", "w681695788", "w681695789", "w681695790",
+    "w681695792", "w681695793", "w681695794", "w681695795", "w681695796", "w681695797", "w681695798", "w681695799",
+    "w681695800", "w681695801", "w681695802", "w681695804", "w681695806", "w681695808", "w681695810", "w699163980",
+    "w699183715", "w728243729", "w736992406", "w769970440", "w939684168", "w986973996"] }
+set_h = { "w106193387" = 4.5, "w106193391" = 4.5, "w1082307414" = 4.5, "w1131874155" = 4.5, "w121565109" = 4.5, "w1315718830" = 4.5, "w1385258787" = 4.5, "w164882623" = 4.5, "w166563025" = 4.5, "w172263145" = 4.5, "w172360747" = 4.5, "w172368098" = 4.5, "w172373820" = 4.5, "w172473528" = 4.5, "w172596763" = 4.5, "w173132986" = 4.5, "w173132987" = 4.5, "w173132988" = 4.5, "w173132989" = 4.5, "w173132990" = 4.5, "w173132991" = 4.5, "w173134753" = 4.5, "w173135619" = 4.5, "w173135621" = 4.5, "w173180249" = 4.5, "w173223954" = 4.5, "w173224132" = 4.5, "w231917880" = 4.5, "w231917883" = 4.5, "w231917948" = 4.5, "w231917957" = 4.5, "w380508284" = 4.5, "w380508303" = 4.5, "w423797940" = 4.5, "w423797944" = 4.5, "w423797947" = 4.5, "w430705685" = 4.5, "w433314952" = 4.5, "w511892575" = 4.5, "w627476465" = 4.5, "w660596707" = 4.5, "w743618324" = 4.5, "w878096841" = 4.5, "w993861386" = 4.5, "w993861387" = 4.5, "w993861388" = 4.5 }
+osm_fix = { "w728368561" = 20.0, "w230082125" = 12.0, "w1075230982" = 100.4, "w116905047" = 227.0, "r3899820" = 25.0 }
+# <<< generated
+[buildings.osm_kind]        # added to china-south's table (its kind names only; facades unchanged until M4)
+church = "civic"            # places of worship and public halls: civic (Sri Mariamman, the Sultan Mosque, churches)
+temple = "civic"
+mosque = "civic"
+synagogue = "civic"
+religious = "civic"
+fire_station = "civic"
+college = "civic"
+sports_centre = "civic"
+grandstand = "civic"
+parking = "factory"         # multi-storey car parks: plain concrete decks (factory: no windows grid of flats)
+shophouse = "house"         # 2-4 storey terraces (the shape rule also makes most of them "house": under 12 m, 250 m²)
+terrace = "house"
+
+[buildings.landmarks]
+# a tower made of OSM parts keeps its parts, no part above its listed height (CTBUH architectural: Guoco's parts reach
+# 290, the planning height above sea level; One Raffles Place's 283 for 277.75)
+cap = true
+# a part-built tower whose parts stop more than 5 m under its listed height has them scaled up to it (Reflections at
+# Keppel Bay: OSM's parts reach 74 m of 174; Asia Square Tower 1 221 of 229)
+raise_parts = 5.0
+
+# M4: the facade styles' city data (presets/sg_singapore/: the rules). Named buildings by OSM name (or id): their style
+# over the rules' (data/landmark_facades.csv, applied after, still wins with a photo-sampled tint). Granite: the 1980s-90s
+# towers in polished stone; fins and bands: the glass towers with stainless fins or aluminium spandrel bands (UOB Plaza's
+# octagons, MBFC's sunshades); colonial: the white-rendered civic buildings round the Padang and Bras Basah
+[facade.singapore]
+# M7 (critic 2: Tiong Bahru's 1930s SIT flats striped like HDB towers): residential HDB blocks built before 1960 cream
+# streamline flats (51 blocks, 1937-1954)
+streamline_before = 1960
+# URA subzones whose untagged (building=yes) towers and blocks are offices, civic buildings or port sheds, not condos
+office = ["RAFFLES PLACE", "CECIL", "ANSON", "BAYFRONT SUBZONE", "CENTRAL SUBZONE", "CHINA SQUARE", "CLIFFORD PIER",
+    "MARINA CENTRE", "PHILLIP", "TANJONG PAGAR", "MAXWELL", "PEOPLE'S PARK", "BUGIS", "MARINA SOUTH", "STRAITS VIEW",
+    "BOULEVARD", "SOMERSET", "DHOBY GHAUT", "CITY HALL", "BRAS BASAH"]
+civic = ["SINGAPORE GENERAL HOSPITAL"]
+port = ["CITY TERMINALS"]
+named.granite = ["Republic Plaza", "One Raffles Place", "One Raffles Place Tower 2", "OCBC Bank", "Six Battery Road",
+    "Prudential Tower", "Hong Leong Building", "International Plaza"]
+named.fins = ["One Raffles Quay North Tower", "One Raffles Quay South Tower", "Guoco Tower", "Ocean Financial Centre",
+    "Asia Square Tower 1", "Asia Square Tower 2", "Guoco Midtown Office Tower"]
+named.bands = ["UOB Plaza One", "UOB Plaza Tower 2", "Marina Bay Financial Centre Tower 1",
+    "Marina Bay Financial Centre Tower 2", "Marina Bay Financial Centre Tower 3", "Capital Tower", "Singapore Land Tower",
+    "Maybank"]
+named.colonial = ["Old Supreme Court", "National Gallery Singapore", "Victoria Theatre and Concert Hall", "The Arts House",
+    "Asian Civilisations Museum", "The Fullerton Hotel", "The Fullerton Waterboat House", "Old Hill Street Police Station",
+    "Old Customs House", "CHIJMES Hall", "Saint Andrew's Cathedral", "Cathedral of the Good Shepherd",
+    "National Museum of Singapore", "Istana", "Goodwood Park Hotel", "Peranakan Museum", "Old Civil District Court",
+    "Masonic Hall", "Old St Joseph's Institution", "Capitol Theatre", "Capitol Building", "Stamford House",
+    "Raffles Singapore", "Raffles Hotel", "Former Tanjong Pagar Railway Station", "Old SSVF HQ", "Singapore Recreation Club",
+    "Old Married Soldiers Quarters", "Old Command Block", "Former Dormitories", "The Substation",
+    "Armenian Church of Saint Gregory the Illuminator"]
+
+[compare]
+detail = [103.851, 1.2845, "Raffles Place"]
+
+[ground]
+margin = 3000.0             # mostly sea to the south and east
+town = true                 # beyond the 500 m band of masses: a painted roofscape (New York's)
+# 500 m of block masses on the land side only (north, west and east of the centre), none on the sea sides: the band
+# polygon (10.8 km², 4 polygons) is data/masses_within.geojson, made by scripts/m1_masses_band.py (the districts + 500 m,
+# less the districts, less the sea by OSM's coastline). `masses_within` (opt-in, merged 6 Oct) keeps only the masses
+# whose footprint lies in it and fetches OSM only over the chunks touching it; the band lies inside the 3 km ground
+# area (until M7, masses_reach 0; see below for Johor Bahru)
+masses = true
+masses_within = "data/masses_within_m7.geojson"
+# M7 (engine opt-ins): Johor Bahru's towers across the strait (OSM: 300 over 30 m, 85 over 80 m) as masses, the clip's
+# second polygon (north of the Causeway, data/masses_within_m7.geojson = the band + it), 15-17 km beyond the ground
+# area: the reach takes them in, masses_thin = false stands every mass in the clip at its height (no thinning towards
+# the reach), cover_inner_reach = 0 keeps the inner cover map where it was. Batam's not: the local Overpass extract has
+# no Indonesia
+masses_reach = 18000.0
+masses_thin = false
+# M7 (engine opt-in; before: beyond the band the heartlands were a flat painted plain to the horizon, North to Johor):
+# over the whole island (data/masses_tall_m7.geojson, a box to the strait) the towers of 30 m and more stand as masses
+# too, the HDB towns' 12-40 storey blocks to the horizon (their low-rise stays the painted roofscape)
+masses_tall_within = { file = "data/masses_tall_m7.geojson", min_h = 30.0 }
+# M5: the container terminals (Keppel, Brani, Tanjong Pagar, Pasir Panjang: OSM industrial=port) as paved yards on the
+# aeroway layer (concrete panels, no lots, scrub or trees), not the land's beige patchwork (engine opt-in)
+yards = ["industrial=port"]
+# 7 Oct (the user: Gardens by the Bay's Meadow car park drawn on the lawn): surface car parks inside a park's green are cut
+# out of it and drawn on the asphalt layer (engine opt-in; w171981662, The Meadow Carpark, open-air, 284 bays)
+lots_off_green = "all"       # M7 (critic: the Bayfront Plaza lot w1121873001 on WorldCover's lawn): every surface lot paved
+# M5 fix round 1 (critic: the Padang a pale concrete plaza; Bay East and Marina South pale lots with grey patches). The
+# Padang (w21587770) is leisure=pitch with no surface tag, which [ground.green] doesn't fetch, so it fell to the land's
+# urban lots (and 08_trees's open class sprinkled trees on it): drawn as green by id (engine opt-in green_ids), its trees
+# gone with every pitch's ([trees] none_extra). Grass pitches (school fields) green by tag. The vacant reclaimed land of
+# Marina East and Marina South, OSM landuse=construction with no project (Bay East Garden w884118657, Marina East
+# w23946435 and w884097568, Marina South w1080278288 and w958871593), grassed in the aerials: green by id. The named
+# building sites (condos, NS Square, Therme) stay lots
+green_tags = ["leisure=pitch;surface=grass"]
+# M7 (critic 2: Marina South still pale polygonal blotches in front of the CBD): the two unnamed construction lots west of
+# Bayfront Plaza (w1229470020, w1415502532), grassed in the aerials, green by id too
+green_ids = ["way/21587770", "way/884118657", "way/23946435", "way/884097568", "way/1080278288", "way/958871593",
+    "way/1229470020", "way/1415502532"]
+
+[roads]
+margin = 1000.0
+# footways on bridges drawn (off by default): the Helix Bridge, the Jubilee and Alkaff bridges, the Sentosa Boardwalk
+# and the river's footbridges are highway=footway; pavements along road bridges stay out
+footbridges = true
+
+[trees]
+urban_margin = 1000.0
+# M3 fix round (critic: trees standing on Brani's container yards): no invented trees on the port terminals (Keppel,
+# Brani, Tanjong Pagar: landuse=industrial) or port land
+none_extra = ["landuse=industrial", "landuse=port", "leisure=pitch", "leisure=track"]
+# M6: street trees after NParks' roadside planting: rain trees, angsana and tembusu (the viewer's broadleaf slots, dressed
+# in web/city.json trees.species), yellow flame and trumpet trees on some streets, palms on a few boulevards (Sentosa,
+# Marina Bay, Raffles Avenue); heights 12-18 m on the arterials (Singapore's mature roadside trees), 9-14 on small roads
+# M6 fix round 1 (critic: flowering trees overused, ~20-30 %): ~5 % of street trees flowering (whole roads, as planted)
+[trees.street.odds]
+major = [["palm", 0.08], ["flowering", 0.14]]
+minor = [["palm", 0.04], ["flowering", 0.09]]
+[trees.street.height]
+palm = [10, 15]
+flowering = [8, 12]
+broadleaf = {major = [12, 18], minor = [9, 14]}
+# M6 (engine opt-in): Orchard Road's and Nicoll Highway's rain-tree avenues: the kerb row of rain trees (the first
+# broadleaf slot) 15-19 m every 13 m, and a lower second row (0.6 of the height) along the pavement's far side: the
+# "double canopy" over the pavements, the carriageway left open to the sky
+[trees.street.named]
+"Orchard Road" = { species = "broadleaf", height = [15.0, 19.0], step = 13.0, rows = [2.6, [9.0, 0.6]], first = true }
+"Nicoll Highway" = { species = "broadleaf", height = [15.0, 19.0], step = 13.0, rows = [2.6, [8.5, 0.6]], first = true }
+"Orchard Boulevard" = { species = "broadleaf", height = [16.0, 20.0], step = 12.0, rows = [2.6], first = true }
+"Scotts Road" = { species = "broadleaf", height = [16.0, 20.0], step = 12.0, rows = [2.6], first = true }
+"Stamford Road" = { species = "broadleaf", height = [16.0, 20.0], step = 12.0, rows = [2.6], first = true }
+"Raffles Avenue" = { species = "palm", height = [11.0, 14.0], step = 10.0, rows = [2.6] }
+
+# M5: Singapore's road markings (LTA's Code of Practice, chapter 3) follow the British system: white lane and centre
+# lines, double yellow lines along the kerbs of the main roads (no parking at any time), signalled junctions with stop
+# lines and two broken lines for the pedestrian crossing, zebras with white zig-zags and amber beacons, bus lanes
+# (red-surfaced on the full-day ones) along the left kerb. The engine's UK options (London M5)
+[markings]
+warning = 18.0
+kerb_lines = { trunk = "yellow", primary = "yellow", secondary = "yellow" }
+kerb_mouths = { tertiary = "yellow", residential = "yellow", unclassified = "yellow" }
+bus_lanes = true
+bus_red = 0.6
+junctions = "signals"
+zebras = true
+zigzag = 16.0
+signal_crossings = true
+
+# M6: a Singapore car mix (LTA's 2025 fleet: ~650k cars, white, silver and black over two thirds; Japanese and German
+# sedans and crossovers; ~140k motorcycles; ~13k taxis; the public buses all in the Lush Green livery since 2021, about
+# half of them Volvo / ADL double-deckers; container prime movers on the port roads, the ECP and the AYE)
+[cars]
+types = [
+    ["sedan", 4.63, 1.78, 1.45],     # Corolla Altis, Civic, Mercedes C, BMW 3
+    ["suv", 4.40, 1.80, 1.62, "crossover"],   # Vezel, C-HR, Model Y, Kona
+    ["taxi", 4.54, 1.76, 1.49],      # Prius / Hyundai Ioniq with the roof sign (ComfortDelGro, CityCab, Strides...)
+    ["van", 4.70, 1.70, 1.95],       # HiAce, NV350, Vellfire / Alphard MPVs
+    ["bus", 12.0, 2.55, 3.2],        # single-deck (Citaro, Scania, BYD)
+    ["truck", 7.2, 2.3, 3.1],        # lorries with a canvas or box body
+    ["lorry", 16.5, 2.5, 4.0],       # prime mover and a 40 ft container
+    ["moto", 2.05, 0.75, 1.2],       # motorcycles and delivery scooters
+    ["bus_dd", 11.3, 2.55, 4.4, "bus_london"],   # Volvo B9TL / ADL Enviro500 double-deckers
+]
+parked_mix = [52, 30, 3, 10, 0, 0, 0, 5, 0]
+# 7 Oct: a surface car park holds no more cars than its OSM capacity (engine opt-in): the stall grid over the Meadow
+# car park's planted islands put ~500 cars on a 284-bay lot
+lot_capacity = true
+# HDB estates and condos park in car parks; kerbside parking only on small streets (shophouse lanes, Sentosa)
+[cars.kerbside]
+tertiary = 0.05
+residential = 0.3
+unclassified = 0.25
+living_street = 0.4
+road = 0.2
+service = 0.2
+# speed m/s, mean gap m, queue factor, mix [sedan, suv, taxi, van, bus, truck, lorry, moto, bus_dd]
+[cars.class]
+motorway = [21, 40, 0.8, [44, 24, 7, 8, 1, 6, 6, 3, 1]]
+trunk = [15, 36, 0.4, [42, 23, 11, 7, 3, 4, 3, 5, 2]]
+primary = [12, 34, 0.3, [40, 22, 14, 7, 4, 2.5, 0, 6, 4]]   # M7: prime movers on expressways and port roads only
+secondary = [11, 38, 0.3, [42, 23, 12, 8, 3, 2, 0, 6, 3]]
+tertiary = [9, 55, 0.3, [44, 25, 10, 9, 2, 2, 0, 6, 1]]
+residential = [7, 90, 0.4, [48, 27, 7, 10, 0, 1, 0, 7, 0]]
+unclassified = [7, 100, 0.4, [48, 26, 6, 11, 0, 3, 0, 6, 0]]
+living_street = [4, 160, 0.5, [50, 28, 6, 10, 0, 0, 0, 6, 0]]
+road = [7, 100, 0.4, [48, 27, 7, 10, 0, 1, 0, 7, 0]]
+service = [5, 180, 0.5, [50, 25, 4, 13, 0, 2, 0, 6, 0]]
+# colours (sRGB): white and pearl ~38 %, silver and grey ~25 %, black ~20 %, the rest blue, red, brown
+[cars.palettes]
+sedan = [["#ecedeb", "", 26], ["#f4f3ee", "", 8], ["#d9d7cf", "", 4], ["#b5b8bb", "", 12], ["#8d9196", "", 7],
+    ["#5c6066", "", 6], ["#16171a", "", 17], ["#25272b", "", 4], ["#1f3254", "", 5], ["#7d1d22", "", 4],
+    ["#6b5442", "", 2], ["#a99d86", "", 2], ["#3d4f45", "", 1]]
+suv = [["#ecedeb", "", 28], ["#f4f3ee", "", 8], ["#b5b8bb", "", 12], ["#8d9196", "", 7], ["#5c6066", "", 7],
+    ["#16171a", "", 18], ["#1f3254", "", 6], ["#7d1d22", "", 5], ["#6b5442", "", 3], ["#3d4f45", "", 2]]
+# ComfortDelGro blue, CityCab yellow, Trans-Cab red, Strides and Prime white/silver, Premier/SMRT black
+taxi = [["#2f6fb7", "#2f6fb7", 44], ["#efc12a", "#efc12a", 14], ["#b32630", "#b32630", 8], ["#eceeec", "#eceeec", 12],
+    ["#b5b8bb", "#b5b8bb", 6], ["#141518", "#141518", 12], ["#3f8f5a", "#3f8f5a", 4]]
+van = [["#ecedeb", "", 52], ["#b5b8bb", "", 14], ["#16171a", "", 14], ["#5c6066", "", 8], ["#2c4a78", "", 4],
+    ["#d6262c", "#ecedeb", 3], ["#f2b705", "", 2], ["#a99d86", "", 3]]
+# the Lush Green livery: leaf green body, a dark grey skirt (single-deck: green with the white roof band)
+bus = [["#5aa338", "#e9ebe6", 100]]
+bus_dd = [["#5aa338", "#2f3532", 100]]
+truck = [["#ecedeb", "#c9ccc6", 30], ["#2a5aa8", "#d9d9d4", 15], ["#ecedeb", "#3d6e47", 15], ["#c9332c", "#d9d9d4", 10],
+    ["#ecedeb", "#2a5aa8", 15], ["#e3b021", "#d9d9d4", 5], ["#5c6066", "#c9ccc6", 10]]
+moto = [["#16171a", "", 30], ["#ecedeb", "", 20], ["#b5b8bb", "", 15], ["#a32028", "", 12], ["#2c4a78", "", 10],
+    ["#2e7d46", "", 8], ["#efc12a", "", 5]]
+
+# M6: rooftops (engine opt-ins of the china-south programmes): HDB blocks and condos with lift motor rooms, a raised
+# water-tank housing and SolarNova PV rows (no Chinese steel tanks, solar water heaters or helipads); shophouses and low
+# blocks with a box now and then and condensers (no tiled hats, plastic tanks or blue sheds)
+[rooftops]
+helipads = false
+residential = "hdb"
+village = "shophouse"
+# M6 fix round 1 (critic: blue tanks and boxes on the colonial roofs): roofs with a shape (pitched tile, mansard) carry
+# nothing (presets/sg_singapore/rooftops.py); the plastic tanks and lean-to sheds china-south's programmes put on flat
+# roofs are grey fibreglass and grey steel here, not Chinese blue
+[rooftops.named]
+tank_blue = "#b4b8b3"
+tank_blue2 = "#a3a8a4"
+shed_blue = "#8e9496"
+shed_blue2 = "#9da2a3"
+shed_cyan = "#a7aca9"
+
+# M5 fix round 1 (critic: white "egg" boulders along the bay at Merlion Park and the Esplanade, where granite promenades
+# meet the water): Marina Bay (OSM's Marina Reservoir) and other lakes over 0.5 km² take the stone edge (granite coping, a
+# short stone face) all round, beside lawns too (engine opt-in); the park ponds keep soft banks, their boulders smaller
+# and greyer in web/city.json shores.pondBank
+[shores]
+pond_edge_area = 0.5
+# M3 critic: Sentosa's beach and lagoon sand glowed and bled 10-20 m into the water, breakwater islets read as glowing
+# blobs, a groyne tip at Tanjong Beach was a pale wedge on the sea. The beach's seaward side (slope 14 m + toe 12 m, and
+# twice that at a sharp tip, the miter) is fitted into 3 m and the rock revetment's (5 + 8 m) into 7 m, the shader's across
+# coordinate unchanged (the same wet-sand ramp and swash line, squeezed; the sand stays 16 m on the land side); a closed
+# coast loop under 120 m across (the beach islets off Siloso and Tanjong; Palawan's 172 m one keeps its beach) gets no sand strip, only revetment. Opt-in engine settings (05e_shores)
+water_side = { beach = 3.0, revetment = 7.0 }
+islet_max = 120.0
+islet_type = "revetment"
+
+[terrain]
+# M7: 30 km (was 15): Johor Bahru's shore and hills to the north (15 km had its edge just behind the city), Batam's
+# and the Riau islands' north coasts to the south (the DEM tiles end at 1 N), Jurong Island to the west
+far_reach = 30000.0
+# M3: the Shenzhen recipe (buildings masked and opened, canopy off, smoothed, the sea knee) on GLO-30. Singapore's
+# hills are small (Fort Canning 300 m across, Pearl's Hill 250 m): open ground smoothed at 30 m, not 45, which
+# shaved Mount Faber to 86 m (106)
+smooth_open = 30.0
+# the town past the 500 m masses band and the backdrop coloured from ESA WorldCover 2021 (06e_masses: cover.jpg,
+# cover_inner.jpg), not by height: Bukit Timah's forest, the HDB towns, Johor's and Batam's shores (London's settings);
+# OSM's roads painted into the inner map as the town's street grid, the masses' footprints in the town colour
+backdrop_cover = "worldcover"
+backdrop_town_rgb = [112, 110, 104]
+cover_roads = { motorway = 24.0, trunk = 18.0, primary = 14.0, secondary = 12.0, tertiary = 10.0, residential = 8.0, unclassified = 8.0, living_street = 6.0 }
+cover_buildings = true
+# M5 (engine opt-in): the [ground] yards (Pasir Panjang's terminal beyond the ground area, Keppel, Brani) painted into
+# the land cover maps as concrete yards, not WorldCover's built-up town (critic M3: the terminal painted as town)
+cover_yards = [98, 97, 94]
+# M3 fix round (critic: rows of 20-40 m pyramids along the reservoirs' south shore and north of Kallang): the land layer
+# ends at the ground area's outline and the grid a cell beyond it, so the coast ramp dropped the whole land edge of the
+# area to 0 over 200 m, under the backdrop's edge at the land's height. Opt-in engine fix: the edge cells take the land
+# of the cells inside
+edge_land = true
+cover_inner_reach = 0.0     # (M7: see [ground] masses_reach)
+# M7 (engine opt-in): the named summits the canopy cut and smoothing flattened (Faber 106 -> 91, Serapong 90 -> 80, Imbiah
+# 62 -> 54) lifted back to their surveyed height less the 5 m sea drop, the hill within 500 m scaled over its foot
+summits = { radius = 500.0 }
+# named summits, for checks/terrain.md: lon, lat, surveyed height (m; OSM natural=peak, research.json)
+[terrain.peaks]
+"Fort Canning Hill" = [103.8466, 1.29358, 48]
+"Pearl's Hill" = [103.83994, 1.28455, 45]
+"Mount Faber" = [103.81767, 1.27359, 106]
+"Telok Blangah Hill" = [103.81045, 1.27888, 94]
+"Mount Imbiah" = [103.81471, 1.25693, 62]
+"Mount Serapong" = [103.83326, 1.24989, 90]
+"Bukit Timah Hill" = [103.77638, 1.35468, 164]
+# other named points for checks/dem.md
+[terrain.spots]
+"Marina Bay (the Float)" = [103.8590, 1.2885, 2]
+"Marina South (reclaimed)" = [103.8640, 1.2770, 4]
+"Raffles Place" = [103.8513, 1.2840, 5]
+"Padang" = [103.8525, 1.2905, 4]
+
+# camera presets. Areas: name = [lon, lat of the point looked at, distance m, elevation degrees(, azimuth the camera
+# stands at(, the target's height over the ground(, the hour the view sets)))]. Landmarks: menu name = building name
+# from data/landmarks.csv. M10: the menu's groups in this order: Areas, Street level, Landmarks, Hills and horizons,
+# Night ([views.groups], chips in the lists' order); every preset checked by eye (eval/m10/). Kept names the speed
+# test and the start view use: "Singapore overview", "Orchard Road (street level)", "Marina Bay".
+[views]
+group_order = true
+
+[views.areas]
+"Singapore overview" = [103.8488, 1.28295, 12000, 40, 200]
+"Marina Bay" = [103.8565, 1.2840, 2800, 26]
+"Civic District" = [103.8515, 1.2915, 1500, 32]
+"Singapore River" = [103.8470, 1.2890, 1300, 30]
+"Chinatown" = [103.8425, 1.2800, 1200, 32]
+# M10: Little India (Serangoon Road's shophouses) had no place
+"Little India" = [103.8515, 1.3065, 900, 30, 200]
+"Kampong Glam and Bugis" = [103.8570, 1.3005, 1300, 32]
+"Kallang Basin and the Sports Hub" = [103.8720, 1.3020, 2000, 28]
+"Orchard Road" = [103.8330, 1.3030, 1600, 30]
+"Gardens by the Bay" = [103.8650, 1.2820, 1300, 30]
+"Tiong Bahru estate" = [103.8305, 1.2848, 450, 22, 160]
+# M10: was "Everton Park (street level)" over the shophouse roofs of Everton Road at 180 m: now the HDB blocks by
+# Cantonment Road from the west, lit, the CBD behind
+"Everton Park HDB blocks" = [103.8400, 1.2742, 380, 7, 255, 30]
+"Keppel Bay and HarbourFront" = [103.8180, 1.2660, 2200, 28]
+"Sentosa" = [103.8250, 1.2500, 3000, 30]
+# Street level ([views.groups])
+"Orchard Road (street level)" = [103.83451, 1.30361, 200, 11, 297]
+# M10: in the Raffles Place park looking north between the towers to the Old Supreme Court's dome (M4-M7 looked from
+# the river at the shaded north faces; every spot west of the towers, facing their lit faces, stands in a wall:
+# scripts' sight-line sweep in the M10 report)
+"Raffles Place (street level)" = [103.8514, 1.2841, 150, 5, 180, 15]
+# M10: down Pagoda Street from South Bridge Road (was 90 m over a back lane's roofs)
+"Pagoda Street (street level)" = [103.8444, 1.28337, 110, 3, 120, 6]
+# M10: over the river by the Asian Civilisations Museum (the camera had stood on The Arts House's roof)
+"Boat Quay across the river" = [103.8505, 1.2866, 200, 5, 340, 4]
+"Marina Bay Sands across the bay" = [103.85761, 1.28522, 420, 6, 297]
+# Landmarks: figures (scripts/m4l_structures.py) aimed at as areas; [views.landmarks] below are framed by the pipeline
+"Marina Bay Sands" = [103.8612, 1.2836, 650, 9, 100, 95]
+"Flower Dome and Cloud Forest" = [103.8653, 1.2841, 480, 16, 115, 15]
+"Supertree Grove" = [103.8640, 1.2818, 260, 12, 150, 22]
+"ArtScience Museum and the Helix" = [103.8597, 1.2866, 330, 12, 320, 14]
+"Esplanade" = [103.8555, 1.2898, 330, 18, 200, 12]
+# M10: closer and lower (40 m from the bay side: the statue and its jet, the Fullerton behind)
+"Merlion" = [103.85449, 1.28679, 40, 6, 80, 6]
+"Singapore Flyer" = [103.86312, 1.28941, 480, 8, 150, 80]
+"Victoria Theatre and Concert Hall" = [103.85159, 1.28835, 230, 14, 70, 25]
+"National Gallery" = [103.8515, 1.2902, 300, 20, 115, 18]
+"Sultan Mosque" = [103.85900, 1.30222, 170, 16, 230, 12]
+"Sri Mariamman Temple" = [103.84521, 1.28268, 80, 12, 80, 8]
+"Buddha Tooth Relic Temple" = [103.84423, 1.28149, 150, 16, 200, 12]
+"National Stadium" = [103.87434, 1.30444, 950, 22, 215, 20]
+# Hills and horizons
+# M7: the hill from HarbourFront's waterfront up the slope to Faber Peak (M10: the M3 "hillside" view along the ridge
+# from Telok Blangah Hill dropped as its near-copy)
+"Mount Faber" = [103.8177, 1.2736, 1150, 2, 155]
+# M8: Imbiah and Serapong low from the south-west over Siloso
+"Sentosa's hills" = [103.8215, 1.2500, 1500, 5, 220, 20]
+# M10: Bukit Timah Hill, 10 km out on the backdrop, from the south-south-east at 4 km (the M8 view from over the
+# Central Catchment showed mostly pale painted ground and no hill)
+"Bukit Timah Hill" = [103.7764, 1.3546, 4000, 5, 150, 60]
+"North to Johor Bahru" = [103.8400, 1.3250, 3500, 7, 175]
+"South to Sentosa and Batam" = [103.8250, 1.2450, 2600, 8, 345]
+# Night: [lon, lat, distance, elevation, azimuth, lift, hour]
+# M10: the CBD's skyline across Marina Bay from the east (was the M3 Marina Bay view at 21 h: Marina South's dark lots)
+"Marina Bay at night" = [103.8520, 1.2840, 1500, 8, 70, 0, 21]
+"Marina Bay Sands at night" = [103.8600, 1.2835, 1300, 8, 315, 0, 21]
+"Supertrees at night" = [103.8640, 1.2818, 260, 12, 150, 22, 21]
+"Boat Quay at dusk" = [103.8505, 1.2866, 200, 5, 340, 4, 19.4]
+"Orchard Road at night" = [103.83451, 1.30361, 200, 11, 297, 0, 21]
+[views.groups]
+"Street level" = ["Orchard Road (street level)", "Raffles Place (street level)", "Pagoda Street (street level)",
+    "Boat Quay across the river", "Marina Bay Sands across the bay"]
+Landmarks = ["Marina Bay Sands", "Flower Dome and Cloud Forest", "Supertree Grove", "ArtScience Museum and the Helix",
+    "Esplanade", "Merlion", "Singapore Flyer", "Raffles Place towers", "Guoco Tower", "Marina Bay Financial Centre",
+    "Victoria Theatre and Concert Hall", "National Gallery", "Sultan Mosque", "Sri Mariamman Temple",
+    "Buddha Tooth Relic Temple", "Pinnacle@Duxton", "ION Orchard", "National Stadium", "Reflections at Keppel Bay"]
+"Hills and horizons" = ["Mount Faber", "Sentosa's hills", "Bukit Timah Hill", "North to Johor Bahru",
+    "South to Sentosa and Batam"]
+Night = ["Marina Bay at night", "Marina Bay Sands at night", "Supertrees at night", "Boat Quay at dusk",
+    "Orchard Road at night"]
+[views.landmarks]
+# M1: names as in data/landmarks.csv (use_height rows, so they name a building); M3 checks they resolve. M10: Marina Bay
+# Sands (the figures' preset above frames it better), CapitaSpring and Republic Plaza (the same Raffles Place cluster
+# from the same side as "Raffles Place towers") dropped
+"Raffles Place towers" = "UOB Plaza One"
+"Guoco Tower" = "Guoco Tower"
+"Marina Bay Financial Centre" = "Marina Bay Financial Centre Tower 2"
+"Pinnacle@Duxton" = "The Pinnacle@Duxton Block 1D"
+"ION Orchard" = "ION Orchard (The Orchard Residences)"
+"Reflections at Keppel Bay" = "Reflections at Keppel Bay Tower 1"
