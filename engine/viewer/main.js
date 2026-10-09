@@ -1081,6 +1081,9 @@ function addTile(kind, t, root) {
 // type (the vertex formats and shaderKind read the type; the counts are kept). three's onUpload hook would do
 // this, but r186's WebGPURenderer never calls it. Bounds are worked out first (frustum culling needs them).
 const toFree = [];
+// (?keeparrays=1, opt-in: the arrays are kept, so a script can read the geometry: scripts/flythrough.mjs builds a
+// height grid from it for its clearance and label-occlusion checks)
+const KEEP_ARRAYS = params.get('keeparrays') === '1';
 // (a building tile's rooftop parapets are made from its arrays first, for at most PARAPETS_MS a frame; the rest
 // wait for the next frame)
 const PARAPETS_MS = 8;
@@ -1097,7 +1100,7 @@ function freeUploaded() {
     if (!g.boundingBox) g.computeBoundingBox();
     for (const a of [g.index, ...attrs]) {
       const b = a?.isInterleavedBufferAttribute ? a.data : a;
-      if (b?.array.length) b.array = new b.array.constructor(0);
+      if (b?.array.length && !KEEP_ARRAYS) b.array = new b.array.constructor(0);
     }
     toFree.splice(i, 1);
   }
@@ -2410,6 +2413,8 @@ renderer.setAnimationLoop(() => {
     if (moving && !glBusy(now)) { moving = false; renderer.setPixelRatio(settings.resolution); }
     return;
   }
+  if (dirty && viewDirty && filmClock !== null) viewDirty = false;   // (filming: every frame is a settled one; a moving
+  // frame at the lower resolution between the script's frames flickered the visible window between two sizes)
   if (dirty && viewDirty) {
     // (the time slider dragged: city.json time.sliderResolution, see SLIDER_RES)
     const pr = SLIDER_RES && now - timeDragAt < 250 ? Math.min(settings.movingResolution, SLIDER_RES) : settings.movingResolution;
@@ -2660,6 +2665,7 @@ const film = {
   hide() { document.getElementById('menu').style.display = 'none'; statsEl.style.display = 'none'; },
   setClock(seconds) { filmClock = seconds; },
   async frame({ position, target, hour } = {}) {
+    controls.enableDamping = false;              // (no damping left over to move the camera between the frames)
     if (target) controls.target.set(...target);
     if (position) camera.position.set(...position);
     controls.maxPolarAngle = Math.PI - 0.01;     // (a path may look up: under a bridge deck; the map's 86 degree

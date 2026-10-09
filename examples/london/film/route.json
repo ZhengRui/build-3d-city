@@ -1,0 +1,459 @@
+{
+ "city": "london",
+ "title": "London: Westminster to Docklands and back, at dusk",
+ "view": "Big Ben and Parliament",
+ "note": "scene metres: x east, y up (above the datum), z south. v: the speed (m/s) when passing the key, linear in distance between keys. turn: the yaw-rate cap is 40 deg/s there; helix: [x, z] the view is biased towards.",
+ "keys": [
+  {
+   "p": [
+    -1985,
+    130,
+    1420
+   ],
+   "v": 130,
+   "mark": "Westminster: Big Ben and the Eye"
+  },
+  {
+   "p": [
+    -1900,
+    135,
+    950
+   ],
+   "v": 140
+  },
+  {
+   "p": [
+    -1850,
+    140,
+    420
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    -1790,
+    160,
+    -60
+   ],
+   "v": 180
+  },
+  {
+   "p": [
+    -1450,
+    180,
+    -480
+   ],
+   "v": 230,
+   "mark": "Down the Thames: St Paul's, Tate"
+  },
+  {
+   "p": [
+    -800,
+    180,
+    -640
+   ],
+   "v": 270
+  },
+  {
+   "p": [
+    -150,
+    170,
+    -640
+   ],
+   "v": 260
+  },
+  {
+   "p": [
+    450,
+    120,
+    -470
+   ],
+   "v": 220
+  },
+  {
+   "p": [
+    800,
+    75,
+    -345
+   ],
+   "v": 180,
+   "mark": "Under Tower Bridge's walkways, the Shard right"
+  },
+  {
+   "p": [
+    1000,
+    62,
+    -310
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    1200,
+    42,
+    -215
+   ],
+   "v": 165
+  },
+  {
+   "p": [
+    1368,
+    28,
+    -135
+   ],
+   "v": 165
+  },
+  {
+   "p": [
+    1600,
+    40,
+    -30
+   ],
+   "v": 175
+  },
+  {
+   "p": [
+    2100,
+    140,
+    200
+   ],
+   "v": 240,
+   "mark": "Docklands run along the south bank"
+  },
+  {
+   "p": [
+    2900,
+    220,
+    350
+   ],
+   "v": 300
+  },
+  {
+   "p": [
+    3500,
+    270,
+    420
+   ],
+   "v": 320
+  },
+  {
+   "p": [
+    4200,
+    300,
+    700
+   ],
+   "v": 320
+  },
+  {
+   "p": [
+    5000,
+    300,
+    880
+   ],
+   "v": 300
+  },
+  {
+   "p": [
+    5750,
+    300,
+    770
+   ],
+   "v": 240,
+   "mark": "Left turn round the Isle of Dogs, past the O2 (dusk)",
+   "turn": true
+  },
+  {
+   "p": [
+    6050.0,
+    298.3,
+    689.6
+   ],
+   "v": 195.0,
+   "turn": true
+  },
+  {
+   "p": [
+    6269.6,
+    296.7,
+    470.0
+   ],
+   "v": 176.69872981077808,
+   "turn": true
+  },
+  {
+   "p": [
+    6350.0,
+    295.0,
+    170.0
+   ],
+   "v": 170.0,
+   "turn": true
+  },
+  {
+   "p": [
+    6269.6,
+    293.3,
+    -130.0
+   ],
+   "v": 176.69872981077805,
+   "turn": true
+  },
+  {
+   "p": [
+    6050.0,
+    291.7,
+    -349.6
+   ],
+   "v": 195.0,
+   "turn": true
+  },
+  {
+   "p": [
+    5750.0,
+    290.0,
+    -430.0
+   ],
+   "v": 220.0,
+   "turn": true
+  },
+  {
+   "p": [
+    5200,
+    285,
+    -520
+   ],
+   "v": 260,
+   "mark": "Dusk glide home over Limehouse: the City, the Shard, Tower Bridge"
+  },
+  {
+   "p": [
+    4500,
+    270,
+    -500
+   ],
+   "v": 280
+  },
+  {
+   "p": [
+    3800,
+    250,
+    -420
+   ],
+   "v": 260
+  },
+  {
+   "p": [
+    3250,
+    225,
+    -150
+   ],
+   "v": 220
+  },
+  {
+   "p": [
+    2900,
+    200,
+    150
+   ],
+   "v": 160
+  },
+  {
+   "p": [
+    2600,
+    185,
+    160
+   ],
+   "v": 90
+  },
+  {
+   "p": [
+    2400,
+    178,
+    130
+   ],
+   "v": 35
+  },
+  {
+   "p": [
+    2250,
+    175,
+    100
+   ],
+   "v": 4
+  }
+ ],
+ "hold": 4.0,
+ "light": {
+  "day": 16.25,
+  "rampFrom": -46,
+  "split": 0.3,
+  "sunset": 18.3,
+  "end": 19.0
+ },
+ "end": {
+  "aim": [
+   1100,
+   60,
+   -250
+  ],
+  "text": "190 m over the Thames at Rotherhithe, facing W: Tower Bridge centre, the Shard left, the City cluster right, at dusk"
+ },
+ "labels": [
+  {
+   "name": "Tower Bridge",
+   "short": "1894",
+   "x": 1366,
+   "z": -128,
+   "h": 65
+  },
+  {
+   "name": "Big Ben",
+   "short": "96 m · 1859",
+   "x": -2028,
+   "z": 538,
+   "h": 96
+  },
+  {
+   "name": "London Eye",
+   "short": "135 m",
+   "x": -1691,
+   "z": 239,
+   "h": 135,
+   "reach": 1800
+  },
+  {
+   "name": "St Paul's Cathedral",
+   "short": "1710",
+   "x": -267,
+   "z": -987,
+   "h": 111
+  },
+  {
+   "name": "The Shard",
+   "short": "310 m",
+   "x": 599,
+   "z": 18,
+   "h": 310
+  },
+  {
+   "name": "The Gherkin",
+   "short": "180 m",
+   "x": 986,
+   "z": -1115,
+   "h": 180
+  },
+  {
+   "name": "Walkie-Talkie",
+   "short": "",
+   "x": 771,
+   "z": -750,
+   "h": 160
+  },
+  {
+   "name": "Tower of London",
+   "short": "",
+   "x": 1313,
+   "z": -415,
+   "h": 28,
+   "w": 200
+  },
+  {
+   "name": "Westminster Abbey",
+   "short": "",
+   "x": -2208,
+   "z": 704,
+   "h": 69
+  },
+  {
+   "name": "HMS Belfast",
+   "short": "",
+   "x": 951,
+   "z": -229,
+   "h": 41,
+   "w": 180
+  },
+  {
+   "name": "Tate Modern",
+   "short": "",
+   "x": -309,
+   "z": -295,
+   "h": 99
+  },
+  {
+   "name": "The O2",
+   "short": "",
+   "x": 6831,
+   "z": -71,
+   "h": 52,
+   "w": 360
+  },
+  {
+   "name": "Cutty Sark",
+   "short": "1869",
+   "x": 6035,
+   "z": 2211,
+   "h": 46
+  },
+  {
+   "name": "Old Royal Naval College",
+   "short": "",
+   "x": 6284,
+   "z": 2201,
+   "h": 50,
+   "w": 250
+  },
+  {
+   "name": "Millennium Bridge",
+   "short": "",
+   "x": -254,
+   "z": -509,
+   "h": 12,
+   "w": 300
+  },
+  {
+   "name": "The Monument",
+   "short": "1677",
+   "x": 617,
+   "z": -610,
+   "h": 62
+  },
+  {
+   "name": "Waterloo Bridge",
+   "short": "",
+   "x": -1534,
+   "z": -369,
+   "h": 15,
+   "w": 300
+  },
+  {
+   "name": "Somerset House",
+   "short": "",
+   "x": -1558,
+   "z": -624,
+   "h": 25,
+   "w": 150
+  },
+  {
+   "name": "Westminster Bridge",
+   "short": "",
+   "x": -1840,
+   "z": 523,
+   "h": 15,
+   "w": 250
+  },
+  {
+   "name": "Southwark Cathedral",
+   "short": "",
+   "x": 371,
+   "z": -155,
+   "h": 50
+  },
+  {
+   "name": "City Hall",
+   "short": "",
+   "x": 1147,
+   "z": -41,
+   "h": 45
+  }
+ ]
+}

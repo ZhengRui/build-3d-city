@@ -35,6 +35,21 @@ waits 250 ms after the last change), take a virtual clock, lift the map controls
 up, under a bridge deck: with the limit the controls pushed the camera above whatever it looked at, and an
 "underpass" rode on the roadway), and prime the streams. They have no effect until called.
 
+**The generic script.** `scripts/flythrough.mjs` is this page as a tool: it reads a route file
+(`demos/<city>/eval/film/route.json`; the format is in its header; six worked routes, 70–93 s each with 9–15
+landmark labels, are in `examples/<city>/film/route.json`) and renders it with the camera rules below, the light
+ramp and the end aim, so a new city needs a route file, not a script. It loads the viewer with `?keeparrays=1` (an opt-in
+that keeps the tiles' arrays in the page) and builds a 10 m height grid of what is loaded, from which it checks the
+clearance once a second (the 110 m rule below; it prints every breach with its time) and whether a landmark is hidden.
+**Landmark hints:** a small label (a dot on the landmark's top, a thin leader, a name pill; one short fact for the big ones
+only) drawn into the page as a DOM overlay before each frame is captured. A route lists 20-25 candidates (towers, bridges,
+churches, stations, museums, squares, parks along it) so that 15-20 show in a 60-90 s video. Each is named once, at its
+first clear sighting: top on screen (in the middle 70 % to start), at least 4.5 % of the frame tall or, for a long low one,
+15 % of it wide, within max(2.6 km, 7 x its height), two of three rays to it over the grid, for 0.5 s. It fades in over
+0.4 s, holds 2-3 s, fades out over 0.6 s; at most three at once, starts at least 0.8 s apart, pills kept 60 px apart;
+none in the first 1.5 s or the last 3 s. The full render writes the label timeline next to the video, and a
+`--start`/`--end` retake replays it.
+
 ## Designing the route
 
 Agree the beats with the user first (a list of places and one or two shots each), then the length: **the route's

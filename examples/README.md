@@ -27,6 +27,7 @@ species, cars, rooftops, road widths) and `../engine/viewer/styles/<name>.json` 
   web/city.json      the viewer's settings for this city: title, About text, views, light, facades, night
   scripts/           city-only scripts, named m<N><x>_<what>.py after the milestone that wrote them
   generated/         structure TOML written by those scripts and `include`d by city.toml
+  film/route.json    (six cities) the fly-through route rendered by scripts/flythrough.mjs: keyframes, light, labels
   data/              hand-made inputs and notes: landmark CSVs (name, height, coordinates, sources),
                      landmark facade CSVs, research notes in Markdown
 ```

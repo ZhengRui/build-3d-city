@@ -10,6 +10,7 @@ Overpass. Each script's header comment is its full manual (`node <script> --help
 | `pixdiff.mjs` | Reference screenshots of every city (day, night, dusk; WebGPU or WebGL 2) and a pixel diff against them: proof that a change kept, or changed only where intended, the picture. `--params` A/Bs a viewer switch in one tree. |
 | `facade-ref.sh` | Take the reference set for `pixdiff.mjs` (all cities' standard views, both backends, a repeat for the noise floor) before a refactor. |
 | `local-overpass.sh` | Build a local Overpass API in Docker from a BBBike extract when the public servers refuse a big city's queries. |
+| `flythrough.mjs` | Render a fly-through video of a city from a route file (`demos/<city>/eval/film/route.json`: keys in scene metres, speeds, beats, the hour ramp, the end aim, the landmarks to label) into ffmpeg, frame by frame over a Chrome you started (`--port`), with landmark-hint labels drawn into the page. `--preview` (5 fps, 960×540), `--start`/`--end` retakes, `--dry` (the route summary and the clearance check only). The guide is `references/flythrough-video.md`. |
 | `lock.sh` | Machine-wide `chrome` and `pipeline` locks so parallel agents never load two cities in Chrome or run two heavy stages at once. `speedtest.mjs` and `pixdiff.mjs` use it. |
 
 ## Where they read and write

@@ -1,0 +1,414 @@
+{
+ "city": "singapore",
+ "title": "Singapore: Supertrees to Marina Bay at night",
+ "view": "Gardens by the Bay",
+ "note": "scene metres: x east, y up (above the datum), z south. v: the speed (m/s) when passing the key, linear in distance between keys. turn: the yaw-rate cap is 40 deg/s there; helix: [x, z] the view is biased towards.",
+ "keys": [
+  {
+   "p": [
+    3450,
+    60,
+    280
+   ],
+   "v": 110,
+   "mark": "In from the Straits: Supertrees, MBS ahead (opening)"
+  },
+  {
+   "p": [
+    3080,
+    62,
+    -40
+   ],
+   "v": 110
+  },
+  {
+   "p": [
+    2700,
+    65,
+    -330
+   ],
+   "v": 115
+  },
+  {
+   "p": [
+    2350,
+    75,
+    -560
+   ],
+   "v": 115
+  },
+  {
+   "p": [
+    2150,
+    130,
+    -760
+   ],
+   "v": 120
+  },
+  {
+   "p": [
+    2000,
+    205,
+    -830
+   ],
+   "v": 130
+  },
+  {
+   "p": [
+    1850,
+    250,
+    -870
+   ],
+   "v": 140
+  },
+  {
+   "p": [
+    1700,
+    262,
+    -890
+   ],
+   "v": 150,
+   "mark": "Over the SkyPark (43 m above it)"
+  },
+  {
+   "p": [
+    1450,
+    225,
+    -960
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    1200,
+    180,
+    -1050
+   ],
+   "v": 190
+  },
+  {
+   "p": [
+    960,
+    150,
+    -1160
+   ],
+   "v": 170,
+   "mark": "Marina Bay: Merlion, Fullerton, the CBD wall"
+  },
+  {
+   "p": [
+    820,
+    160,
+    -1400
+   ],
+   "v": 160
+  },
+  {
+   "p": [
+    900,
+    210,
+    -1700
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    980,
+    260,
+    -2050
+   ],
+   "v": 200,
+   "mark": "Civic District, Kampong Glam (dusk)"
+  },
+  {
+   "p": [
+    1250,
+    280,
+    -2550
+   ],
+   "v": 230
+  },
+  {
+   "p": [
+    1600,
+    270,
+    -2950
+   ],
+   "v": 240
+  },
+  {
+   "p": [
+    2200,
+    250,
+    -3200
+   ],
+   "v": 240
+  },
+  {
+   "p": [
+    2800,
+    220,
+    -3150
+   ],
+   "v": 200,
+   "mark": "Kallang Basin, the Sports Hub"
+  },
+  {
+   "p": [
+    2990.2,
+    225.0,
+    -3107.8
+   ],
+   "v": 180,
+   "turn": true
+  },
+  {
+   "p": [
+    3144.7,
+    230.0,
+    -2989.3
+   ],
+   "v": 180,
+   "turn": true
+  },
+  {
+   "p": [
+    3234.7,
+    235.0,
+    -2816.5
+   ],
+   "v": 180,
+   "turn": true
+  },
+  {
+   "p": [
+    3243.2,
+    240.0,
+    -2621.9
+   ],
+   "v": 180,
+   "turn": true
+  },
+  {
+   "p": [
+    3050,
+    245,
+    -2150
+   ],
+   "v": 200,
+   "mark": "Night: past the Flyer, the bay lit"
+  },
+  {
+   "p": [
+    2800,
+    240,
+    -1700
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    2550,
+    230,
+    -1420
+   ],
+   "v": 90
+  },
+  {
+   "p": [
+    2400,
+    223,
+    -1300
+   ],
+   "v": 40
+  },
+  {
+   "p": [
+    2250,
+    220,
+    -1250
+   ],
+   "v": 4
+  }
+ ],
+ "hold": 4.0,
+ "light": {
+  "day": 18.2,
+  "rampFrom": -34,
+  "sunset": 19.25,
+  "end": 20.0
+ },
+ "end": {
+  "aim": [
+   700,
+   60,
+   -930
+  ],
+  "text": "220 m up off the Bayfront, facing WSW: Marina Bay Sands left, the lit CBD across the bay, Merlion and Fullerton below"
+ },
+ "labels": [
+  {
+   "name": "Marina Bay Sands",
+   "short": "2010",
+   "x": 1623,
+   "z": -870,
+   "h": 207
+  },
+  {
+   "name": "Merlion",
+   "short": "",
+   "x": 934,
+   "z": -1223,
+   "h": 9
+  },
+  {
+   "name": "Supertree Grove",
+   "short": "",
+   "x": 1991,
+   "z": -702,
+   "h": 50,
+   "w": 200
+  },
+  {
+   "name": "Singapore Flyer",
+   "short": "165 m",
+   "x": 1893,
+   "z": -1513,
+   "h": 165,
+   "reach": 1800
+  },
+  {
+   "name": "Esplanade",
+   "short": "2002",
+   "x": 1009,
+   "z": -1510,
+   "h": 35,
+   "w": 200
+  },
+  {
+   "name": "The Fullerton",
+   "short": "",
+   "x": 775,
+   "z": -1160,
+   "h": 37,
+   "w": 120
+  },
+  {
+   "name": "Raffles Place",
+   "short": "",
+   "x": 555,
+   "z": -991,
+   "h": 278
+  },
+  {
+   "name": "Helix Bridge",
+   "short": "",
+   "x": 1595,
+   "z": -1300,
+   "h": 20,
+   "w": 280
+  },
+  {
+   "name": "ArtScience Museum",
+   "short": "",
+   "x": 1464,
+   "z": -1143,
+   "h": 60
+  },
+  {
+   "name": "Cloud Forest",
+   "short": "",
+   "x": 2217,
+   "z": -900,
+   "h": 58
+  },
+  {
+   "name": "Flower Dome",
+   "short": "",
+   "x": 2064,
+   "z": -974,
+   "h": 38,
+   "w": 150
+  },
+  {
+   "name": "National Gallery",
+   "short": "",
+   "x": 597,
+   "z": -1608,
+   "h": 25,
+   "w": 200
+  },
+  {
+   "name": "Victoria Theatre",
+   "short": "",
+   "x": 610,
+   "z": -1397,
+   "h": 54
+  },
+  {
+   "name": "CapitaSpring",
+   "short": "280 m",
+   "x": 438,
+   "z": -902,
+   "h": 280
+  },
+  {
+   "name": "Marina Bay Financial Centre",
+   "short": "",
+   "x": 859,
+   "z": -427,
+   "h": 245
+  },
+  {
+   "name": "Raffles Hotel",
+   "short": "1887",
+   "x": 950,
+   "z": -2096,
+   "h": 20,
+   "w": 150
+  },
+  {
+   "name": "National Stadium",
+   "short": "",
+   "x": 3144,
+   "z": -3174,
+   "h": 83,
+   "w": 300
+  },
+  {
+   "name": "South Beach",
+   "short": "",
+   "x": 1144,
+   "z": -2192,
+   "h": 218
+  },
+  {
+   "name": "Suntec City",
+   "short": "",
+   "x": 1374,
+   "z": -2178,
+   "h": 181
+  },
+  {
+   "name": "Parkview Square",
+   "short": "",
+   "x": 1274,
+   "z": -2707,
+   "h": 144
+  },
+  {
+   "name": "Sultan Mosque",
+   "short": "1932",
+   "x": 1435,
+   "z": -2930,
+   "h": 40
+  },
+  {
+   "name": "Guoco Tower",
+   "short": "284 m",
+   "x": -48,
+   "z": -160,
+   "h": 284
+  }
+ ]
+}

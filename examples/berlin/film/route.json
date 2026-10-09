@@ -1,0 +1,435 @@
+{
+ "city": "berlin",
+ "title": "Berlin: Tiergarten to the Fernsehturm, at dusk",
+ "view": "Siegessäule",
+ "note": "scene metres: x east, y up (above the datum), z south. v: the speed (m/s) when passing the key, linear in distance between keys. turn: the yaw-rate cap is 40 deg/s there; helix: [x, z] the view is biased towards.",
+ "keys": [
+  {
+   "p": [
+    -4250,
+    85,
+    -330
+   ],
+   "v": 120,
+   "mark": "Victory Column pass (opening)"
+  },
+  {
+   "p": [
+    -3700,
+    90,
+    -400
+   ],
+   "v": 125
+  },
+  {
+   "p": [
+    -3227,
+    95,
+    -520
+   ],
+   "v": 140
+  },
+  {
+   "p": [
+    -2650,
+    90,
+    -560
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    -2000,
+    85,
+    -565
+   ],
+   "v": 190,
+   "mark": "Tiergarten, over the Brandenburg Gate"
+  },
+  {
+   "p": [
+    -1350,
+    75,
+    -566
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    -900,
+    80,
+    -610
+   ],
+   "v": 160
+  },
+  {
+   "p": [
+    -450,
+    85,
+    -640
+   ],
+   "v": 160,
+   "mark": "Unter den Linden to Museum Island"
+  },
+  {
+   "p": [
+    50,
+    100,
+    -700
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    400,
+    150,
+    -780
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    600,
+    200,
+    -800
+   ],
+   "v": 135,
+   "mark": "Past the Fernsehturm at sphere height"
+  },
+  {
+   "p": [
+    813,
+    210,
+    -790
+   ],
+   "v": 130
+  },
+  {
+   "p": [
+    1100,
+    225,
+    -830
+   ],
+   "v": 160
+  },
+  {
+   "p": [
+    1500,
+    240,
+    -860
+   ],
+   "v": 200,
+   "mark": "Karl-Marx-Allee east (sun behind)"
+  },
+  {
+   "p": [
+    2100,
+    260,
+    -680
+   ],
+   "v": 250
+  },
+  {
+   "p": [
+    2800,
+    260,
+    -520
+   ],
+   "v": 260
+  },
+  {
+   "p": [
+    3300,
+    255,
+    -420
+   ],
+   "v": 220
+  },
+  {
+   "p": [
+    3608.5,
+    250.8,
+    -342.1
+   ],
+   "v": 190.0,
+   "turn": true
+  },
+  {
+   "p": [
+    3843.1,
+    246.7,
+    -127.2
+   ],
+   "v": 175.35898384862247,
+   "turn": true
+  },
+  {
+   "p": [
+    3947.5,
+    242.5,
+    173.3
+   ],
+   "v": 170.0,
+   "turn": true
+  },
+  {
+   "p": [
+    3896.8,
+    238.3,
+    487.5
+   ],
+   "v": 175.35898384862244,
+   "turn": true
+  },
+  {
+   "p": [
+    3703.2,
+    234.2,
+    739.9
+   ],
+   "v": 190.0,
+   "turn": true
+  },
+  {
+   "p": [
+    3412.9,
+    230.0,
+    870.1
+   ],
+   "v": 210.0,
+   "turn": true
+  },
+  {
+   "p": [
+    3150,
+    220,
+    870
+   ],
+   "v": 170,
+   "mark": "Dusk: over the Spree, the tower against the afterglow"
+  },
+  {
+   "p": [
+    2700,
+    210,
+    500
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    2150,
+    205,
+    -60
+   ],
+   "v": 140
+  },
+  {
+   "p": [
+    1650,
+    201,
+    -390
+   ],
+   "v": 60
+  },
+  {
+   "p": [
+    1520,
+    200,
+    -480
+   ],
+   "v": 20
+  },
+  {
+   "p": [
+    1450,
+    200,
+    -530
+   ],
+   "v": 4
+  }
+ ],
+ "hold": 4.0,
+ "light": {
+  "day": 16.0,
+  "rampFrom": -36,
+  "split": 0.35,
+  "sunset": 18.4,
+  "end": 19.05
+ },
+ "end": {
+  "aim": [
+   813,
+   200,
+   -1022
+  ],
+  "text": "200 m up over Friedrichshain, 800 m from the tower, facing NW: the Fernsehturm centre, lit sphere, afterglow left behind it"
+ },
+ "labels": [
+  {
+   "name": "Fernsehturm",
+   "short": "368 m · 1969",
+   "x": 813,
+   "z": -1022,
+   "h": 368
+  },
+  {
+   "name": "Brandenburg Gate",
+   "short": "1791",
+   "x": -1350,
+   "z": -565,
+   "h": 26,
+   "w": 90
+  },
+  {
+   "name": "Reichstag",
+   "short": "1894",
+   "x": -1448,
+   "z": -828,
+   "h": 48
+  },
+  {
+   "name": "Berliner Dom",
+   "short": "",
+   "x": 237,
+   "z": -844,
+   "h": 98
+  },
+  {
+   "name": "Victory Column",
+   "short": "67 m · 1873",
+   "x": -3228,
+   "z": -410,
+   "h": 67
+  },
+  {
+   "name": "Red City Hall",
+   "short": "",
+   "x": 758,
+   "z": -765,
+   "h": 94
+  },
+  {
+   "name": "Humboldt Forum",
+   "short": "",
+   "x": 309,
+   "z": -708,
+   "h": 70
+  },
+  {
+   "name": "St Mary's Church",
+   "short": "",
+   "x": 608,
+   "z": -1013,
+   "h": 90
+  },
+  {
+   "name": "Museum Island",
+   "short": "",
+   "x": -22,
+   "z": -1094,
+   "h": 25,
+   "w": 300
+  },
+  {
+   "name": "Potsdamer Platz",
+   "short": "",
+   "x": -1482,
+   "z": 175,
+   "h": 103
+  },
+  {
+   "name": "Gendarmenmarkt",
+   "short": "",
+   "x": -339,
+   "z": -256,
+   "h": 70
+  },
+  {
+   "name": "State Opera",
+   "short": "",
+   "x": -176,
+   "z": -575,
+   "h": 27,
+   "w": 80
+  },
+  {
+   "name": "Unter den Linden",
+   "short": "",
+   "x": -785,
+   "z": -633,
+   "h": 20,
+   "w": 300
+  },
+  {
+   "name": "Chancellery",
+   "short": "",
+   "x": -1931,
+   "z": -1015,
+   "h": 36,
+   "w": 100
+  },
+  {
+   "name": "Holocaust Memorial",
+   "short": "",
+   "x": -1289,
+   "z": -299,
+   "h": 5,
+   "w": 150
+  },
+  {
+   "name": "Karl-Marx-Allee",
+   "short": "",
+   "x": 2134,
+   "z": -646,
+   "h": 35,
+   "w": 300
+  },
+  {
+   "name": "Frankfurter Tor",
+   "short": "",
+   "x": 3825,
+   "z": -398,
+   "h": 68
+  },
+  {
+   "name": "East Side Gallery",
+   "short": "",
+   "x": 2823,
+   "z": 737,
+   "h": 4,
+   "w": 300
+  },
+  {
+   "name": "Oberbaumbrücke",
+   "short": "1896",
+   "x": 3236,
+   "z": 1136,
+   "h": 34,
+   "w": 150
+  },
+  {
+   "name": "Ostbahnhof",
+   "short": "",
+   "x": 2516,
+   "z": 186,
+   "h": 25,
+   "w": 250
+  },
+  {
+   "name": "EDGE East Side Tower",
+   "short": "142 m",
+   "x": 3111,
+   "z": 643,
+   "h": 142
+  },
+  {
+   "name": "Uber Arena",
+   "short": "",
+   "x": 3074,
+   "z": 765,
+   "h": 28,
+   "w": 160
+  }
+ ]
+}

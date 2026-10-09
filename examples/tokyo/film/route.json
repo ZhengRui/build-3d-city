@@ -1,0 +1,548 @@
+{
+ "city": "tokyo",
+ "title": "Tokyo: a spiral round Tokyo Tower, Marunouchi, the Skytree at night",
+ "view": "Tokyo Tower from Shiba Park",
+ "helixYaw": 50,
+ "note": "scene metres: x east, y up (above the datum), z south. v: the speed (m/s) when passing the key, linear in distance between keys. turn: the yaw-rate cap is 40 deg/s there; helix: [x, z] the view is biased towards.",
+ "keys": [
+  {
+   "p": [
+    -899,
+    215,
+    2550
+   ],
+   "v": 120,
+   "mark": "Tokyo Tower: in from the south (opening)"
+  },
+  {
+   "p": [
+    -899,
+    225,
+    2150
+   ],
+   "v": 125
+  },
+  {
+   "p": [
+    -899,
+    240,
+    1750
+   ],
+   "v": 135,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -899,
+    255,
+    1317
+   ],
+   "v": 140,
+   "mark": "Spiral round Tokyo Tower",
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -865.3,
+    269.6,
+    1178.8
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -771.7,
+    284.3,
+    1071.7
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -639.3,
+    298.9,
+    1019.7
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -497.8,
+    313.6,
+    1034.6
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -379.1,
+    328.2,
+    1112.9
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -309.8,
+    342.9,
+    1237.2
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -305.6,
+    357.5,
+    1379.4
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -367.3,
+    372.1,
+    1507.5
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -481.1,
+    386.8,
+    1592.9
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -621.4,
+    401.4,
+    1616.2
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -756.7,
+    416.1,
+    1572.2
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -856.5,
+    430.7,
+    1470.9
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -898.5,
+    445.4,
+    1334.9
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -873.1,
+    460.0,
+    1195.0
+   ],
+   "v": 140,
+   "turn": true,
+   "helix": [
+    -599,
+    1317
+   ]
+  },
+  {
+   "p": [
+    -560,
+    420,
+    600
+   ],
+   "v": 200,
+   "mark": "Toranomon and Kasumigaseki, over the towers"
+  },
+  {
+   "p": [
+    -380,
+    330,
+    150
+   ],
+   "v": 230
+  },
+  {
+   "p": [
+    -50,
+    290,
+    -400
+   ],
+   "v": 240
+  },
+  {
+   "p": [
+    400,
+    270,
+    -800
+   ],
+   "v": 240
+  },
+  {
+   "p": [
+    880,
+    280,
+    -1120
+   ],
+   "v": 220,
+   "mark": "Marunouchi and Tokyo Station"
+  },
+  {
+   "p": [
+    1300,
+    280,
+    -1430
+   ],
+   "v": 210
+  },
+  {
+   "p": [
+    1850,
+    255,
+    -1250
+   ],
+   "v": 240
+  },
+  {
+   "p": [
+    2500,
+    210,
+    -1050
+   ],
+   "v": 260,
+   "mark": "Nihonbashi to the Sumida"
+  },
+  {
+   "p": [
+    3150,
+    175,
+    -1120
+   ],
+   "v": 260
+  },
+  {
+   "p": [
+    3634,
+    155,
+    -1300
+   ],
+   "v": 250
+  },
+  {
+   "p": [
+    3522,
+    160,
+    -2062
+   ],
+   "v": 270,
+   "mark": "Dusk on the river: Ryogoku, Kuramae, the Skytree ahead"
+  },
+  {
+   "p": [
+    3409,
+    180,
+    -2512
+   ],
+   "v": 250
+  },
+  {
+   "p": [
+    3550,
+    210,
+    -2950
+   ],
+   "v": 190
+  },
+  {
+   "p": [
+    3700,
+    235,
+    -3300
+   ],
+   "v": 130
+  },
+  {
+   "p": [
+    3860,
+    246,
+    -3530
+   ],
+   "v": 70
+  },
+  {
+   "p": [
+    3950,
+    249,
+    -3640
+   ],
+   "v": 30
+  },
+  {
+   "p": [
+    4000,
+    250,
+    -3700
+   ],
+   "v": 4
+  }
+ ],
+ "hold": 4.0,
+ "light": {
+  "day": 15.0,
+  "rampFrom": -36,
+  "sunset": 17.05,
+  "end": 18.0
+ },
+ "end": {
+  "aim": [
+   5370,
+   260,
+   -4333
+  ],
+  "text": "250 m over the Sumida at Kuramae, facing ENE: the Skytree lit"
+ },
+ "labels": [
+  {
+   "name": "Tokyo Tower",
+   "short": "333 m · 1958",
+   "x": -599,
+   "z": 1317,
+   "h": 333
+  },
+  {
+   "name": "Tokyo Skytree",
+   "short": "634 m · 2012",
+   "x": 5370,
+   "z": -4333,
+   "h": 634
+  },
+  {
+   "name": "Tokyo Station",
+   "short": "1914",
+   "x": 1283,
+   "z": -1177,
+   "h": 35,
+   "w": 330
+  },
+  {
+   "name": "Imperial Palace",
+   "short": "",
+   "x": 161,
+   "z": -1088,
+   "h": 20,
+   "w": 600
+  },
+  {
+   "name": "National Diet",
+   "short": "1936",
+   "x": -619,
+   "z": -618,
+   "h": 65
+  },
+  {
+   "name": "Sensō-ji",
+   "short": "",
+   "x": 4113,
+   "z": -4866,
+   "h": 48
+  },
+  {
+   "name": "Azabudai Hills",
+   "short": "325 m",
+   "x": -1038,
+   "z": 1046,
+   "h": 325
+  },
+  {
+   "name": "Zōjō-ji",
+   "short": "",
+   "x": -342,
+   "z": 1437,
+   "h": 25,
+   "w": 100
+  },
+  {
+   "name": "Toranomon Hills",
+   "short": "",
+   "x": -235,
+   "z": 390,
+   "h": 256
+  },
+  {
+   "name": "Marunouchi Building",
+   "short": "",
+   "x": 1091,
+   "z": -1185,
+   "h": 180
+  },
+  {
+   "name": "Tokyo Torch",
+   "short": "212 m",
+   "x": 1706,
+   "z": -1507,
+   "h": 212
+  },
+  {
+   "name": "Tokyo International Forum",
+   "short": "",
+   "x": 1056,
+   "z": -697,
+   "h": 60
+  },
+  {
+   "name": "Nihonbashi",
+   "short": "1911",
+   "x": 2058,
+   "z": -1492,
+   "h": 10,
+   "w": 50
+  },
+  {
+   "name": "Kiyosu Bridge",
+   "short": "1928",
+   "x": 3637,
+   "z": -1282,
+   "h": 25,
+   "w": 180
+  },
+  {
+   "name": "Ryōgoku Bridge",
+   "short": "",
+   "x": 3745,
+   "z": -2517,
+   "h": 15,
+   "w": 170
+  },
+  {
+   "name": "Kuramae Bridge",
+   "short": "",
+   "x": 3848,
+   "z": -3570,
+   "h": 15,
+   "w": 170
+  },
+  {
+   "name": "Ryōgoku Kokugikan",
+   "short": "",
+   "x": 3768,
+   "z": -2894,
+   "h": 40,
+   "w": 150
+  },
+  {
+   "name": "Asahi Beer Hall",
+   "short": "",
+   "x": 4247,
+   "z": -4352,
+   "h": 95
+  },
+  {
+   "name": "Akihabara",
+   "short": "",
+   "x": 1911,
+   "z": -3427,
+   "h": 138
+  },
+  {
+   "name": "Ueno Park",
+   "short": "",
+   "x": 2001,
+   "z": -4901,
+   "h": 20,
+   "w": 500
+  },
+  {
+   "name": "Nijūbashi",
+   "short": "",
+   "x": 161,
+   "z": -1086,
+   "h": 10,
+   "w": 60
+  }
+ ]
+}

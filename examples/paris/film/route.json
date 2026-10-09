@@ -1,0 +1,579 @@
+{
+ "city": "paris",
+ "title": "Paris: the Tower, the Seine, Montmartre, the Étoile, the Champs-Élysées in golden light",
+ "view": "Eiffel Tower from the Trocadéro",
+ "note": "scene metres: x east, y up (above the datum), z south. v: the speed (m/s) when passing the key, linear in distance between keys. turn: the yaw-rate cap is 40 deg/s there; helix: [x, z] the view is biased towards.",
+ "keys": [
+  {
+   "p": [
+    -4700,
+    174,
+    560
+   ],
+   "v": 130,
+   "mark": "Eiffel Tower pass (opening)"
+  },
+  {
+   "p": [
+    -4250,
+    180,
+    60
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    -3880,
+    185,
+    -330
+   ],
+   "v": 165,
+   "mark": "Down the Seine: Grand Palais, Invalides"
+  },
+  {
+   "p": [
+    -3400,
+    180,
+    -610
+   ],
+   "v": 230
+  },
+  {
+   "p": [
+    -2800,
+    170,
+    -660
+   ],
+   "v": 280
+  },
+  {
+   "p": [
+    -2200,
+    160,
+    -620
+   ],
+   "v": 280
+  },
+  {
+   "p": [
+    -1650,
+    150,
+    -480
+   ],
+   "v": 250
+  },
+  {
+   "p": [
+    -1150,
+    140,
+    -300
+   ],
+   "v": 220,
+   "mark": "Louvre and Orsay"
+  },
+  {
+   "p": [
+    -600,
+    135,
+    -110
+   ],
+   "v": 200
+  },
+  {
+   "p": [
+    -100,
+    140,
+    220
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    200,
+    150,
+    470
+   ],
+   "v": 150,
+   "mark": "Notre-Dame, then one wide left turn north",
+   "turn": true
+  },
+  {
+   "p": [
+    427.3,
+    180.0,
+    578.1
+   ],
+   "v": 176.0,
+   "turn": true
+  },
+  {
+   "p": [
+    678.8,
+    200.0,
+    561.4
+   ],
+   "v": 192.0,
+   "turn": true
+  },
+  {
+   "p": [
+    890.2,
+    220.0,
+    424.2
+   ],
+   "v": 208.0,
+   "turn": true
+  },
+  {
+   "p": [
+    1007.8,
+    240.0,
+    201.2
+   ],
+   "v": 224.0,
+   "turn": true
+  },
+  {
+   "p": [
+    1001.6,
+    260.0,
+    -50.8
+   ],
+   "v": 240.0,
+   "turn": true
+  },
+  {
+   "p": [
+    520,
+    300,
+    -1730
+   ],
+   "v": 300,
+   "mark": "North over the Marais, Sacré-Cœur on the left"
+  },
+  {
+   "p": [
+    140,
+    310,
+    -3000
+   ],
+   "v": 250,
+   "turn": true
+  },
+  {
+   "p": [
+    -42.0,
+    307.5,
+    -3520.6
+   ],
+   "v": 230,
+   "turn": true
+  },
+  {
+   "p": [
+    -232.6,
+    305.0,
+    -3673.6
+   ],
+   "v": 230,
+   "turn": true
+  },
+  {
+   "p": [
+    -468.4,
+    302.5,
+    -3737.9
+   ],
+   "v": 230,
+   "turn": true
+  },
+  {
+   "p": [
+    -710.2,
+    300.0,
+    -3702.8
+   ],
+   "v": 230,
+   "turn": true
+  },
+  {
+   "p": [
+    -2460,
+    285,
+    -3140
+   ],
+   "v": 300,
+   "mark": "One diagonal leg south-west to the Étoile",
+   "turn": true
+  },
+  {
+   "p": [
+    -3600,
+    250,
+    -2780
+   ],
+   "v": 220,
+   "turn": true
+  },
+  {
+   "p": [
+    -4349.6,
+    222.0,
+    -2481.9
+   ],
+   "v": 176.0,
+   "turn": true
+  },
+  {
+   "p": [
+    -4429.8,
+    209.0,
+    -2336.8
+   ],
+   "v": 172.0,
+   "turn": true
+  },
+  {
+   "p": [
+    -4434.1,
+    196.0,
+    -2171.0
+   ],
+   "v": 168.0,
+   "turn": true
+  },
+  {
+   "p": [
+    -4361.7,
+    183.0,
+    -2021.9
+   ],
+   "v": 164.0,
+   "turn": true
+  },
+  {
+   "p": [
+    -4228.8,
+    170.0,
+    -1922.8
+   ],
+   "v": 160.0,
+   "turn": true
+  },
+  {
+   "p": [
+    -3815,
+    150,
+    -1619
+   ],
+   "v": 190,
+   "mark": "Over the Arc de Triomphe, down the Champs-Élysées"
+  },
+  {
+   "p": [
+    -3300,
+    140,
+    -1370
+   ],
+   "v": 220
+  },
+  {
+   "p": [
+    -2900,
+    135,
+    -1170
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    -2680,
+    132,
+    -1060
+   ],
+   "v": 60
+  },
+  {
+   "p": [
+    -2559,
+    130,
+    -1000
+   ],
+   "v": 4
+  }
+ ],
+ "hold": 4.0,
+ "light": {
+  "day": 16.25,
+  "rampFrom": -30,
+  "sunset": 18.5,
+  "end": 18.85
+ },
+ "end": {
+  "aim": [
+   -1350,
+   20,
+   -560
+  ],
+  "text": "130 m over the Champs-Élysées (Rond-Point), facing ESE: the Concorde obelisk, the Tuileries and the Louvre ahead in the low sun from behind, the Seine right"
+ },
+ "labels": [
+  {
+   "name": "Eiffel Tower",
+   "short": "330 m · 1889",
+   "x": -3836,
+   "z": 22,
+   "h": 330
+  },
+  {
+   "name": "Arc de Triomphe",
+   "short": "1836",
+   "x": -3783,
+   "z": -1705,
+   "h": 50,
+   "w": 45
+  },
+  {
+   "name": "Notre-Dame",
+   "short": "1345",
+   "x": 223,
+   "z": 643,
+   "h": 96
+  },
+  {
+   "name": "Louvre",
+   "short": "",
+   "x": -804,
+   "z": -266,
+   "h": 30,
+   "w": 400
+  },
+  {
+   "name": "Sacré-Cœur",
+   "short": "1914",
+   "x": -244,
+   "z": -3107,
+   "h": 83
+  },
+  {
+   "name": "Champs-Élysées",
+   "short": "",
+   "x": -2863,
+   "z": -1252,
+   "h": 20,
+   "w": 400
+  },
+  {
+   "name": "Place de la Concorde",
+   "short": "",
+   "x": -1870,
+   "z": -776,
+   "h": 23,
+   "w": 250
+  },
+  {
+   "name": "Grand Palais",
+   "short": "",
+   "x": -2508,
+   "z": -837,
+   "h": 45,
+   "w": 240
+  },
+  {
+   "name": "Les Invalides",
+   "short": "1706",
+   "x": -2519,
+   "z": 386,
+   "h": 107
+  },
+  {
+   "name": "Pont Alexandre III",
+   "short": "",
+   "x": -2429,
+   "z": -592,
+   "h": 20,
+   "w": 160
+  },
+  {
+   "name": "Musée d'Orsay",
+   "short": "",
+   "x": -1487,
+   "z": -150,
+   "h": 35,
+   "w": 180
+  },
+  {
+   "name": "Opéra Garnier",
+   "short": "",
+   "x": -1101,
+   "z": -1480,
+   "h": 56
+  },
+  {
+   "name": "La Madeleine",
+   "short": "",
+   "x": -1624,
+   "z": -1263,
+   "h": 30,
+   "w": 100
+  },
+  {
+   "name": "Sainte-Chapelle",
+   "short": "",
+   "x": -134,
+   "z": 373,
+   "h": 75
+  },
+  {
+   "name": "Conciergerie",
+   "short": "",
+   "x": -90,
+   "z": 307,
+   "h": 45
+  },
+  {
+   "name": "Pont Neuf",
+   "short": "",
+   "x": -404,
+   "z": 171,
+   "h": 15,
+   "w": 230
+  },
+  {
+   "name": "Hôtel de Ville",
+   "short": "",
+   "x": 395,
+   "z": 244,
+   "h": 50,
+   "w": 140
+  },
+  {
+   "name": "Centre Pompidou",
+   "short": "",
+   "x": 399,
+   "z": -200,
+   "h": 42,
+   "w": 160
+  },
+  {
+   "name": "Tuileries",
+   "short": "",
+   "x": -1410,
+   "z": -538,
+   "h": 10,
+   "w": 300
+  },
+  {
+   "name": "Tour Saint-Jacques",
+   "short": "",
+   "x": 147,
+   "z": 87,
+   "h": 52
+  },
+  {
+   "name": "Panthéon",
+   "short": "",
+   "x": -62,
+   "z": 1397,
+   "h": 83
+  },
+  {
+   "name": "Assemblée nationale",
+   "short": "",
+   "x": -2072,
+   "z": -366,
+   "h": 30,
+   "w": 120
+  },
+  {
+   "name": "Montparnasse Tower",
+   "short": "210 m",
+   "x": -1835,
+   "z": 1837,
+   "h": 210
+  },
+  {
+   "name": "Saint-Eustache",
+   "short": "",
+   "x": -119,
+   "z": -516,
+   "h": 58
+  },
+  {
+   "name": "Gare du Nord",
+   "short": "",
+   "x": 645,
+   "z": -2455,
+   "h": 30,
+   "w": 200
+  },
+  {
+   "name": "Gare de l'Est",
+   "short": "",
+   "x": 927,
+   "z": -1997,
+   "h": 30,
+   "w": 180
+  },
+  {
+   "name": "Place de la République",
+   "short": "",
+   "x": 1249,
+   "z": -960,
+   "h": 15,
+   "w": 200
+  },
+  {
+   "name": "Place des Vosges",
+   "short": "",
+   "x": 1370,
+   "z": 364,
+   "h": 20,
+   "w": 140
+  },
+  {
+   "name": "Moulin Rouge",
+   "short": "",
+   "x": -1045,
+   "z": -2825,
+   "h": 20
+  },
+  {
+   "name": "Gare Saint-Lazare",
+   "short": "",
+   "x": -1559,
+   "z": -1963,
+   "h": 30,
+   "w": 220
+  },
+  {
+   "name": "Saint-Augustin",
+   "short": "",
+   "x": -2036,
+   "z": -1900,
+   "h": 60
+  },
+  {
+   "name": "Parc Monceau",
+   "short": "",
+   "x": -2765,
+   "z": -2351,
+   "h": 15,
+   "w": 400
+  },
+  {
+   "name": "Saint-Sulpice",
+   "short": "",
+   "x": -887,
+   "z": 856,
+   "h": 73
+  },
+  {
+   "name": "La Défense",
+   "short": "",
+   "x": -8089,
+   "z": -3770,
+   "h": 200
+  }
+ ]
+}

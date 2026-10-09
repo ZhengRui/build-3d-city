@@ -1,0 +1,444 @@
+{
+ "city": "hongkong",
+ "title": "Hong Kong: the harbour to the Peak, at night",
+ "view": "Victoria Harbour",
+ "note": "scene metres: x east, y up (above the datum), z south. v: the speed (m/s) when passing the key, linear in distance between keys. turn: the yaw-rate cap is 40 deg/s there; helix: [x, z] the view is biased towards.",
+ "keys": [
+  {
+   "p": [
+    -8500,
+    140,
+    3700
+   ],
+   "v": 140,
+   "mark": "West harbour: ICC and IFC frame the run (opening)"
+  },
+  {
+   "p": [
+    -7700,
+    145,
+    3800
+   ],
+   "v": 150
+  },
+  {
+   "p": [
+    -6900,
+    150,
+    3880
+   ],
+   "v": 180
+  },
+  {
+   "p": [
+    -6200,
+    150,
+    3930
+   ],
+   "v": 210
+  },
+  {
+   "p": [
+    -5600,
+    150,
+    3980
+   ],
+   "v": 230,
+   "mark": "Between the skylines: IFC right, TST left"
+  },
+  {
+   "p": [
+    -4900,
+    150,
+    4100
+   ],
+   "v": 260
+  },
+  {
+   "p": [
+    -4100,
+    160,
+    4250
+   ],
+   "v": 280
+  },
+  {
+   "p": [
+    -3400,
+    180,
+    4380
+   ],
+   "v": 290
+  },
+  {
+   "p": [
+    -2700,
+    220,
+    4500
+   ],
+   "v": 240,
+   "mark": "Turn over North Point (sunset)"
+  },
+  {
+   "p": [
+    -2525.0,
+    250.0,
+    4546.9
+   ],
+   "v": 190,
+   "turn": true
+  },
+  {
+   "p": [
+    -2396.9,
+    260.0,
+    4675.0
+   ],
+   "v": 190,
+   "turn": true
+  },
+  {
+   "p": [
+    -2350.0,
+    270.0,
+    4850.0
+   ],
+   "v": 190,
+   "turn": true
+  },
+  {
+   "p": [
+    -2396.9,
+    280.0,
+    5025.0
+   ],
+   "v": 190,
+   "turn": true
+  },
+  {
+   "p": [
+    -2525.0,
+    290.0,
+    5153.1
+   ],
+   "v": 190,
+   "turn": true
+  },
+  {
+   "p": [
+    -2700.0,
+    300.0,
+    5200.0
+   ],
+   "v": 190,
+   "turn": true
+  },
+  {
+   "p": [
+    -3300,
+    300,
+    5050
+   ],
+   "v": 230,
+   "mark": "West along the Island: Central Plaza, BoC"
+  },
+  {
+   "p": [
+    -4000,
+    300,
+    4780
+   ],
+   "v": 260
+  },
+  {
+   "p": [
+    -4700,
+    320,
+    4760
+   ],
+   "v": 250
+  },
+  {
+   "p": [
+    -5150,
+    360,
+    4830
+   ],
+   "v": 200
+  },
+  {
+   "p": [
+    -5450,
+    430,
+    5100
+   ],
+   "v": 190,
+   "mark": "Up the Mid-Levels (night falls)"
+  },
+  {
+   "p": [
+    -5750,
+    520,
+    5700
+   ],
+   "v": 170
+  },
+  {
+   "p": [
+    -6078,
+    600,
+    6427
+   ],
+   "v": 140,
+   "mark": "Over the summit, round to the view"
+  },
+  {
+   "p": [
+    -6220.2,
+    586.0,
+    6539.2
+   ],
+   "v": 122.3973688765007,
+   "turn": true
+  },
+  {
+   "p": [
+    -6399.7,
+    572.0,
+    6564.4
+   ],
+   "v": 108.49651191085502,
+   "turn": true
+  },
+  {
+   "p": [
+    -6567.6,
+    558.0,
+    6496.5
+   ],
+   "v": 90.49556986868436,
+   "turn": true
+  },
+  {
+   "p": [
+    -6679.2,
+    544.0,
+    6353.8
+   ],
+   "v": 69.17895101200571,
+   "turn": true
+  },
+  {
+   "p": [
+    -6704.4,
+    530.0,
+    6174.3
+   ],
+   "v": 45.0,
+   "turn": true
+  },
+  {
+   "p": [
+    -6637,
+    515,
+    6006
+   ],
+   "v": 4
+  }
+ ],
+ "hold": 4.0,
+ "light": {
+  "day": 15.0,
+  "rampFrom": -42,
+  "sunset": 17.7,
+  "end": 19.0
+ },
+ "end": {
+  "aim": [
+   -5492,
+   5,
+   4486
+  ],
+  "text": "The Peak's night view (preset), 515 m up, facing NE: Central and Admiralty below, the harbour, Kowloon lit beyond"
+ },
+ "labels": [
+  {
+   "name": "IFC",
+   "short": "412 m",
+   "x": -5669,
+   "z": 4449,
+   "h": 412
+  },
+  {
+   "name": "ICC",
+   "short": "484 m",
+   "x": -5534,
+   "z": 2448,
+   "h": 484,
+   "reach": 4500
+  },
+  {
+   "name": "Bank of China Tower",
+   "short": "367 m",
+   "x": -5446,
+   "z": 5122,
+   "h": 367
+  },
+  {
+   "name": "The Peak Tower",
+   "short": "1997",
+   "x": -6657,
+   "z": 5987,
+   "h": 30,
+   "w": 60
+  },
+  {
+   "name": "Clock Tower",
+   "short": "1915",
+   "x": -4594,
+   "z": 3551,
+   "h": 44
+  },
+  {
+   "name": "Cultural Centre",
+   "short": "",
+   "x": -4524,
+   "z": 3537,
+   "h": 40,
+   "w": 200
+  },
+  {
+   "name": "Central Plaza",
+   "short": "374 m",
+   "x": -4198,
+   "z": 5064,
+   "h": 374
+  },
+  {
+   "name": "Convention Centre",
+   "short": "",
+   "x": -4274,
+   "z": 4657,
+   "h": 30,
+   "w": 300
+  },
+  {
+   "name": "HSBC Building",
+   "short": "",
+   "x": -5653,
+   "z": 5005,
+   "h": 179
+  },
+  {
+   "name": "Lion Rock",
+   "short": "495 m",
+   "x": -2654,
+   "z": -2998,
+   "h": 3,
+   "hill": true,
+   "reach": 11000
+  },
+  {
+   "name": "Victoria Dockside",
+   "short": "",
+   "x": -3951,
+   "z": 3419,
+   "h": 284
+  },
+  {
+   "name": "The Peninsula",
+   "short": "1928",
+   "x": -4385,
+   "z": 3366,
+   "h": 100
+  },
+  {
+   "name": "Avenue of Stars",
+   "short": "",
+   "x": -4062,
+   "z": 3485,
+   "h": 10,
+   "w": 300
+  },
+  {
+   "name": "M+",
+   "short": "",
+   "x": -5649,
+   "z": 2728,
+   "h": 65,
+   "w": 200
+  },
+  {
+   "name": "Palace Museum",
+   "short": "",
+   "x": -6024,
+   "z": 2633,
+   "h": 50
+  },
+  {
+   "name": "Lippo Centre",
+   "short": "",
+   "x": -5244,
+   "z": 5115,
+   "h": 186
+  },
+  {
+   "name": "Cheung Kong Center",
+   "short": "",
+   "x": -5578,
+   "z": 5100,
+   "h": 283
+  },
+  {
+   "name": "Jardine House",
+   "short": "",
+   "x": -5687,
+   "z": 4704,
+   "h": 178
+  },
+  {
+   "name": "Government HQ",
+   "short": "",
+   "x": -5010,
+   "z": 4977,
+   "h": 126
+  },
+  {
+   "name": "Hopewell Centre",
+   "short": "",
+   "x": -4383,
+   "z": 5653,
+   "h": 216
+  },
+  {
+   "name": "Times Square",
+   "short": "",
+   "x": -3325,
+   "z": 5269,
+   "h": 194
+  },
+  {
+   "name": "Victoria Park",
+   "short": "",
+   "x": -2657,
+   "z": 4824,
+   "h": 10,
+   "w": 400
+  },
+  {
+   "name": "One Island East",
+   "short": "298 m",
+   "x": -36,
+   "z": 4454,
+   "h": 298
+  },
+  {
+   "name": "Hong Kong Coliseum",
+   "short": "",
+   "x": -3288,
+   "z": 2708,
+   "h": 30,
+   "w": 120
+  }
+ ]
+}
